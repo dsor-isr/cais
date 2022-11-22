@@ -59,13 +59,13 @@ def update_second_level_dir(input_value):
     #if not (type(input_value) == str):
     #    # If the app is loading for the first time
     #    return [{'label': i, 'value': i} for i in fn.get_directory_content()]
-
-    if not (fn.is_part_of_path(fn.get_pwd(),input_value)):
+    input_value = str(input_value)
+    if not (fn.is_part_of_path(fn.get_pwd(),input_value)) and input_value != 'None':
         # If the path actually changed
         ##fn.change_directory(home)
         fn.change_directory(last_directories[0])
         path = fn.extend_dir(input_value)
-        fn.change_directory(path)
+        fn.change_directory(str(path))
         last_directories[1] = path
 
         return [{'label': i, 'value': i} for i in fn.get_directory_content()]
@@ -85,8 +85,8 @@ def update_third_level_dir(input_value):
     #if not (type(input_value) == str):
     #    # If the app is loading for the first time
     #    return
-
-    if not (fn.is_part_of_path(fn.get_pwd(), input_value)):
+    input_value = str(input_value)
+    if not (fn.is_part_of_path(fn.get_pwd(), input_value)) and input_value != 'None':
         #fn.change_directory(last_dir)
         fn.change_directory(last_directories[1])
         path = fn.extend_dir(input_value)
@@ -111,8 +111,10 @@ def update_plot(input_value):
     #
     ##if not (fn.is_image(input_value)):
     ##    return
-
-    path = fn.extend_dir(input_value)
+    input_value = str(input_value)
+    if input_value == 'None':
+        return
+    path = fn.extend_dir(str(input_value))
 
     return b64_image(path)
 

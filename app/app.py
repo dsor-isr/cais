@@ -8,7 +8,6 @@ import base64
 home = fn.get_pwd()
 last_directories = [home, home]
 
-
 image_path = 'images/cats/cat-png-17.png'
 
 # Using base64 encoding and decoding
@@ -22,6 +21,8 @@ def b64_image(image_filename):
 
 
 app = Dash(__name__)
+
+server = app.server
 
 app.layout = html.Div([
     html.Div(children=[

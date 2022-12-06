@@ -67,6 +67,18 @@ def is_png_file(file):
     return re.search("\.png$", file) != None
 
 
+def is_html_file(file):
+    """Takes a string and checks if it has a .html extension."""
+
+    # TODO could become more robust by checking if the data content is of the type
+    # text/html. This ought to work for files without an html extension, but that are html files
+
+    if not (type(file) == str):
+        raise TypeError("Input should be of type str, but an object of type {t} was received.".format(type(file)))
+
+    return re.search("\.html$", file) != None
+
+
 def is_image(file):
     """Takes a string and checks if it has a .png or .jpg extension"""
 
@@ -111,6 +123,15 @@ def filter_out_text_files(files):
         raise TypeError("Input should be a list, but an object of type {t} was received.".format(type(files)))
     
     return [file for file in files if not (is_txt_file(file))]
+
+
+def filter_out_html_files(files):
+    """Takes a list of files and removes all files with a .html extension"""
+
+    if not (type(files) == list):
+        raise TypeError("Input should be a list, but an object of type {t} was received.".format(type(files)))
+    
+    return [file for file in files if not (is_html_file(file))]
 
 
 def filter_out_images(files):
@@ -220,11 +241,25 @@ def get_txt_files():
     return [file for file in files if (is_txt_file(file))]
 
 
+def get_html_files():
+    """Lists all .html files in the current working directory.
+    
+    Note: Calls os.listdir(path='.'), as such, the behaviour is unspecified if
+    files are created or deleted during the call of this function. For more
+    information, check the documentation for python's os module
+    https://docs.python.org/3/library/os.html#"""
+
+    files = os.listdir(path='.')
+    
+    return [file for file in files if (is_html_file(file))]
+
+
 def get_directory_content(ignore_hidden_files=True, ignore_text_files=False, 
-                        ignore_directories=False, ignore_files=False, ignore_images=False):
+                        ignore_directories=False, ignore_files=False, ignore_images=False,
+                        ignore_html=False):
     """Lists all files and directories on the current working directory.
     Default behaviour is to remove hidden files from output. To include 
-    hidden files, set ignore_hidden_files to False. Directories, .txts 
+    hidden files, set ignore_hidden_files to False. Directories, .txts, .html 
     and other files are kept, unless the respective flags are used.
     
     Note: Calls os.listdir(path='.'), as such, the behaviour is unspecified if
@@ -249,6 +284,9 @@ def get_directory_content(ignore_hidden_files=True, ignore_text_files=False,
     if (ignore_images == True):
         # Remove images from output
         files = filter_out_images(files)
+    if (ignore_html == True):
+        # Remove images from output
+        files = filter_out_html_files(files)
 
     return files
 

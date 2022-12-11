@@ -6,9 +6,9 @@ import file_navigation as fn
 import base64
 
 home = fn.get_pwd()
-last_directories = [home, home]
+last_directories = [home, home, home]
 
-image_path = 'images/cats/cat-png-17.png'
+#image_path = 'images/cats/cat-png-17.png'
 
 # Using base64 encoding and decoding
 def b64_image(image_filename):
@@ -18,7 +18,8 @@ def b64_image(image_filename):
 
     return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
 
-
+def path_cat(path):
+    return path[path.find('assets'):]
 
 app = Dash(__name__)
 
@@ -41,9 +42,21 @@ app.layout = html.Div([
         id='Third level dir'),
 
         html.Br(),
-        html.H1('Pets'),
-        html.Img(src=b64_image(image_path),
+        html.Label('Fourth level Directory'),
+        dcc.Dropdown((),
+        id='Fourth level dir'),
+
+        html.Br(),
+        dcc.Link('CLICK HERE TO PLOT',
+        href='',
+        target='_blank',
+        refresh=True,
         id='plot'),
+
+        #html.Br(),
+        #html.H1('Pets'),
+        #html.Img(src=b64_image(image_path),
+        #id='plot'),
 
     ], style={'padding': 10, 'flex': 1}),
 
@@ -52,7 +65,6 @@ app.layout = html.Div([
 
 @app.callback(
     Output('Second level dir', 'options'),
-    #Output('Third level dir', 'options'),
     Input('Home directory', 'value'),
 )
 def update_second_level_dir(input_value):
@@ -68,36 +80,52 @@ def update_second_level_dir(input_value):
     
     return ()
 
-
 @app.callback(
     Output('Third level dir', 'options'),
     Input('Second level dir', 'value'),
 )
 def update_third_level_dir(input_value):
 
-    if (type(input_value) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value)):
+    if (type(input_value) == str) and not (fn.is_part_of_path(fn.get_pwd(),input_value)):
+        # If the path actually changed
         fn.change_directory(last_directories[1])
+        path = fn.extend_dir(input_value)
+        fn.change_directory(str(path))
+        last_directories[2] = path
+
+        return [{'label': i, 'value': i} for i in fn.get_directories()]
+    
+    return ()
+
+@app.callback(
+    Output('Fourth level dir', 'options'),
+    Input('Third level dir', 'value'),
+)
+def update_fourth_level_dir(input_value):
+
+    if (type(input_value) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value)):
+        fn.change_directory(last_directories[2])
         path = fn.extend_dir(input_value)
         fn.change_directory(path)
 
 
-        return [{'label': i, 'value': i} for i in fn.get_images()]
+        return [{'label': i, 'value': i} for i in fn.get_html_files()]
     
     return ()
 
 
 @app.callback(
-    Output('plot', 'src'),
-    Input('Third level dir', 'value'),
+    Output('plot', 'href'),
+    Input('Fourth level dir', 'value'),
 )
 def update_plot(input_value):
 
     if input_value == None:
-        return
+        return ''
 
     path = fn.extend_dir(str(input_value))
-
-    return b64_image(path)
+    
+    return path_cat(path)
 
 
 

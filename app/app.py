@@ -6,7 +6,7 @@ import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import file_navigation as fn
 import base64
-
+import webbrowser
 
 ##############################
 ###    Global Variables    ###
@@ -15,6 +15,8 @@ import base64
 
 home = fn.get_pwd()
 last_directories = [home, home, home]
+plot_dir = home
+host = 'http://127.0.0.1:8050/'
 
 dsor_logo = 'assets/logos/DSOR_logo_v05a.jpg'
 isr_logo = 'assets/logos/isr_logo_red_background.png'
@@ -128,8 +130,14 @@ app.layout = html.Div([
         refresh=True,
         id='plot'),
 
+        html.Button('open directory',
+        id='plot button',
+        n_clicks=0,
+        style={'margin-left': '40px'}),
+        html.Div(id='hidden-div', style={'display':'none'}),        
 
     ], style={'padding': 10, 'flex': 1}),
+    
 
 
 ], style={'display': 'flex', 'flex-direction': 'row'})
@@ -185,10 +193,25 @@ def update_fourth_level_dir(input_value):
         path = fn.extend_dir(input_value)
         fn.change_directory(path)
 
+        global plot_dir
+        plot_dir = path
 
         return [{'label': i, 'value': i} for i in fn.get_html_files()]
     
     return ()
+
+@app.callback(
+    Output('hidden-div', 'children'),
+    Input('plot button', 'n_clicks'),
+)
+def plot_directory(n_clicks):
+    if plot_dir != home:
+        fn.change_directory(plot_dir)
+        for files in fn.get_html_files():
+            path = fn.extend_dir(files)
+            webbrowser.open_new_tab(host + path_cat(path))
+
+    return html.Div('')
 
 
 @app.callback(

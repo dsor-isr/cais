@@ -2,33 +2,108 @@
 # visit http://127.0.0.1:8050/ in your web browser.
 
 from dash import Dash, html, dcc, Input, Output
+import dash_bootstrap_components as dbc
+from dash_bootstrap_templates import load_figure_template
 import file_navigation as fn
 import base64
+
+
+##############################
+###    Global Variables    ###
+##############################
+
 
 home = fn.get_pwd()
 last_directories = [home, home, home]
 
-#image_path = 'images/cats/cat-png-17.png'
+dsor_logo = 'assets/logos/DSOR_logo_v05a.jpg'
+isr_logo = 'assets/logos/isr_logo_red_background.png'
+
+
+##############################
+###   Auxilary Functions   ###
+##############################
 
 # Using base64 encoding and decoding
 def b64_image(image_filename):
+    """Take the path to an image and use base 64 to process file"""
 
     with open(image_filename, 'rb') as f:
         image = f.read()
 
     return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
 
+
 def path_cat(path):
     return path[path.find('assets'):]
 
-app = Dash(__name__)
+
+##############################
+###     Custom Bootstrap   ###
+###        Components      ###
+##############################
+
+
+# Nav/Footer placed at the bottom of the html page
+nav = dbc.Nav(
+    [
+        html.Br(),
+        dbc.NavItem(dbc.NavLink("Institute for Systems and Robotics", href="https://welcome.isr.tecnico.ulisboa.pt/")),
+        html.Br(),
+        dbc.NavItem(dbc.NavLink("Dynamical Systems and Ocean Robotics", href="https://welcome.isr.tecnico.ulisboa.pt/projects_cat/dsor/")),
+        html.Br(),
+        dbc.NavItem(dbc.NavLink("Instituto Superior Técnico", href="https://tecnico.ulisboa.pt/pt/")),
+        html.Br(),
+
+    ], style={'position':'fixed', 'bottom':0, 'width':'100%'},
+)
+
+
+##############################
+###        HTML Layout     ###
+##############################
+
+
+load_figure_template('CERULEAN')
+
+app = Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
 
 server = app.server
 
 app.layout = html.Div([
+    
+    nav,
+    
+    ##############################
+    ####      First Div      #####
+    ##############################
+    
     html.Div(children=[
+        
+        ##############################
+        ###         Logos          ###
+        ##############################
+        
+        html.Img(src=b64_image(isr_logo),
+        id='ISR logo',
+        style={'position':'sticky', 'height':'20%', 'display':'inline'},
+        ),
+        
+        html.Img(src=b64_image(dsor_logo),
+        id='DSOR logo',
+        style={'position':'sticky', 'height':'20%', 'width':'30%', 'display':'inline'},
+        ),
+        
+        html.H1('Cluster of Analysis for Intelligent Systems'),
+        
+        
+        ##############################
+        ####        Dropdowns      ###
+        ##############################
+        
+        html.Br(),
         html.Label('Main Directory'),
-        dcc.Dropdown(fn.get_directories(),
+        dcc.Dropdown([{'label': i, 'value': i} for i in fn.get_directories() if i not in ('images', '__pycache__')],
         id='Home directory'),
 
         html.Br(),
@@ -47,20 +122,22 @@ app.layout = html.Div([
         id='Fourth level dir'),
 
         html.Br(),
-        dcc.Link('CLICK HERE TO PLOT',
+        dcc.Link('CLICK HERE FOR PLOT',
         href='',
         target='_blank',
         refresh=True,
         id='plot'),
 
-        #html.Br(),
-        #html.H1('Pets'),
-        #html.Img(src=b64_image(image_path),
-        #id='plot'),
 
     ], style={'padding': 10, 'flex': 1}),
 
+
 ], style={'display': 'flex', 'flex-direction': 'row'})
+
+
+##############################
+###   Callback Functions   ###
+##############################
 
 
 @app.callback(
@@ -76,7 +153,7 @@ def update_second_level_dir(input_value):
         fn.change_directory(str(path))
         last_directories[1] = path
 
-        return [{'label': i, 'value': i} for i in fn.get_directories()]
+        return [{'label': i, 'value': i} for i in fn.get_directories() if i not in ('logos')]
     
     return ()
 
@@ -128,6 +205,9 @@ def update_plot(input_value):
     return path_cat(path)
 
 
+##############################
+###      Main Function     ###
+##############################
 
 if __name__ == '__main__':
     app.run_server(debug=True)

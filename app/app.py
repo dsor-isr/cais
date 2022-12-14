@@ -1,12 +1,14 @@
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
 
-from dash import Dash, html, dcc, Input, Output
+from dash import Dash, html, dcc, Input, Output, ctx
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import file_navigation as fn
 import base64
 import webbrowser
+from bs4 import BeautifulSoup
+import copy
 
 ##############################
 ###    Global Variables    ###
@@ -17,6 +19,7 @@ home = fn.get_pwd()
 last_directories = [home, home, home]
 plot_dir = home
 host = 'http://127.0.0.1:8050/'
+merged_html = 'all.html'
 
 dsor_logo = 'assets/logos/DSOR_logo_v05a.jpg'
 isr_logo = 'assets/logos/isr_logo_red_background.png'
@@ -38,6 +41,35 @@ def b64_image(image_filename):
 
 def path_cat(path):
     return path[path.find('assets'):]
+
+
+def merge_html_files(files):
+
+    if not type(files) == list or len(files) == 0:
+        raise TypeError("merge_html_files: Expected a file of type list with size > 0, but received something else.")
+
+    soup_objects = []
+
+    # Iterate over the files
+    for file in files:
+        with open(file, 'r') as f:
+            # Read html files as BeautifulSoup objects and store them
+            contents = f.read()
+
+            soup = BeautifulSoup(contents, 'lxml')
+            soup_objects.append(soup)
+
+    output_file = soup_objects[0]
+
+    # Append the contents of each html to a baseline html file
+    for soup in soup_objects[1::]:
+        for element in soup.body:
+            output_file.body.append(copy.copy(element))
+
+
+    # Save the new merged html file in the file system
+    with open("all.html", "w", encoding='utf-8') as file:
+        file.write(str(output_file))
 
 
 ##############################
@@ -71,6 +103,7 @@ load_figure_template('CERULEAN')
 app = Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
 
 server = app.server
+
 
 app.layout = html.Div([
     
@@ -124,13 +157,13 @@ app.layout = html.Div([
         id='Fourth level dir'),
 
         html.Br(),
-        dcc.Link('CLICK HERE FOR PLOT',
+        dcc.Link('',
         href='',
         target='_blank',
         refresh=True,
         id='plot'),
 
-        html.Button('open directory',
+        html.Button('Merge Files',
         id='plot button',
         n_clicks=0,
         style={'margin-left': '40px'}),
@@ -185,47 +218,53 @@ def update_third_level_dir(input_value):
 @app.callback(
     Output('Fourth level dir', 'options'),
     Input('Third level dir', 'value'),
-)
-def update_fourth_level_dir(input_value):
-
-    if (type(input_value) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value)):
-        fn.change_directory(last_directories[2])
-        path = fn.extend_dir(input_value)
-        fn.change_directory(path)
-
-        global plot_dir
-        plot_dir = path
-
-        return [{'label': i, 'value': i} for i in fn.get_html_files()]
-    
-    return ()
-
-@app.callback(
-    Output('hidden-div', 'children'),
     Input('plot button', 'n_clicks'),
 )
-def plot_directory(n_clicks):
-    if plot_dir != home:
-        fn.change_directory(plot_dir)
-        for files in fn.get_html_files():
-            path = fn.extend_dir(files)
-            webbrowser.open_new_tab(host + path_cat(path))
+def update_fourth_level_dir(input_value_dir, n_clicks_plot):
+    callback_trigger = ctx.triggered_id
 
-    return html.Div('')
+    if callback_trigger == 'Third level dir':
+        # Triggered by directory change
+
+        if (type(input_value_dir) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value_dir)):
+            fn.change_directory(last_directories[2])
+            path = fn.extend_dir(input_value_dir)
+            fn.change_directory(path)
+
+            global plot_dir
+            plot_dir = path
+
+            return [{'label': i, 'value': i} for i in fn.get_html_files()]
+
+    elif callback_trigger == 'plot button':
+        # Triggered by merge button
+
+        files = fn.get_html_files()
+        if (len(files) != 0):
+            # html files found on present working directory
+            
+            merge_html_files(files)
+
+            path = fn.extend_dir(merged_html)
+
+            return [{'label': i, 'value': i} for i in fn.get_html_files()]
+
+    return ()
 
 
 @app.callback(
+    Output('plot', 'children'),
     Output('plot', 'href'),
     Input('Fourth level dir', 'value'),
 )
 def update_plot(input_value):
-
+    
     if input_value == None:
-        return ''
+        return '',  ''
 
     path = fn.extend_dir(str(input_value))
     
-    return path_cat(path)
+    return path, path_cat(path)
 
 
 ##############################

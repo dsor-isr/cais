@@ -17,9 +17,9 @@ import copy
 
 home = fn.get_pwd()
 last_directories = [home, home, home]
-plot_dir = home
+
 host = 'http://127.0.0.1:8050/'
-merged_html = 'all.html'
+merged_html = home + '/assets/all.html'
 
 dsor_logo = 'assets/logos/DSOR_logo_v05a.jpg'
 isr_logo = 'assets/logos/isr_logo_red_background.png'
@@ -68,7 +68,7 @@ def merge_html_files(files):
 
 
     # Save the new merged html file in the file system
-    with open("all.html", "w", encoding='utf-8') as file:
+    with open(merged_html, "w", encoding='utf-8') as file:
         file.write(str(output_file))
 
 
@@ -161,13 +161,12 @@ app.layout = html.Div([
         href='',
         target='_blank',
         refresh=True,
-        id='plot'),
+        id='plot',),
 
-        html.Button('Merge Files',
+        html.Button('Plot Directory',
         id='plot button',
         n_clicks=0,
         style={'margin-left': '40px'}),
-        html.Div(id='hidden-div', style={'display':'none'}),        
 
     ], style={'padding': 10, 'flex': 1}),
     
@@ -186,10 +185,9 @@ app.layout = html.Div([
     Input('Home directory', 'value'),
 )
 def update_second_level_dir(input_value):
-
+    fn.change_directory(last_directories[0])
     if (type(input_value) == str) and not (fn.is_part_of_path(fn.get_pwd(),input_value)):
         # If the path actually changed
-        fn.change_directory(last_directories[0])
         path = fn.extend_dir(input_value)
         fn.change_directory(str(path))
         last_directories[1] = path
@@ -231,21 +229,18 @@ def update_fourth_level_dir(input_value_dir, n_clicks_plot):
             path = fn.extend_dir(input_value_dir)
             fn.change_directory(path)
 
-            global plot_dir
-            plot_dir = path
-
             return [{'label': i, 'value': i} for i in fn.get_html_files()]
 
     elif callback_trigger == 'plot button':
         # Triggered by merge button
 
         files = fn.get_html_files()
-        if (len(files) != 0):
+        if (len(files) != 0) and input_value_dir != None:
             # html files found on present working directory
             
             merge_html_files(files)
-
-            path = fn.extend_dir(merged_html)
+            
+            webbrowser.open_new(host + 'assets/all.html')
 
             return [{'label': i, 'value': i} for i in fn.get_html_files()]
 

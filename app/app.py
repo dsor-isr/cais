@@ -152,6 +152,13 @@ app.layout = html.Div([
         id='Third level dir'),
 
         html.Br(),
+        html.Button('Plot Directory',
+        id='plot button',
+        n_clicks=0,
+        #style={'margin-left': '40px'}
+        ),
+
+        html.Br(),
         html.Label('Fourth level Directory'),
         dcc.Dropdown((),
         id='Fourth level dir'),
@@ -162,11 +169,6 @@ app.layout = html.Div([
         target='_blank',
         refresh=True,
         id='plot',),
-
-        html.Button('Plot Directory',
-        id='plot button',
-        n_clicks=0,
-        style={'margin-left': '40px'}),
 
     ], style={'padding': 10, 'flex': 1}),
     

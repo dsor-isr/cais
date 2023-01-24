@@ -244,8 +244,8 @@ class Missions(object):
                 self.yaw_rate_state_vec.append(msg.orientation_rate.z)
                 self.depth_state_vec.append(msg.position.depth)
                 self.altitude_state_vec.append(msg.global_position.altitude)
-                # self.time_state_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_state_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_state_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                #self.time_state_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
 
             for index in range(0, len(self.x_state_vec)): 
                 self.error_x_state_vec.append(self.x_state_vec[index] - self.x_state_vec[0])
@@ -261,7 +261,8 @@ class Missions(object):
                 self.x_usbl_vec.append(msg.Y)
                 self.y_usbl_vec.append(msg.X)
                 self.time_sec_usbl_topic.append(t.to_sec())
-                self.time_usbl_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                # self.time_usbl_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_usbl_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
            
         self.x_dr_vec = []
         self.y_dr_vec = []
@@ -277,8 +278,8 @@ class Missions(object):
                 self.y_dr_vec.append(msg.position.east)
                 self.vx_dr_vec.append(msg.seafloor_velocity.x)
                 self.vy_dr_vec.append(msg.seafloor_velocity.y)
-                # self.time_dr_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_dr_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_dr_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_dr_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
            
             for index in range(0, len(self.x_dr_vec)): 
                 self.error_x_dr_vec.append(self.x_dr_vec[index] - self.x_dr_vec[0])
@@ -294,8 +295,8 @@ class Missions(object):
             for topic, msg, t in findTopic(bag, self.gt_topic):
                 self.x_gt_vec.append(msg.Y)
                 self.y_gt_vec.append(msg.X)
-                # self.time_gt_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_gt_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_gt_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_gt_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
             
             for index in range(0, len(self.x_gt_vec)): 
                 self.error_x_gt_vec.append(self.x_gt_vec[index] - self.x_gt_vec[0])
@@ -327,8 +328,8 @@ class Missions(object):
                 self.crossTrackError_vec.append(msg.cross_track_error)
                 self.alongTrackError_vec.append(msg.along_track_error)
                 self.pathfollowingAlgorithm = msg.algorithm
-                # self.time_pathFollowingDebug_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_pathFollowingDebug_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_pathFollowingDebug_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_pathFollowingDebug_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
 
         self.x_force_vec = []
         self.y_force_vec = []
@@ -338,8 +339,8 @@ class Missions(object):
             for topic, msg, t in findTopic(bag, self.innerLoopForces_topic):
                 self.x_force_vec.append(msg.wrench.force.x)
                 self.y_force_vec.append(msg.wrench.force.y)
-                # self.time_innerLoopForces_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_innerLoopForces_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_innerLoopForces_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_innerLoopForces_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
         
         self.ref_sway_vec = []
         self.time_ref_sway_topic = []
@@ -347,8 +348,8 @@ class Missions(object):
         if self.ref_sway_topic:
             for topic, msg, t in findTopic(bag, self.ref_sway_topic):
                 self.ref_sway_vec.append(msg.data)
-                # self.time_ref_sway_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_ref_sway_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_ref_sway_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_ref_sway_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
     
         self.ref_surge_vec = []
         self.time_ref_surge_topic = []
@@ -356,8 +357,8 @@ class Missions(object):
         if self.ref_surge_topic:
             for topic, msg, t in findTopic(bag, self.ref_surge_topic):
                 self.ref_surge_vec.append(msg.data)
-                # self.time_ref_surge_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_ref_surge_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_ref_surge_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_ref_surge_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
 
         self.ref_yaw_vec = []
         self.time_ref_yaw_topic = []
@@ -365,8 +366,8 @@ class Missions(object):
         if self.ref_yaw_topic:
             for topic, msg, t in findTopic(bag, self.ref_yaw_topic):
                 self.ref_yaw_vec.append(wrapTo360(msg.data))
-                # self.time_ref_yaw_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_ref_yaw_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_ref_yaw_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_ref_yaw_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
 
         self.ref_yaw_rate_vec = []
         self.time_ref_yaw_rate_topic = []
@@ -374,8 +375,8 @@ class Missions(object):
         if self.ref_yaw_rate_topic:
             for topic, msg, t in findTopic(bag, self.ref_yaw_rate_topic):
                 self.ref_yaw_rate_vec.append(msg.data)
-                # self.time_ref_yaw_rate_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_ref_yaw_rate_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_ref_yaw_rate_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_ref_yaw_rate_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
 
         self.ref_depth_vec = []
         self.time_ref_depth_topic = []
@@ -383,8 +384,8 @@ class Missions(object):
         if self.ref_depth_topic:
             for topic, msg, t in findTopic(bag, self.ref_depth_topic):
                 self.ref_depth_vec.append(msg.data)
-                # self.time_ref_depth_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_ref_depth_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_ref_depth_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_ref_depth_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
 
         self.ref_altitude_vec = []
         self.time_ref_altitude_topic = []
@@ -392,8 +393,8 @@ class Missions(object):
         if self.ref_altitude_vec:
             for topic, msg, t in findTopic(bag, self.ref_altitude_topic):
                 self.ref_altitude_vec.append(msg.data)
-                # self.time_ref_altitude_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_ref_altitude_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_ref_altitude_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_ref_altitude_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
 
         self.vx_current_vec = []
         self.vy_current_vec = []
@@ -403,8 +404,8 @@ class Missions(object):
             for topic, msg, t in findTopic(bag, self.currents_topic):
                 self.vx_current_vec.append(msg.x_current)
                 self.vy_current_vec.append(msg.y_current)
-                # self.time_current_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
-                self.time_current_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
+                self.time_current_topic.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+                # self.time_current_topic.append(time.strftime(('%H:%M:%S'), time.gmtime(t.to_sec())))
             
     def poseGTposeDRposeFilter(self):
 

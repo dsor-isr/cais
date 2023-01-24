@@ -5,8 +5,8 @@ from readUSBL import DriverUSBL
 from handyTools import *
 
 """
-Class Reader responsable to find all .bag files into a specifica folder and call 
-methods to make a Driver and Mission Analise
+Class Reader responsible to find all .bag files into a specific folder and call 
+methods to make a Driver and Mission Analysis
 """
 class Reader(object):
     def __init__(self):
@@ -45,13 +45,14 @@ class Reader(object):
 if __name__ == '__main__':
     reader = Reader()
 
-    # Set the pattern correspondent to the mission
+    # Set the pattern correspondent to the mission (the Flag indicates the current mission, 4 for waypoint, 6 for PF)
     # pattern = [4,6,4]
     pattern = [6,4,0]
     # Set bags folder to process
-    bags_folder = os.path.expanduser('~')+'/ROS_data'
+    print("Reading from folder \'~/trials_raw/\'")
+    bags_folder = os.path.expanduser('~')+'/trials_raw'
     
-    # search for any .bag that exists into a specific path, and for each one make a driver analise
+    # search for any .bag that exists into a specific path, and for each one make a driver analysis
     for root, dirs, files in os.walk(bags_folder, topdown=False):
         for name in files:
             # check if the file is a .bag or a _mission.bag
@@ -62,7 +63,7 @@ if __name__ == '__main__':
                     reader.createMissionBags(bag, os.path.join(root, name.split('.')[0]), pattern)
                 except:
                     pass
-    # search for any ._mission.bag that exists into a specific path, and for each one make a misson analise 
+    # search for any ._mission.bag that exists into a specific path, and for each one make a misson analysis
     # and a driver analise
     for root, dirs, files in os.walk(bags_folder, topdown=False):
         for name in files:

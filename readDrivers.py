@@ -86,11 +86,11 @@ class Drivers(object):
         elif topic.find('Thruster5') != -1: 
             thruster_number = '/Thruster5'
 
-        current = [];
-        errors = [];
-        speed = [];
-        temperature = [];
-        time_vec = [];
+        current = []
+        errors = []
+        speed = []
+        temperature = []
+        time_vec = []
         for topic, msg, t in data:
             try: current.append(msg.Current)
             except: pass
@@ -187,16 +187,16 @@ class Drivers(object):
         Plots for BatMonit
         """    
         # print("BatMonit")
-        actual_charge = [];
-        charging = [];
-        current = [];
-        equalize = [];
-        max_cell = [];
-        max_temp = [];
-        min_cell = [];
-        min_temp = [];
-        number_of_packs = [];
-        time_vec = [];
+        actual_charge = []
+        charging = []
+        current = []
+        equalize = []
+        max_cell = []
+        max_temp = []
+        min_cell = []
+        min_temp = []
+        number_of_packs = []
+        time_vec = []
 
         for topic, msg, t in data:
             try: actual_charge.append(msg.actual_charge)
@@ -393,15 +393,15 @@ class Drivers(object):
         """
         Plots for GPS
         """    
-        altitude = [];
-        course = [];
-        latitude = [];
-        longitude = [];
-        mode = [];
-        satellites = [];
-        speed_over_ground = [];
-        utc_time = [];
-        time_vec = [];
+        altitude = []
+        course = []
+        latitude = []
+        longitude = []
+        mode = []
+        satellites = []
+        speed_over_ground = []
+        utc_time = []
+        time_vec = []
 
         for topic, msg, t in data:
             try: altitude.append(msg.altitude)

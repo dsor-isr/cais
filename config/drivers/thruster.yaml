@@ -1,0 +1,110 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+plots:
+  Current:
+    name: "Current"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Current [A]"
+        topics:
+          - "drivers/Thruster"
+        fields:
+          - "Current"
+    plot_markers:
+      - "lines"
+  Errors:
+    name: "Errors"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: ""
+        topics:
+          - "drivers/Thruster"
+        fields:
+          - "Errors"
+    plot_markers:
+      - "lines"
+  Speed:
+    name: "Speed"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Speed [m/s]"
+        topics:
+          - "drivers/Thruster"
+        fields:
+          - "Speed"
+    plot_markers:
+      - "lines"
+  Temperature:
+    name: "Temperature"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Temperature [ºC]"
+        topics:
+          - "drivers/Thruster"
+        fields:
+          - "Temperature"
+    plot_markers:
+      - "lines"
+  # Current_:
+  #   name: "Current"
+  #   axes:
+  #     x: # time
+  #     y:
+  #       vehicles: # for all vehicles
+  #       label: "Current [A]"
+  #       topics:
+  #         - "drivers/thruster"
+  #       fields:
+  #         - "Current"
+  #   plot_markers:
+  #     - "lines"
+  # Errors_:
+  #   name: "Errors"
+  #   axes:
+  #     x: # time
+  #     y:
+  #       vehicles: # for all vehicles
+  #       label: ""
+  #       topics:
+  #         - "drivers/thruster"
+  #       fields:
+  #         - "Errors"
+  #   plot_markers:
+  #     - "lines"
+  # Speed_:
+  #   name: "Speed"
+  #   axes:
+  #     x: # time
+  #     y:
+  #       vehicles: # for all vehicles
+  #       label: "Speed [m/s]"
+  #       topics:
+  #         - "drivers/thruster"
+  #       fields:
+  #         - "Speed"
+  #   plot_markers:
+  #     - "lines"
+  # Temperature_:
+  #   name: "Temperature"
+  #   axes:
+  #     x: # time
+  #     y:
+  #       vehicles: # for all vehicles
+  #       label: "Temperature [ºC]"
+  #       topics:
+  #         - "drivers/thruster"
+  #       fields:
+  #         - "Temperature"
+  #   plot_markers:
+  #     - "lines"

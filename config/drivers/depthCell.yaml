@@ -1,0 +1,50 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+
+# plot_markers: "lines" "markers" "lines+markers"
+plots:
+  pressure:
+    name: "Pressure"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Pressure [mbar]"
+        topics:
+          - "drivers/depth_cell/data"
+        fields:
+          - "pressure"
+    plot_markers:
+      - "lines"
+  temperature:
+    name: "Temperature"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Temperature [ºC]"
+        topics:
+          - "drivers/depth_cell/data"
+        fields:
+          - "temperature"
+    plot_markers:
+      - "lines"
+  test:
+    name: "Pressure vs. Temperature"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Bruh"
+        topics:
+          - "drivers/depth_cell/data"
+          - "drivers/depth_cell/data"
+        fields:
+          - "pressure"
+          - "temperature"
+    plot_markers:
+      - "lines"
+      - "lines"

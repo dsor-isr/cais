@@ -1,7 +1,7 @@
 import os     
 import sys
 from Bag import Bag
-from BagPlot import Plotter
+from Plotter import Plotter
 import yaml
 
 def getPathToTrialsData():
@@ -20,24 +20,33 @@ def getPathToTrialsData():
 def loadConfigurations():
 	# dict with yaml info
 	configs = dict()
+	configs_parent_dirs = dict()
 	config_dir = "config/"
 
 	# find all .yaml files
 	for root, dirs, files in os.walk(config_dir, topdown=False):
 		for name in files:
 			if ".yaml" in name:
+			# if ".yaml" in name:
 				# name without ".yaml"
 				true_name = name[:name.rfind('.')]
+				path_to_file = os.path.join(root, name)
 
 				# add entry to the dictionary
 				# this entry will be a dict of its own, with all info from
 				# this specific yaml file
-				configs[true_name] = loadYamlFile(name, config_dir)
+				configs[true_name] = loadYamlFile(path_to_file)
+				
+				# get parent directory
+				path_from_parent = path_to_file.replace(config_dir, "")
+				configs_parent_dirs[true_name] = path_from_parent.replace(name, "")[0:-1]
 
-	return configs
+				print("\t" + path_from_parent)
 
-def loadYamlFile(filename, config_dir):
-	with open(config_dir + filename) as f:
+	return configs, configs_parent_dirs
+
+def loadYamlFile(path_to_file):
+	with open(path_to_file) as f:
 		yaml_config = yaml.load(f, Loader=yaml.loader.SafeLoader)
 
 	return yaml_config
@@ -59,22 +68,15 @@ def main():
 				# add new bag to bag list if it is inside ROSData folder
 				if "ROSData/" in path_to_bag:
 					bag_list.append(Bag(path_to_bag))
-
-	# print loaded bags
-	print("Loaded bags:")
-	for bag in bag_list: print("\t" + bag.filename)
+					print("\t" + name)
 
 	# load configurations inside config/ folder
 	print("\nLoading configurations...")
-	configs = loadConfigurations()
-
-	# print loaded configs
-	print("Loaded configs:")
-	for key in configs.keys(): print("\t" + key + ".yaml")
+	configs, configs_parent_dirs = loadConfigurations()
 
 	# create plots according to configs using loaded bags
 	print("\nPlotting...")
-	plt = Plotter(bag_list, configs)
+	plt = Plotter(bag_list, configs, configs_parent_dirs)
 	plt.createPlots()
 
 if __name__ == '__main__':

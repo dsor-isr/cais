@@ -10,19 +10,37 @@ import webbrowser
 from bs4 import BeautifulSoup
 import copy
 
+
+##############################
+###    Suggested Debug     ###
+###      
+##############################
+
+
+##############################
+###        Constants       ###
+##############################
+
+ALL_HTML = '/all.html'
+ALL_HTML2 = 'all.html'
+
 ##############################
 ###    Global Variables    ###
 ##############################
 
-
-home = fn.get_pwd()
+#home = fn.get_pwd()
+home = fn.extend_dir('assets')
+#print("home = ", home)
+#print("content = ", fn.get_directories(path=home))
 last_directories = [home, home, home]
+#fn.change_directory(home)
 
 host = 'http://127.0.0.1:8050/'
-merged_html = home + '/assets/all.html'
 
 dsor_logo = 'assets/logos/DSOR_logo_v05a.jpg'
 isr_logo = 'assets/logos/isr_logo_red_background.png'
+
+last_dropdown_changed = 0
 
 
 ##############################
@@ -52,12 +70,14 @@ def merge_html_files(files):
 
     # Iterate over the files
     for file in files:
-        with open(file, 'r') as f:
-            # Read html files as BeautifulSoup objects and store them
-            contents = f.read()
+        if (file != ALL_HTML2):
+            # This if prevents from concatenating old all.html files
+            with open(file, 'r') as f:
+                # Read html files as BeautifulSoup objects and store them
+                contents = f.read()
 
-            soup = BeautifulSoup(contents, 'lxml')
-            soup_objects.append(soup)
+                soup = BeautifulSoup(contents, 'lxml')
+                soup_objects.append(soup)
 
     output_file = soup_objects[0]
 
@@ -68,6 +88,7 @@ def merge_html_files(files):
 
 
     # Save the new merged html file in the file system
+    merged_html = fn.get_pwd() + ALL_HTMl
     with open(merged_html, "w", encoding='utf-8') as file:
         file.write(str(output_file))
 
@@ -138,7 +159,7 @@ app.layout = html.Div([
         
         html.Br(),
         html.Label('Main Directory'),
-        dcc.Dropdown([{'label': i, 'value': i} for i in fn.get_directories() if i not in ('images', '__pycache__')],
+        dcc.Dropdown([{'label': i, 'value': i} for i in fn.get_directories(path=home) if (i not in {'logos'})],
         id='Home directory'),
 
         html.Br(),
@@ -187,6 +208,12 @@ app.layout = html.Div([
     Input('Home directory', 'value'),
 )
 def update_second_level_dir(input_value):
+    #print("(callback) update_second_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+    print("(callback) update_second_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+    print("     (callback) update_second_level_dir: fn.get_directories()", fn.get_directories())
+    print("     (callback) update_second_level_dir: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
+    print("")
+    # Roll back to parent directory
     fn.change_directory(last_directories[0])
     if (type(input_value) == str) and not (fn.is_part_of_path(fn.get_pwd(),input_value)):
         # If the path actually changed
@@ -194,7 +221,11 @@ def update_second_level_dir(input_value):
         fn.change_directory(str(path))
         last_directories[1] = path
 
-        return [{'label': i, 'value': i} for i in fn.get_directories() if i not in ('logos')]
+        options = []
+        options.extend(fn.get_directories())
+        options.extend(fn.get_html_files())
+        
+        return [{'label': i, 'value': i} for i in options if i not in ('logos')]
     
     return ()
 
@@ -204,34 +235,65 @@ def update_second_level_dir(input_value):
 )
 def update_third_level_dir(input_value):
 
-    if (type(input_value) == str) and not (fn.is_part_of_path(fn.get_pwd(),input_value)):
+    # Roll back to parent directory
+    fn.change_directory(last_directories[1])
+
+
+    #print("(callback) update_third_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+    #print("     (callback) update_third_level_dir: fn.get_directories()", fn.get_directories())
+    #print("     (callback) update_third_level_dir: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
+    #print("")
+    if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories())):
         # If the path actually changed
         fn.change_directory(last_directories[1])
         path = fn.extend_dir(input_value)
         fn.change_directory(str(path))
         last_directories[2] = path
 
-        return [{'label': i, 'value': i} for i in fn.get_directories()]
+        options = []
+        options.extend(fn.get_directories())
+        options.extend(fn.get_html_files())
+
+        return [{'label': i, 'value': i} for i in options]
     
     return ()
 
 @app.callback(
     Output('Fourth level dir', 'options'),
+    ###Output('plot', 'children'), # Remover se der merda
+    ###Output('plot', 'href'), # Remover se der merda
     Input('Third level dir', 'value'),
     Input('plot button', 'n_clicks'),
 )
 def update_fourth_level_dir(input_value_dir, n_clicks_plot):
     callback_trigger = ctx.triggered_id
 
+    print("(callback) update_fourth_level_dir: Input = {" + str(input_value_dir) + ", " + str(n_clicks_plot) + "} ; path = ", fn.get_pwd())
+
     if callback_trigger == 'Third level dir':
         # Triggered by directory change
 
-        if (type(input_value_dir) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value_dir)):
-            fn.change_directory(last_directories[2])
-            path = fn.extend_dir(input_value_dir)
-            fn.change_directory(path)
+        # Roll back directory
+        fn.change_directory(last_directories[2])
 
-            return [{'label': i, 'value': i} for i in fn.get_html_files()]
+        if (type(input_value_dir) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value_dir)):
+            if (input_value_dir in fn.get_directories()):
+                # Extend path if it was a directory
+
+                #fn.change_directory(last_directories[2])
+                path = fn.extend_dir(input_value_dir)
+                fn.change_directory(path)
+
+                options = []
+                options.extend(fn.get_directories())
+                options.extend(fn.get_html_files())
+
+                return [{'label': i, 'value': i} for i in options]
+            ###elif (input_value_dir in fn.get_html_files()):
+                #### Prepare plot if it was an html file
+                ###path = fn.extend_dir(str(input_value_dir))
+
+                ###return (), path, path_cat(path)
 
     elif callback_trigger == 'plot button':
         # Triggered by merge button
@@ -255,8 +317,10 @@ def update_fourth_level_dir(input_value_dir, n_clicks_plot):
     Input('Fourth level dir', 'value'),
 )
 def update_plot(input_value):
+
+    #print("(callback) update_plot: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
     
-    if input_value == None:
+    if input_value == None or not (input_value in fn.get_html_files()):
         return '',  ''
 
     path = fn.extend_dir(str(input_value))

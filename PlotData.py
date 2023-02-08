@@ -28,9 +28,12 @@ class PlotData(object):
     # check through all topics in the bag
     for topic_name in bag.topics_list:
       # if a topic to be plotted is found and has not been plotted for the current plot configuration
-      if (config_topic in topic_name) and (topic_name not in self.topics_read_list):
+      if (config_topic.lower() in topic_name.lower()) and (topic_name not in self.topics_read_list):
         # extract message from the topic data
         for topic, msg, t in bag.getBagTopicData(topic_name):
+          # add new topic used for this axis
+          axis_data_topic = topic
+          
           # add value to list
           try:
             axis_data.append(getattr(msg, config_field))
@@ -38,14 +41,12 @@ class PlotData(object):
             print("[Error] Topic data msg has no attribute named " + config_field + ".")
             axis_data = None
             break
-          
-          # add new topic used for this axis
-          axis_data_topic = topic
 
-        return axis_data, axis_data_topic
+        return axis_data, axis_data_topic, False
 
-    # did not find any topic with that config_topic
-    return None, None
+    # did not find any more topics with that config_topic or did not find any, but reached the end
+    # of all topics in the bag list
+    return None, None, True
 
   def __getTimeDataFromConfigTopic(self, bag, config_topic):
     axis_data = []
@@ -100,7 +101,10 @@ class PlotData(object):
     # add curves' y values
     for config_topic, config_field, plot_marker in zip(plot_value["axes"]["y"]["topics"], plot_value["axes"]["y"]["fields"], plot_value["plot_markers"]):
       new_curve = dict()
-      new_curve["y"], new_curve["y_topic"] = self.__getDataFromConfigTopic(bag, config_topic, config_field)
+      new_curve["y"], new_curve["y_topic"], self.flag_all_topics_read = self.__getDataFromConfigTopic(bag, config_topic, config_field)
+
+      # update list of topics read
+      self.topics_read_list.append(new_curve["y_topic"])
 
       # if no curve was found to be plotted
       if new_curve["y"] is None:
@@ -113,7 +117,6 @@ class PlotData(object):
         # if no more curves are found for this plot configuration
         else:
           self.curves = None
-          self.flag_all_topics_read = True
           return
 
       # config field is the label for this curve
@@ -125,16 +128,13 @@ class PlotData(object):
       # add new curve to this plot
       self.curves.append(new_curve)
 
-      # update list of topics read
-      self.topics_read_list.append(new_curve["y_topic"])
-
     # add curves' x values
     if plot_value["axes"]["x"] is None: # if x axis should be Time
       for curve, config_topic in zip(self.curves, plot_value["axes"]["y"]["topics"]):
         curve["x"], curve["x_topic"] = self.__getTimeDataFromConfigTopic(bag, curve["y_topic"])
     else: # if x axis data comes from a specific topic
       for curve, config_topic, config_field in zip(self.curves, plot_value["axes"]["x"]["topics"], plot_value["axes"]["x"]["fields"]):
-        curve["x"], curve["x_topic"] = self.__getDataFromConfigTopic(bag, config_topic, config_field)
+        curve["x"], curve["x_topic"], _ = self.__getDataFromConfigTopic(bag, config_topic, config_field)
 
     # set plot title
     if plot_value["name"] is None:

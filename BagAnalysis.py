@@ -26,8 +26,8 @@ def loadConfigurations():
 	# find all .yaml files
 	for root, dirs, files in os.walk(config_dir, topdown=False):
 		for name in files:
-			if ".yaml" in name:
-			# if "thruster.yaml" in name:
+			# if ".yaml" in name:
+			if "thruster.yaml" in name:
 				# name without ".yaml"
 				true_name = name[:name.rfind('.')]
 				path_to_file = os.path.join(root, name)

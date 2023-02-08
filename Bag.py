@@ -8,7 +8,6 @@ class Bag(object):
     self.filename = bag_path[bag_path.rfind('/')+1:] # name of the .bag file
     self.bag = None
     self.topics_list = [] # list of topics (strings)
-    # self.data = dict() # dictionary with data from each topic
     self.__loadBag()
 
   # Private Methods
@@ -19,10 +18,6 @@ class Bag(object):
 
     # get topics
     self.topics_list = list(self.bag.get_type_and_topic_info()[1].keys())
-
-    # create dict with data from topics, indexed by topic name
-    # for topic_name in self.topics_list:
-    #   self.data[topic_name] = self.bag.read_messages(topics = topic_name)
   
   # Public Methods
 

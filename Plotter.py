@@ -95,7 +95,7 @@ class Plotter(object):
 
     # topic name from the first curve in the plot
     try:
-      topic_name = plot_data.curves[0]["y_topic"][0]
+      topic_name = plot_data.curves[0]["y_topic"]
     except:
       topic_name = ""
 
@@ -119,8 +119,20 @@ class Plotter(object):
     # for each specified plot in the yaml file
     try:
       for plot_key, plot_value in self.configs[config_type]["plots"].items():
-        plot_data = PlotData(bag, config_type, plot_key, plot_value)
-        self.__makePlotFromPlotData(plot_data, path_to_plots, config_type, bag_filename, "Overall")
+        # flag to know if all topics corresponding to this plot configuration have been read
+        flag_all_topics_read = False
+
+        # list of already checked bags for this plot configuration
+        topics_read_list = []
+
+        # as long as not all topics have been read for this plot configuration
+        while(not flag_all_topics_read):
+          plot_data = PlotData(bag, config_type, plot_key, plot_value, topics_read_list)
+          self.__makePlotFromPlotData(plot_data, path_to_plots, config_type, bag_filename, "Overall")
+
+          # update flag and list of topics read
+          topics_read_list = plot_data.topics_read_list
+          flag_all_topics_read = plot_data.flag_all_topics_read
     except:
       # ignores yaml files with no info
       pass

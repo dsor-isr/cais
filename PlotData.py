@@ -7,11 +7,13 @@ from datetime import datetime
 class PlotData(object):
 
   # Constructor
-  def __init__(self, bag, config_type, plot_key, plot_value):
+  def __init__(self, bag, config_type, plot_key, plot_value, topics_read_list):
     self.id = plot_key
     self.title = None
     self.curves = []
     self.axes_labels = dict()
+    self.topics_read_list = topics_read_list
+    self.flag_all_topics_read = False
 
     # get all data into the appropriate structure
     self.__loadPlotData(bag, config_type, plot_value)
@@ -25,8 +27,8 @@ class PlotData(object):
 
     # check through all topics in the bag
     for topic_name in bag.topics_list:
-      # if a topic to be plotted is found
-      if config_topic in topic_name:
+      # if a topic to be plotted is found and has not been plotted for the current plot configuration
+      if (config_topic in topic_name) and (topic_name not in self.topics_read_list):
         # extract message from the topic data
         for topic, msg, t in bag.getBagTopicData(topic_name):
           # add value to list
@@ -34,6 +36,9 @@ class PlotData(object):
             axis_data.append(getattr(msg, config_field))
           except:
             print("[Error] Topic data msg has no attribute named " + config_field + ".")
+            axis_data = None
+            break
+          
           # add new topic used for this axis
           axis_data_topic = topic
 
@@ -96,21 +101,32 @@ class PlotData(object):
     for config_topic, config_field, plot_marker in zip(plot_value["axes"]["y"]["topics"], plot_value["axes"]["y"]["fields"], plot_value["plot_markers"]):
       new_curve = dict()
       new_curve["y"], new_curve["y_topic"] = self.__getDataFromConfigTopic(bag, config_topic, config_field)
-      
+
+      # if no curve was found to be plotted
+      if new_curve["y"] is None:
+        # if no curve has been plotted for this plot configuration
+        if len(self.topics_read_list) == 0:
+          print("[Warning] " + config_type + "(" + self.id + "): no topic corresponding to the one specified was found.")
+          self.curves = None
+          self.flag_all_topics_read = True
+          return
+        # if no more curves are found for this plot configuration
+        else:
+          self.curves = None
+          self.flag_all_topics_read = True
+          return
+
       # config field is the label for this curve
       new_curve["label"] = config_field
 
       # load plot_marker for each curve
       new_curve["plot_marker"] = plot_marker
 
-      # if no curve was found to be plotted
-      if new_curve["y"] is None:
-        print("[Warning] " + config_type + "(" + self.id + "): no topic corresponding to the one specified was found.")
-        self.curves = None
-        return
-
       # add new curve to this plot
       self.curves.append(new_curve)
+
+      # update list of topics read
+      self.topics_read_list.append(new_curve["y_topic"])
 
     # add curves' x values
     if plot_value["axes"]["x"] is None: # if x axis should be Time

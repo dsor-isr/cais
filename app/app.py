@@ -1,4 +1,4 @@
-# Run this app with `python app.py` and
+# Run this app with 'python3 app.py' and
 # visit http://127.0.0.1:8050/ in your web browser.
 
 from dash import Dash, html, dcc, Input, Output, ctx
@@ -6,15 +6,20 @@ import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import file_navigation as fn
 import base64
-import webbrowser
+#import webbrowser
 from bs4 import BeautifulSoup
 import copy
 
 
 ##############################
 ###    Suggested Debug     ###
-###      
+###         Format         ###
 ##############################
+
+"""print("(callback) <function_name>: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+print("		(callback) <function_name>: other useful things")
+print("")
+"""
 
 
 ##############################
@@ -88,7 +93,7 @@ def merge_html_files(files):
 
 
     # Save the new merged html file in the file system
-    merged_html = fn.get_pwd() + ALL_HTMl
+    merged_html = fn.get_pwd() + ALL_HTML
     with open(merged_html, "w", encoding='utf-8') as file:
         file.write(str(output_file))
 
@@ -191,9 +196,10 @@ app.layout = html.Div([
         refresh=True,
         id='plot',),
 
+        html.P(id='placeholder') # TODO remove later
+
     ], style={'padding': 10, 'flex': 1}),
     
-
 
 ], style={'display': 'flex', 'flex-direction': 'row'})
 
@@ -209,10 +215,9 @@ app.layout = html.Div([
 )
 def update_second_level_dir(input_value):
     #print("(callback) update_second_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
-    print("(callback) update_second_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
-    print("     (callback) update_second_level_dir: fn.get_directories()", fn.get_directories())
-    print("     (callback) update_second_level_dir: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
-    print("")
+    #print("     (callback) update_second_level_dir: fn.get_directories()", fn.get_directories())
+    #print("     (callback) update_second_level_dir: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
+    #print("")
     # Roll back to parent directory
     fn.change_directory(last_directories[0])
     if (type(input_value) == str) and not (fn.is_part_of_path(fn.get_pwd(),input_value)):
@@ -229,6 +234,7 @@ def update_second_level_dir(input_value):
     
     return ()
 
+
 @app.callback(
     Output('Third level dir', 'options'),
     Input('Second level dir', 'value'),
@@ -237,7 +243,6 @@ def update_third_level_dir(input_value):
 
     # Roll back to parent directory
     fn.change_directory(last_directories[1])
-
 
     #print("(callback) update_third_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
     #print("     (callback) update_third_level_dir: fn.get_directories()", fn.get_directories())
@@ -258,74 +263,95 @@ def update_third_level_dir(input_value):
     
     return ()
 
+
 @app.callback(
     Output('Fourth level dir', 'options'),
-    ###Output('plot', 'children'), # Remover se der merda
-    ###Output('plot', 'href'), # Remover se der merda
+    Output('plot', 'children'),
+    Output('plot', 'href'),
     Input('Third level dir', 'value'),
+    Input('Fourth level dir', 'value'),
     Input('plot button', 'n_clicks'),
 )
-def update_fourth_level_dir(input_value_dir, n_clicks_plot):
+def update_fourth_level_dir(third_dir, fourth_dir, n_clicks_plot):
     callback_trigger = ctx.triggered_id
 
-    print("(callback) update_fourth_level_dir: Input = {" + str(input_value_dir) + ", " + str(n_clicks_plot) + "} ; path = ", fn.get_pwd())
+    #print("(callback) update_fourth_level_dir: Input = {" + str(third_dir) + ", " + str(fourth_dir) + ", " + str(n_clicks_plot) + "} ; path = ", fn.get_pwd())
 
     if callback_trigger == 'Third level dir':
         # Triggered by directory change
 
-        # Roll back directory
-        fn.change_directory(last_directories[2])
-
-        if (type(input_value_dir) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value_dir)):
-            if (input_value_dir in fn.get_directories()):
-                # Extend path if it was a directory
-
-                #fn.change_directory(last_directories[2])
-                path = fn.extend_dir(input_value_dir)
-                fn.change_directory(path)
-
-                options = []
-                options.extend(fn.get_directories())
-                options.extend(fn.get_html_files())
-
-                return [{'label': i, 'value': i} for i in options]
-            ###elif (input_value_dir in fn.get_html_files()):
-                #### Prepare plot if it was an html file
-                ###path = fn.extend_dir(str(input_value_dir))
-
-                ###return (), path, path_cat(path)
+        return treat_third_lvl_dropdown(third_dir)
 
     elif callback_trigger == 'plot button':
         # Triggered by merge button
+        return merge_button_click()
 
-        files = fn.get_html_files()
-        if (len(files) != 0) and input_value_dir != None:
-            # html files found on present working directory
+    elif callback_trigger == 'Fourth level dir':
+        # Triggered by directory change
+
+        return fourth_level_dir_dropdown(fourth_dir)
+
+    return (), '', ''
+
+
+def treat_third_lvl_dropdown(input_value_dir):
+    # Roll back directory
+    fn.change_directory(last_directories[2])
+
+    #print("(callback) update_third_level_dir: Input = " + str(input_value_dir) + " ; path = ", fn.get_pwd())
+    #print("     (callback) update_third_level_dir: fn.get_directories()", fn.get_directories())
+    #print("     (callback) update_third_level_dir: input_value in fn.get_directories()", str(input_value_dir in fn.get_directories()))
+    #print("")
+
+    if (type(input_value_dir) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value_dir)):
+        if (input_value_dir in fn.get_directories()):
+            # Extend path if it was a directory
+
+            path = fn.extend_dir(input_value_dir)
+            fn.change_directory(path)
+
+            options = []
+            options.extend(fn.get_directories())
+            options.extend(fn.get_html_files())
+
+            return [{'label': i, 'value': i} for i in options], '', ''
+
+        elif (input_value_dir in fn.get_html_files()):
+            # Prepare plot if it was an html file
+                path = fn.extend_dir(str(input_value_dir))
+
+                return (), path, path_cat(path)
+
+    return (), '', ''
+
+
+def fourth_level_dir_dropdown(input_value_dir):
+
+    if (input_value_dir in fn.get_html_files()):
+        # Prepare plot if it was an html file
+            path = fn.extend_dir(str(input_value_dir))
+
+            options = []
+            options.extend(fn.get_directories())
+            options.extend(fn.get_html_files())
+
+            return [{'label': i, 'value': i} for i in options], path, path_cat(path)
+
+    return (), '', ''
+
+
+def merge_button_click():
+    files = fn.get_html_files()
+    if (len(files) != 0):
+        # html files found on present working directory
             
-            merge_html_files(files)
-            
-            webbrowser.open_new(host + 'assets/all.html')
+        merge_html_files(files)
 
-            return [{'label': i, 'value': i} for i in fn.get_html_files()]
+        path = fn.extend_dir(ALL_HTML2)
 
-    return ()
-
-
-@app.callback(
-    Output('plot', 'children'),
-    Output('plot', 'href'),
-    Input('Fourth level dir', 'value'),
-)
-def update_plot(input_value):
-
-    #print("(callback) update_plot: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+        return [{'label': i, 'value': i} for i in files], path, path_cat(path)
     
-    if input_value == None or not (input_value in fn.get_html_files()):
-        return '',  ''
-
-    path = fn.extend_dir(str(input_value))
-    
-    return path, path_cat(path)
+    return [{'label': i, 'value': i} for i in files], '', ''
 
 
 ##############################
@@ -333,4 +359,25 @@ def update_plot(input_value):
 ##############################
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+
+    ###########################################################################
+    ####                                                                   ####
+    ####  Warning: By default, Dash applications run with Hot Reload       ####
+    ####    enabled. This means that everytime the code is changed or a    ####
+    ####    file is saved in the working directory, it reloads the app.    ####
+    ####    Since Dash applications are stateless, it resets everything.   ####
+    ####                                                                   ####
+    ####    For CAIS, this is mostly an issue when merging html files.     ####
+    ####    To prevent problems, always run the server with                ####
+    ####    dev_tools_hot_reload=False.                                    ####
+    ####                                                                   ####
+    ####    If you add new folders or files manually or with a script,     ####
+    ####    you need to restart the application or refresh the page/change ####
+    ####    one of the upper dropdowns.                                    ####
+    ####                                                                   ####
+    ####    For more on this, read: https://dash.plotly.com/devtools       ####
+    ####    and https://github.com/plotly/dash/issues/1293                 ####
+    ####                                                                   ####
+    ###########################################################################
+
+    app.run_server(debug=True, dev_tools_hot_reload=False)  # TODO set debug to False after app is fully functional

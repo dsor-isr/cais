@@ -1,7 +1,7 @@
 # Run this app with 'python3 app.py' and
 # visit http://127.0.0.1:8050/ in your web browser.
 
-from dash import Dash, html, dcc, Input, Output, ctx
+from dash import Dash, html, dcc, Input, Output, ctx, State
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import file_navigation as fn
@@ -28,6 +28,17 @@ print("")
 
 ALL_HTML = '/all.html'
 ALL_HTML2 = 'all.html'
+
+HELP = """The Cluster of Analysis for Intelligent Systems (CAIS) is a data visualization tool, developed for analysis of data gathered by the vehicles and robots developed at ISR\'s Dynamical Systems and Ocean Robotics lab."""
+HELP2 = """\nIt works by taking advantage of the tree like nature of the machine\'s file system. Any directory or html file placed somewhere on the Assets/ directories sub-tree (Assets is on the same folder as the executable) will be detected by CAIS. All one has to do is select what they wish to see on each dropdown menu. CAIS then follows that path on the file system to display the already plotted graphs."""
+HELP3 = """\nAfter a particular .html file is selected, a hyperlink will appear. Once clicked, it opens a new tab with the plot."""
+HELP4 = """\nAdditionally, if the button "Plot Directory" is clicked, it generates a all.html file on the current directory by concatenating all other html files on that directory. If there are no html, nothing will be generated.\nThe CAIS web application is built using Dash Plotly (a Flask based framework). By default, Dash servers run with a flag called \'Hot Reloading\'. This means that whenever a file is saved within the Assets folder or on any part of it\'s directory sub-tree, Dash reloads the application page, losing its current state. To avoid this, the server should be run with app.py containing the following line of code:"""
+HELP5 = """app.run_server(debug=False, dev_tools_hot_reload=False)"""
+HELP6 = """\nWhenever a file is saved (including app.py itself) or a directory is created/deleted, you should either:"""
+HELP7 = """a) Refresh the web page"""
+HELP8 = """b) Change the first drop down"""
+HELP9 = """c) Run app.py again"""
+HELP += '\n' + HELP2 + '\n' + HELP3 + '\n' + HELP4 + '\n' + HELP5 + '\n' + HELP6 + '\n' + HELP7 + '\n' + HELP8 + '\n' + HELP9
 
 ##############################
 ###    Global Variables    ###
@@ -156,6 +167,51 @@ app.layout = html.Div([
         ),
         
         html.H1('Cluster of Analysis for Intelligent Systems'),
+
+
+        ##############################
+        ####        Buttons        ###
+        ##############################
+        
+        #html.Button('Plot Directory',
+        #id='plot button',
+        #n_clicks=0,
+        #style={'display':'inline'},
+        #style={'margin-left': '40px'}
+        #),
+
+        dbc.Button('Plot Directory',
+        id='plot button',
+        n_clicks=0,
+        style={'display':'inline'},
+        #style={'margin-left': '40px'}
+        ),
+
+        dbc.Button(
+            "Help", 
+            id="open-help-body-scroll", 
+            n_clicks=0,
+            style={'display':'inline'},
+        ),
+
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Help")),
+                dbc.ModalBody(HELP),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close",
+                        id="close-help-body-scroll",
+                        className="ms-auto",
+                        n_clicks=0,
+                    )
+                ),
+            ],
+            id="modal-help-body-scroll",
+            scrollable=True,
+            is_open=False,
+            style={'white-space':'pre-line'}
+        ),
         
         
         ##############################
@@ -176,13 +232,6 @@ app.layout = html.Div([
         html.Label('Third level Directory'),
         dcc.Dropdown((),
         id='Third level dir'),
-
-        html.Br(),
-        html.Button('Plot Directory',
-        id='plot button',
-        n_clicks=0,
-        #style={'margin-left': '40px'}
-        ),
 
         html.Br(),
         html.Label('Fourth level Directory'),
@@ -352,6 +401,22 @@ def merge_button_click():
         return [{'label': i, 'value': i} for i in files], path, path_cat(path)
     
     return [{'label': i, 'value': i} for i in files], '', ''
+
+
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+
+app.callback(
+    Output("modal-help-body-scroll", "is_open"),
+    [
+        Input("open-help-body-scroll", "n_clicks"),
+        Input("close-help-body-scroll", "n_clicks"),
+    ],
+    [State("modal-help-body-scroll", "is_open")],
+)(toggle_modal)
 
 
 ##############################

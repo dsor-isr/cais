@@ -16,10 +16,9 @@ from datetime import datetime
 class Plotter(object):
 
   # Constructor
-  def __init__(self, bag_list, configs, configs_parent_dirs):
+  def __init__(self, bag_list, configs):
     self.bag_list = bag_list
     self.configs = configs
-    self.configs_parent_dirs = configs_parent_dirs
 
   # Private Methods
 
@@ -103,7 +102,6 @@ class Plotter(object):
     folder = path_to_plots + "/" + \
             bag_filename + "/" + \
             overall_folder + "/" + \
-            self.configs_parent_dirs[config_type] + "/" + \
             config_type + self.__getIdFromConfigTopic(topic_name) + "/"
     try:  # else already exists
       os.makedirs(folder)

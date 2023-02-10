@@ -20,30 +20,31 @@ def getPathToTrialsData():
 def loadConfigurations():
 	# dict with yaml info
 	configs = dict()
-	configs_parent_dirs = dict()
 	config_dir = "config/"
 
 	# find all .yaml files
 	for root, dirs, files in os.walk(config_dir, topdown=False):
 		for name in files:
 			if ".yaml" in name:
-			# if "thruster.yaml" in name:
-				# name without ".yaml"
+				# name withou .yaml
 				true_name = name[:name.rfind('.')]
+
+				# get parent directory
 				path_to_file = os.path.join(root, name)
+				path_from_parent = path_to_file.replace(config_dir, "")
+				parent_dir = path_from_parent.replace(name, "")[0:-1]
+
+				# key to dicts
+				yaml_key = parent_dir + "/" + true_name
 
 				# add entry to the dictionary
 				# this entry will be a dict of its own, with all info from
 				# this specific yaml file
-				configs[true_name] = loadYamlFile(path_to_file)
-				
-				# get parent directory
-				path_from_parent = path_to_file.replace(config_dir, "")
-				configs_parent_dirs[true_name] = path_from_parent.replace(name, "")[0:-1]
+				configs[yaml_key] = loadYamlFile(path_to_file)
 
 				print("\t" + path_from_parent)
 
-	return configs, configs_parent_dirs
+	return configs
 
 def loadYamlFile(path_to_file):
 	with open(path_to_file) as f:
@@ -72,11 +73,11 @@ def main():
 
 	# load configurations inside config/ folder
 	print("\nLoading configurations...")
-	configs, configs_parent_dirs = loadConfigurations()
+	configs = loadConfigurations()
 
 	# create plots according to configs using loaded bags
 	print("\nPlotting...")
-	plt = Plotter(bag_list, configs, configs_parent_dirs)
+	plt = Plotter(bag_list, configs)
 	plt.createPlots()
 
 if __name__ == '__main__':

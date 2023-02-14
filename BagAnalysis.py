@@ -26,6 +26,7 @@ def loadConfigurations():
 	for root, dirs, files in os.walk(config_dir, topdown=False):
 		for name in files:
 			if ".yaml" in name:
+			# if "usbl.yaml" in name:
 				# name withou .yaml
 				true_name = name[:name.rfind('.')]
 
@@ -76,7 +77,6 @@ def main():
 	configs = loadConfigurations()
 
 	# create plots according to configs using loaded bags
-	print("\nPlotting...")
 	plt = Plotter(bag_list, configs)
 	plt.createPlots()
 

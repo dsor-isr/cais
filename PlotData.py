@@ -28,7 +28,7 @@ class PlotData(object):
     # check through all topics in the bag
     for topic_name in bag.topics_list:
       # if a topic to be plotted is found and has not been plotted for the current plot configuration
-      if (config_topic.lower() in topic_name.lower()) and (topic_name not in self.topics_read_list):
+      if (config_topic.lower() in topic_name.lower()) and ([topic_name, config_field] not in self.topics_read_list):
         # extract message from the topic data
         for topic, msg, t in bag.getBagTopicData(topic_name):
           # add new topic used for this axis
@@ -103,8 +103,8 @@ class PlotData(object):
       new_curve = dict()
       new_curve["y"], new_curve["y_topic"], self.flag_all_topics_read = self.__getDataFromConfigTopic(bag, config_topic, config_field)
 
-      # update list of topics read
-      self.topics_read_list.append(new_curve["y_topic"])
+      # update list of topics/fields read
+      self.topics_read_list.append([new_curve["y_topic"], config_field])
 
       # if no curve was found to be plotted
       if new_curve["y"] is None:
@@ -156,3 +156,5 @@ class PlotData(object):
         print("[Warning] " + config_type + "(" + self.id + "): no label was specified for " + axis + " axis.")
       else: # otherwise
         self.axes_labels[axis] = plot_value["axes"][axis]["label"]
+    
+    print("New plot data added for CONFIG_TYPE: " + config_type)

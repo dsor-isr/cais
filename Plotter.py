@@ -45,6 +45,7 @@ class Plotter(object):
   def __getIdFromConfigTopic(self, topic_name):
     string_list = topic_name.split("/")[::-1] # reversed list of strings
     it = 0 # iterations
+    max_it = len(string_list) - 2
 
     for string in string_list:
       it += 1
@@ -59,8 +60,7 @@ class Plotter(object):
         return nr
       
       # if string is tooooo far away (prevent getting index of vehicle)
-      # sorry for hard code
-      if it > 2:
+      if it >= max_it:
         return ""
 
     return ""
@@ -138,6 +138,10 @@ class Plotter(object):
   # Public Methods
 
   def createPlots(self):
+    overall_configs_list = ["drivers"]
+    mission_configs_list = ["path_following"]
+
+    print("\nCreating Overall plots...")
     # create plots for each bag
     for bag in self.bag_list:
       # get path to plots folder
@@ -145,4 +149,28 @@ class Plotter(object):
 
       # for each config file
       for config_type in self.configs.keys():
-        self.__makePlotsFromConfig(bag, config_type, path_to_plots)
+        # if config file corresponds to plots for Overall folder
+        if any(config_folder in config_type for config_folder in overall_configs_list):
+          self.__makePlotsFromConfig(bag, config_type, path_to_plots)
+
+    print("\nCreating Mission plots...")
+
+    # mission patterns
+    patterns = [[], []]
+
+    # create plots for all missions
+    for bag in self.bag_list:
+      # get path to plots folder
+      path_to_plots = self.__getPathToPlotsFolder(bag.bag_path)
+
+      # divide bag into mission bags
+      mission_bags = bag.getMissionBags(patterns)
+
+      # for each mission bag
+      for bag in mission_bags:
+        # for each config file
+        for config_type in self.configs.keys():
+          # if config file corresponds to plots for Missions folder
+          if any(config_folder in config_type for config_folder in mission_configs_list):
+            # create mission plots
+            print("Bruh")

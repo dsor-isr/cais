@@ -23,3 +23,10 @@ class Bag(object):
 
   def getBagTopicData(self, topic_name):
     return self.bag.read_messages(topics = topic_name)
+
+  def getMissionBags(self, patterns):
+    bags_list = []
+
+    
+    
+    return bags_list

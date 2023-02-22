@@ -2,6 +2,7 @@ import rosbag
 import os
 import time
 from Bag import Bag
+from Mission import Mission
 from handyTools import *
 from PlotData import PlotData
 import plotly.graph_objs as go
@@ -25,7 +26,11 @@ class Plotter(object):
   def __getPathToPlotsFolder(self, bag_path):
     # here it is assumed that the bag_path has a format of type:
     # /home/{{username}}/trials_raw/{{day_of_trials}}/vehicles/{{vehicle_name}}/ROSData/{{bag_name}}.bag
-    # ex: /home/ecunhado/trials_raw/20230120/vehicles/mblack/ROSData/mblack__2023-01-20-09-59-09.bag
+    #
+    # ex: bag_path = /home/ecunhado/trials_raw/20230120/vehicles/mblack/ROSData/mblack__2023-01-20-09-59-09.bag
+    #     str1 = mblack/ROSData/mblack__2023-01-20-09-59-09.bag
+    #     str2 = ROSData/mblack__2023-01-20-09-59-09.bag
+    #     path_to_plots = /home/ecunhado/trials_raw/20230120/vehicles/mblack/plots/
     
     # get string to subtract to the original one
     str1 = bag_path.split("/vehicles/")[1]
@@ -110,7 +115,7 @@ class Plotter(object):
 
     py.offline.plot(fig_data, filename=folder + plot_data.id + ".html", auto_open=False)
 
-  def __makePlotsFromConfig(self, bag, config_type, path_to_plots):
+  def __makeOverallPlotsFromConfig(self, bag, config_type, path_to_plots):
     # get bag filename without ".bag"
     bag_filename = bag.filename[:bag.filename.rfind('.')]
 
@@ -134,6 +139,77 @@ class Plotter(object):
     except:
       # ignores yaml files with no info
       pass
+
+  def __saveMissionBags(self, bag, missions, path_to_plots):
+    # bag filename
+    bag_filename = bag.filename[:bag.filename.rfind('.')]
+
+    # get folder to save missions' bags
+    folder = path_to_plots + \
+            bag_filename + "/" + \
+            "Missions/"
+
+    print("Folder to save mission bags: " + folder)
+
+    # for each mission
+    for mission in missions:
+      # set mission name and folder
+      mission.setMissionNameAndFolder(str(missions.index(mission)) + "_mission", folder)
+
+      # create mission folder
+      try: # else already exists
+        os.makedirs(mission.mission_folder)
+      except:
+        pass
+
+    # create new bags for the missions
+    new_bag_list = [rosbag.Bag(folder + str(missions.index(mission)) + "_mission.bag", 'w') for mission in missions]
+
+    # index of first mission
+    mission_idx = 0
+    
+    # go through the bag and record the mission_bags
+    for topic, msg, t in bag.bag.read_messages():
+      # if time corresponds to current mission
+      if missions[mission_idx].start_time <= t <= missions[mission_idx].end_time:
+        new_bag_list[mission_idx].write(topic, msg, t)
+      # if time corresponds to after the current mission
+      elif t > missions[mission_idx].end_time:
+        new_bag_list[mission_idx].close()
+        print("Created " + missions[mission_idx].mission_name)
+        
+        # update index to next mission
+        mission_idx += 1
+        
+        # if already saved bags for all missions, we can skip the rest of the bag
+        if mission_idx == len(missions):
+          break
+
+    return
+
+  def __getMissions(self, bag, start_flags, mission_flags, end_flags):
+    # list of missions
+    missions = []
+
+    # get Flag data as a dictionary with "data" and "time" entries
+    Flag = bag.getFlagData("/Flag")
+    length = len(Flag["time"])
+
+    print(Flag["data"])
+
+    # go through the Flag data and find missions
+    for i in range(length - 1):
+      # if a starting sequence of flags is found
+      if (Flag["data"][i] in start_flags) and (Flag["data"][i+1] in mission_flags):
+        # from index i+1 forward, try to find the end of the mission
+        for j in range(i+1, length - 1):
+          # if an ending sequence of flags is found
+          if (Flag["data"][j] in mission_flags) and (Flag["data"][j+1] in end_flags):
+            # after having the start (i) and end (j+1) indexes
+            missions.append(Mission(bag, Flag["time"][i], Flag["time"][j+1]))
+            break
+    
+    return missions
           
   # Public Methods
 
@@ -151,26 +227,40 @@ class Plotter(object):
       for config_type in self.configs.keys():
         # if config file corresponds to plots for Overall folder
         if any(config_folder in config_type for config_folder in overall_configs_list):
-          self.__makePlotsFromConfig(bag, config_type, path_to_plots)
+          self.__makeOverallPlotsFromConfig(bag, config_type, path_to_plots)
 
     print("\nCreating Mission plots...")
 
-    # mission patterns
-    patterns = [[], []]
+    # mission patterns:
+    # 4 6 4 -> waypoint, PF, waypoint
+    # 4 6 0 -> waypoint, PF, idle
+    # 0 6 4 -> idle, PF, waypoint
+    # 0 6 0 -> idle, PF, idle
+    start_flags = [0, 4]
+    mission_flags = [6]
+    end_flags = [0, 4]
 
     # create plots for all missions
     for bag in self.bag_list:
       # get path to plots folder
       path_to_plots = self.__getPathToPlotsFolder(bag.bag_path)
 
-      # divide bag into mission bags
-      mission_bags = bag.getMissionBags(patterns)
+      # create missions for this bag
+      missions = self.__getMissions(bag, start_flags, mission_flags, end_flags)
 
-      # for each mission bag
-      for bag in mission_bags:
+      # save missions' bags in the correct directories
+      self.__saveMissionBags(bag, missions, path_to_plots)
+
+      # for each mission
+      for mission in missions:
+        # associate mission bags to its mission (mission.mission_bag)
+        mission.setMissionBag()
+
+        print("Mission: start: " + str(mission.start_time) + ", end: " + str(mission.end_time))
         # for each config file
         for config_type in self.configs.keys():
           # if config file corresponds to plots for Missions folder
           if any(config_folder in config_type for config_folder in mission_configs_list):
             # create mission plots
             print("Bruh")
+            # self.__makeMissionPlotsFromConfig(mission_bag, config_type, path_to_plots)

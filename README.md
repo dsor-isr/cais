@@ -1,5 +1,5 @@
 # CAIS
-Cluster of Analysis for Inteligent Systems 
+Cluster of Analysis for Intelligent Systems 
 
 How to run:
 

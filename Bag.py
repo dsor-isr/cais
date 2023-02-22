@@ -18,15 +18,27 @@ class Bag(object):
 
     # get topics
     self.topics_list = list(self.bag.get_type_and_topic_info()[1].keys())
-  
+
   # Public Methods
+
+  def getFlagData(self, flag_topic):
+    # Flag topic data
+    Flag = dict()
+    Flag["time"] = []
+    Flag["data"] = []
+
+    # find topic name correspondent to the Flag topic
+    for topic_name in self.topics_list:
+      # if topic name is the Flag topic
+      if flag_topic in topic_name:
+        # extract time and message from the topic data
+        for topic, msg, t in self.getBagTopicData(topic_name):
+          Flag["time"].append(t)
+          Flag["data"].append(msg.data)
+        
+        return Flag
+
+    return Flag
 
   def getBagTopicData(self, topic_name):
     return self.bag.read_messages(topics = topic_name)
-
-  def getMissionBags(self, patterns):
-    bags_list = []
-
-    
-    
-    return bags_list

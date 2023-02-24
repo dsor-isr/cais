@@ -1,7 +1,7 @@
 import rosbag
 import time
 from Bag import Bag
-# from handyTools import *
+from handyTools import *
 from datetime import datetime
 
 class PlotData(object):
@@ -21,14 +21,55 @@ class PlotData(object):
 
   # Private Methods
 
+  def __foundDesiredTopic(self, topic_name, config_topic, config_field):
+    # if the topic to be plotted (config) is not in the current topic being checked
+    if config_topic.lower() not in topic_name.lower():
+      return False
+
+    # if the currently checked topic and config filed have already been analysed
+    if [topic_name, config_field] in self.topics_read_list:
+      return False
+
+    # since at this point config_topic is in the topic_name, let's know what's before and after
+    try:
+      before, after = topic_name.lower().split(config_topic.lower())
+    except:
+      # if failed, let it consider the topic has been found
+      return True
+    
+    # check if there is anything other than the vehicle name before the config topic 
+    # (== occurences of "/*" is 0 or 1, * being a wildcard for any character)
+    nr_of_slashes = 0 # number of '/' with characters after
+    for c in before:
+      try:
+        if (c == '/') and (before[before.index(c)+1] is not None):
+          nr_of_slashes += 1
+      except:
+        pass
+    
+    if nr_of_slashes > 1:
+      return False
+
+    # check if there is anything after the config_topic
+    if len(after) != 0:
+      return False
+
+    print("config_topic: " + config_topic + "\ttopic_name: " + topic_name + " AFTER: " + after)
+
+    return True
+
   def __getDataFromConfigTopic(self, bag, config_topic, config_field):
     axis_data = []
     axis_data_topic = None
 
     # check through all topics in the bag
     for topic_name in bag.topics_list:
+      # print(topic_name)
       # if a topic to be plotted is found and has not been plotted for the current plot configuration
-      if (config_topic.lower() in topic_name.lower()) and ([topic_name, config_field] not in self.topics_read_list):
+      if self.__foundDesiredTopic(topic_name, config_topic, config_field):
+
+        print("Found topic: " + topic_name)
+
         # extract message from the topic data
         for topic, msg, t in bag.getBagTopicData(topic_name):
           # add new topic used for this axis
@@ -36,7 +77,7 @@ class PlotData(object):
           
           # add value to list
           try:
-            axis_data.append(getattr(msg, config_field))
+            axis_data.append(nestedGetAttribute(msg, config_field))
           except:
             print("[Error] Topic data msg has no attribute named " + config_field + ".")
             axis_data = None
@@ -64,6 +105,23 @@ class PlotData(object):
     # did not find any topic with that config_topic
     return None, None
 
+  def __getPlotLabel(self, new_curve_y_topic, config_field, x_axis_is_time):
+    # the label starts as the string after the last "/" in the topic name
+    label = new_curve_y_topic.split("/")[-1] + "."
+    
+    # add to the label the fields of the config_field
+    if type(config_field) == list:
+      label += '.'.join(config_field)
+    else:
+      label += config_field
+
+    # if x axis is not time, then the label should not be specific to the y_topic
+    # as a workaround, we suppose that taking the string after the last "." in the label
+    # generalises it
+    if not x_axis_is_time:
+      label = label[:label.rfind(".")]
+
+    return label
 
   def __loadPlotData(self, bag, config_type, plot_value):    
     # number of curves in the plot
@@ -96,7 +154,7 @@ class PlotData(object):
       for i in range(nr_curves):
         plot_value["plot_markers"].append("lines")
 
-    print("CONFIG_TYPE: " + config_type)
+    print("YAML CONFIG: " + config_type)
 
     # add curves' y values
     for config_topic, config_field, plot_marker in zip(plot_value["axes"]["y"]["topics"], plot_value["axes"]["y"]["fields"], plot_value["plot_markers"]):
@@ -119,8 +177,9 @@ class PlotData(object):
           self.curves = None
           return
 
-      # config field is the label for this curve
-      new_curve["label"] = config_field
+      # set label for this curve
+      new_curve["label"] = self.__getPlotLabel(new_curve["y_topic"], config_field, plot_value["axes"]["x"] is None)
+      # new_curve["label"] = new_curve["y_topic"]
 
       # load plot_marker for each curve
       new_curve["plot_marker"] = plot_marker

@@ -26,7 +26,7 @@ def loadConfigurations():
 	for root, dirs, files in os.walk(config_dir, topdown=False):
 		for name in files:
 			if ".yaml" in name:
-			# if "usbl.yaml" in name:
+			# if "pfollowing.yaml" in name:
 				# name withou .yaml
 				true_name = name[:name.rfind('.')]
 

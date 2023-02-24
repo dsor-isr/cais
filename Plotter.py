@@ -140,6 +140,33 @@ class Plotter(object):
       # ignores yaml files with no info
       pass
 
+  def __makeMissionPlotsFromConfig(self, bag, original_bag_filename, mission_name, config_type, path_to_plots):
+    # get bag filename without ".bag"
+    bag_filename = original_bag_filename[:original_bag_filename.rfind('.')]
+
+    # for each specified plot in the yaml file
+    try:
+      for plot_key, plot_value in self.configs[config_type]["plots"].items():
+        # flag to know if all topics corresponding to this plot configuration have been read
+        flag_all_topics_read = False
+
+        # list of already checked bags for this plot configuration
+        topics_read_list = []
+
+        # as long as not all topics have been read for this plot configuration
+        while(not flag_all_topics_read):
+          plot_data = PlotData(bag, config_type, plot_key, plot_value, topics_read_list)
+          self.__makePlotFromPlotData(plot_data, path_to_plots, mission_name, bag_filename, "Missions")
+
+          # update flag and list of topics read
+          topics_read_list = plot_data.topics_read_list
+          flag_all_topics_read = plot_data.flag_all_topics_read
+
+        print("TOPICS READ LIST: " + str(topics_read_list))
+    except:
+      # ignores yaml files with no info
+      pass
+
   def __saveMissionBags(self, bag, missions, path_to_plots):
     # bag filename
     bag_filename = bag.filename[:bag.filename.rfind('.')]
@@ -176,7 +203,7 @@ class Plotter(object):
       # if time corresponds to after the current mission
       elif t > missions[mission_idx].end_time:
         new_bag_list[mission_idx].close()
-        print("Created " + missions[mission_idx].mission_name)
+        print("Created " + missions[mission_idx].mission_name + ".bag")
         
         # update index to next mission
         mission_idx += 1
@@ -215,7 +242,8 @@ class Plotter(object):
 
   def createPlots(self):
     overall_configs_list = ["drivers"]
-    mission_configs_list = ["path_following"]
+    # overall_configs_list = ["drivers", "missions"]
+    mission_configs_list = ["missions"]
 
     print("\nCreating Overall plots...")
     # create plots for each bag
@@ -256,11 +284,12 @@ class Plotter(object):
         # associate mission bags to its mission (mission.mission_bag)
         mission.setMissionBag()
 
-        print("Mission: start: " + str(mission.start_time) + ", end: " + str(mission.end_time))
+        print("\tCreating plots for: " + mission.mission_name)
+
+        # print("Mission: start: " + str(mission.start_time) + ", end: " + str(mission.end_time))
         # for each config file
         for config_type in self.configs.keys():
           # if config file corresponds to plots for Missions folder
           if any(config_folder in config_type for config_folder in mission_configs_list):
             # create mission plots
-            print("Bruh")
-            # self.__makeMissionPlotsFromConfig(mission_bag, config_type, path_to_plots)
+            self.__makeMissionPlotsFromConfig(mission.mission_Bag, mission.original_Bag.filename, mission.mission_name, config_type, path_to_plots)

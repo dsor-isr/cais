@@ -10,3 +10,16 @@ def wrapTo360(deg):
     :return: deg [0 360]
     """
     return deg % 360
+
+def nestedGetAttribute(obj, config_field):
+    # if the config_field is a single string
+    if type(config_field) != list:
+        return getattr(obj, config_field)
+
+    # if the config field is a list of strings, we need to nest the attributes
+    obj_iter = obj
+    for attr in config_field:
+        field = getattr(obj_iter, attr)
+        obj_iter = field
+
+    return field

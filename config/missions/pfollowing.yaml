@@ -1,0 +1,70 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+plots:
+  crossTrackAlongTrack:
+    name: "Cross and Along track errors"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Error [m]"
+        topics:
+          - "/pfollowing/debug"
+          - "/pfollowing/debug"
+        fields:
+          - "cross_track_error"
+          - "along_track_error"
+    plot_markers:
+      - "lines"
+      - "lines"
+  overview:
+    name: "Overview of Path Following"
+    axes:
+      x:
+        vehicles: # for all vehicles
+        label: "Easting [m]"
+        topics:
+          - "/nav/filter/state"
+        fields:
+          - ["position", "east"]
+      y:
+        vehicles: # for all vehicles
+        label: "Northing [m]"
+        topics:
+          - "/nav/filter/state"
+        fields:
+          - ["position", "north"]
+    plot_markers:
+      - "lines"
+  # test:
+  #   name: "Overview of Filter/DR/USBL"
+  #   axes:
+  #     x:
+  #       vehicles: # for all vehicles
+  #       label: "Easting [m]"
+  #       topics:
+  #         - "/mvector0/nav/filter/state"
+  #         - "/mvector0/State_dr"
+  #         - "/mvector0/State_usbl_est"
+  #       fields:
+  #         - ["position", "east"]
+  #         - "X"
+  #         - "X"
+  #     y:
+  #       vehicles: # for all vehicles
+  #       label: "Northing [m]"
+  #       topics:
+  #         - "/mvector0/nav/filter/state"
+  #         - "/mvector0/State_dr"
+  #         - "/mvector0/State_usbl_est"
+  #       fields:
+  #         - ["position", "north"]
+  #         - "Y"
+  #         - "Y"
+  #   plot_markers:
+  #     - "lines"
+  #     - "lines"
+  #     - "lines"

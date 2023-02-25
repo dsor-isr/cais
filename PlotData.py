@@ -52,7 +52,8 @@ class PlotData(object):
 
     # check if there is anything after the config_topic
     if len(after) != 0:
-      return False
+      if (after[0] not in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]):
+        return False
 
     print("config_topic: " + config_topic + "\ttopic_name: " + topic_name + " AFTER: " + after)
 

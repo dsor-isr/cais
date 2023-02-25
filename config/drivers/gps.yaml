@@ -12,7 +12,7 @@ plots:
         vehicles: # for all vehicles
         label: "Altitude [m]"
         topics:
-          - "drivers/gps"
+          - "drivers/gps/data"
         fields:
           - "altitude"
     plot_markers:
@@ -25,7 +25,7 @@ plots:
         vehicles: # for all vehicles
         label: ""
         topics:
-          - "drivers/gps"
+          - "drivers/gps/data"
         fields:
           - "course"
     plot_markers:
@@ -38,7 +38,7 @@ plots:
         vehicles: # for all vehicles
         label: "Latitude [m]"
         topics:
-          - "drivers/gps"
+          - "drivers/gps/data"
         fields:
           - "latitude"
     plot_markers:
@@ -51,7 +51,7 @@ plots:
         vehicles: # for all vehicles
         label: "Longitude [m]"
         topics:
-          - "drivers/gps"
+          - "drivers/gps/data"
         fields:
           - "longitude"
     plot_markers:
@@ -64,7 +64,7 @@ plots:
         vehicles: # for all vehicles
         label: ""
         topics:
-          - "drivers/gps"
+          - "drivers/gps/data"
         fields:
           - "mode"
     plot_markers:
@@ -77,7 +77,7 @@ plots:
         vehicles: # for all vehicles
         label: ""
         topics:
-          - "drivers/gps"
+          - "drivers/gps/data"
         fields:
           - "satellites"
     plot_markers:
@@ -90,7 +90,7 @@ plots:
         vehicles: # for all vehicles
         label: "Speed [m/s]"
         topics:
-          - "drivers/gps"
+          - "drivers/gps/data"
         fields:
           - "speed_over_ground"
     plot_markers:
@@ -103,7 +103,7 @@ plots:
         vehicles: # for all vehicles
         label: ""
         topics:
-          - "drivers/gps"
+          - "drivers/gps/data"
         fields:
           - "utc_time"
     plot_markers:

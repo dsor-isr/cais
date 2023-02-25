@@ -42,7 +42,7 @@ class PlotData(object):
     nr_of_slashes = 0 # number of '/' with characters after
     for c in before:
       try:
-        if (c == '/') and (before[before.index(c)+1] is not None):
+        if (c == '/') and (before.index(c)+1 >= len(before)):
           nr_of_slashes += 1
       except:
         pass
@@ -180,7 +180,6 @@ class PlotData(object):
 
       # set label for this curve
       new_curve["label"] = self.__getPlotLabel(new_curve["y_topic"], config_field, plot_value["axes"]["x"] is None)
-      # new_curve["label"] = new_curve["y_topic"]
 
       # load plot_marker for each curve
       new_curve["plot_marker"] = plot_marker

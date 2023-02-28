@@ -40,17 +40,17 @@ if len(sys.argv) != 2:
     exit(1)
 
 plot_data = []
-color_dict = {"red": "red", "black": "black", "vector": "yellow", "delfim": "orange"}
+color_dict = {"mred": "red", "mblack": "black", "mvector": "yellow", "delfim": "orange"}
 
 if sys.argv[0].split('plot_movie.py')[0] == "":
     path = "./files/"
 else:
     path = sys.argv[0].split('plot_movie.py')[0] + "files/"
 
-if os.path.exists(path):
+if os.path.exists(path) and os.path.exists(path.split("files/")[0] + "save/"):
     pass
 else:
-    print("\"files/\" directory does not exist in specified path")
+    print("Either \"files/\" or \"saves\" directory does not exist in specified path")
     exit(1)
 
 for root, dirs, files in os.walk(path):
@@ -60,9 +60,7 @@ for root, dirs, files in os.walk(path):
             pd["mat_file"] = os.path.join(root, f)
             for c in color_dict.keys():
                 if c in f:
-                    pd["color"] = color_dict[c]
-            if pd["color"] is None:
-                pd["color"] = "blue"
+                    pd["color"] = c
             plot_data.append(pd)
 
 
@@ -88,11 +86,11 @@ for pd in plot_data:
 # Define the variables of interest
 #keys = ("Time", "North", "East", "Yaw")
 
-if os.path.exists(path.split('files/')[0] + "saves/"):
-    pass
-else:
-    print("\"saves/\" directory does not exist in specified path")
-    exit(1)
+# if os.path.exists(path.split('files/')[0] + "saves/"):
+#     pass
+# else:
+#     print("\"saves/\" directory does not exist in specified path")
+#     exit(1)
 
 legend_size = 15
 
@@ -113,8 +111,11 @@ for pd in plot_data:
     #         print("The following variable does not exist in the .mat file: " + key)
     #         exit(1)
     #ax.plot(data[2], data[1], color='blue', linestyle='--')
-    
-    ax.plot(pd["data"][2], pd["data"][1], color=pd["color"])
+    if pd["color"] in color_dict.keys():
+        c = color_dict[pd["color"]]
+    else:
+        c = "blue"
+    ax.plot(pd["data"][2], pd["data"][1], color=c)
 
 ax.ticklabel_format(useOffset=False, style='plain')
 
@@ -128,15 +129,18 @@ ax.grid()
 ax.axis('equal')
 
 # Legend
-ax.legend(['Path','Position'], prop={'size': legend_size})
+legends = []
+for pd in plot_data:
+    legends.append(pd["color"])
+ax.legend(legends, prop={'size': legend_size})
 
 fig.show()
 # file_name, ext = sys.argv[1].split('.')
-fig.savefig(fname=sys.argv[1] + ".png", format='png')
+fig.savefig(fname=path.split('files/')[0] + "saves/" + sys.argv[1] + ".png", format='png')
 
 response = input("Static image created. Type \"[y]es\" to continue creating the video...\n")
 
-if "y" in response:
+if "y" or "\n" or "Y" in response:
     pass
 else:
     print("Ended program at image creation")
@@ -165,8 +169,12 @@ def make_frame(t):
 
     ax.cla()
     for pd in plot_data:
-        ax.plot(pd["data"][2][:i], pd["data"][1][:i], color=pd["color"])
-        ax.plot(pd["data"][2][i], pd["data"][1][i], color=pd["color"], marker=(3, 0, 360 - pd["data"][3][i]), markersize=20)
+        if pd["color"] in color_dict.keys():
+            c = color_dict[pd["color"]]
+        else:
+            c = "blue"
+        ax.plot(pd["data"][2][:i], pd["data"][1][:i], color=c, label='_nolegend_')
+        ax.plot(pd["data"][2][i], pd["data"][1][i], color=c, marker=(3, 0, 360 - pd["data"][3][i]), markersize=20)
     
     ax.ticklabel_format(useOffset=False, style='plain')
 
@@ -180,7 +188,10 @@ def make_frame(t):
     ax.axis('equal')
 
     # Legend
-    #ax.legend(['Path','Position'], prop={'size': legend_size})
+    legends = []
+    for pd in plot_data:
+        legends.append(pd["color"])
+    ax.legend(legends, prop={'size': legend_size})
 
     return mplfig_to_npimage(fig)
 

@@ -2,7 +2,8 @@ import rosbag
 import time
 from Bag import Bag
 from handyTools import *
-from datetime import datetime
+import datetime
+import pandas as pd
 
 class PlotData(object):
 
@@ -21,13 +22,23 @@ class PlotData(object):
 
   # Private Methods
 
-  def __foundDesiredTopic(self, topic_name, config_topic, config_field):
+  def __foundDesiredTopic(self, topic_name, config_topic, config_field, plot_value, axis, i):
     # if the topic to be plotted (config) is not in the current topic being checked
     if config_topic.lower() not in topic_name.lower():
       return False
 
-    # if the currently checked topic and config filed have already been analysed
-    if [topic_name, config_field] in self.topics_read_list:
+    # create key with currently checked topic, config field and index
+    topic_config_index_key = [topic_name, config_field]
+
+    # if indexes are not specified for this axis...
+    if "indexes" not in plot_value["axes"][axis].keys():
+      topic_config_index_key.append(None)
+    else: # otherwise
+      index = plot_value["axes"][axis]["indexes"][i]
+      topic_config_index_key.append(index)
+
+    # if the currently checked topic, config field and index have already been analysed
+    if topic_config_index_key in self.topics_read_list:
       return False
 
     # since at this point config_topic is in the topic_name, let's know what's before and after
@@ -37,12 +48,14 @@ class PlotData(object):
       # if failed, let it consider the topic has been found
       return True
     
+    # print("config_topic: " + config_topic + "\ttopic_name: " + topic_name + " AFTER: " + after)
+    
     # check if there is anything other than the vehicle name before the config topic 
     # (== occurences of "/*" is 0 or 1, * being a wildcard for any character)
     nr_of_slashes = 0 # number of '/' with characters after
-    for c in before:
+    for i, c in enumerate(before):
       try:
-        if (c == '/') and (before.index(c)+1 >= len(before)):
+        if (c == '/') and (i+1 < len(before)):
           nr_of_slashes += 1
       except:
         pass
@@ -55,19 +68,34 @@ class PlotData(object):
       if (after[0] not in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]):
         return False
 
-    print("config_topic: " + config_topic + "\ttopic_name: " + topic_name + " AFTER: " + after)
-
     return True
 
-  def __getDataFromConfigTopic(self, bag, config_topic, config_field):
+  def __getIndexedValueIfNeeded(self, new_value, plot_value, axis, i):
+    # if indexes are not specified for this axis...
+    if "indexes" not in plot_value["axes"][axis].keys():
+      return new_value, None
+    
+    # if indexes are specified...
+    # get index for this curve
+    index = plot_value["axes"][axis]["indexes"][i]
+
+    # if index is not specified for this curve
+    if index is None:
+      return new_value, None
+
+    # return the indexed value since the index is not None
+    return new_value[index], index
+
+  def __getDataFromConfigTopic(self, axis, bag, config_topic, config_field, plot_value, i):
     axis_data = []
     axis_data_topic = None
+    index = None
 
     # check through all topics in the bag
     for topic_name in bag.topics_list:
       # print(topic_name)
       # if a topic to be plotted is found and has not been plotted for the current plot configuration
-      if self.__foundDesiredTopic(topic_name, config_topic, config_field):
+      if self.__foundDesiredTopic(topic_name, config_topic, config_field, plot_value, axis, i):
 
         print("Found topic: " + topic_name)
 
@@ -78,17 +106,23 @@ class PlotData(object):
           
           # add value to list
           try:
-            axis_data.append(nestedGetAttribute(msg, config_field))
+            # value
+            value = nestedGetAttribute(msg, config_field)
+
+            # updated value
+            new_value, index = self.__getIndexedValueIfNeeded(value, plot_value, axis, i)
+
+            axis_data.append(new_value)
           except:
             print("[Error] Topic data msg has no attribute named " + config_field + ".")
             axis_data = None
             break
 
-        return axis_data, axis_data_topic, False
+        return axis_data, axis_data_topic, index, False
 
     # did not find any more topics with that config_topic or did not find any, but reached the end
     # of all topics in the bag list
-    return None, None, True
+    return None, None, index, True
 
   def __getTimeDataFromConfigTopic(self, bag, config_topic):
     axis_data = []
@@ -100,8 +134,11 @@ class PlotData(object):
         # extract message from the topic data
         for topic, msg, t in bag.getBagTopicData(topic_name):
           # add value to list
-          axis_data.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])       
-        return axis_data, None
+          # axis_data.append(datetime.fromtimestamp(t.to_sec()).strftime('%H:%M:%S.%f')[:-3])
+          # axis_data.append(t.to_sec())
+          # axis_data.append(datetime.timedelta(seconds=int(t.to_sec()), microseconds=int((t.to_sec()%1)*1000000)))
+          axis_data.append(pd.to_datetime(t.to_sec(), unit='s'))
+        return axis_data, "time"
 
     # did not find any topic with that config_topic
     return None, None
@@ -139,13 +176,30 @@ class PlotData(object):
       self.curves = None
       return
     
-    # if the number of topics or fields is different for the x axis, there's an error
+    # if x axis is specified
     if plot_value["axes"]["x"] is not None:
+      # if the number of topics or fields is different for the x axis, there's an error
       if len(plot_value["axes"]["x"]["fields"]) != nr_curves or len(plot_value["axes"]["x"]["topics"]) != nr_curves:
         print("[Error] " + config_type + "(" + self.id + "): different number of topics and fields.")
         self.curves = None
         return
-    
+      
+      # if indexes are specified for the x axis...
+      if ("indexes" in plot_value["axes"]["x"].keys()):
+        # ... but the length doesn't match the number of curves, there's an error
+        if len(plot_value["axes"]["x"]["indexes"]) != nr_curves:
+          print("[Error] " + config_type + "(" + self.id + "): x indexes length is not correct.")
+          self.curves = None
+          return
+
+    # if indexes are specified for the y axis...
+    if "indexes" in plot_value["axes"]["y"].keys():
+      # ... but the length doesn't match the number of curves, there's an error
+      if len(plot_value["axes"]["y"]["indexes"]) != nr_curves:
+        print("[Error] " + config_type + "(" + self.id + "): y indexes length is not correct.")
+        self.curves = None
+        return
+      
     # if the number of plot_markers is different from the number of curves
     if len(plot_value["plot_markers"]) != nr_curves:
       print("[Warning] " + config_type + "(" + self.id + "): different number of plot_markers. Default configuration used (lines).")
@@ -155,15 +209,16 @@ class PlotData(object):
       for i in range(nr_curves):
         plot_value["plot_markers"].append("lines")
 
-    print("YAML CONFIG: " + config_type)
+    print("YAML CONFIG: " + config_type + "-> " + self.id)
 
-    # add curves' y values
-    for config_topic, config_field, plot_marker in zip(plot_value["axes"]["y"]["topics"], plot_value["axes"]["y"]["fields"], plot_value["plot_markers"]):
+    # add curves' y values (i is index)
+    for i, (config_topic, config_field, plot_marker) in enumerate(zip(plot_value["axes"]["y"]["topics"], plot_value["axes"]["y"]["fields"], plot_value["plot_markers"])):
       new_curve = dict()
-      new_curve["y"], new_curve["y_topic"], self.flag_all_topics_read = self.__getDataFromConfigTopic(bag, config_topic, config_field)
+      new_curve["y"], new_curve["y_topic"], index_read, self.flag_all_topics_read = self.__getDataFromConfigTopic("y", bag, config_topic, config_field, plot_value, i)
 
-      # update list of topics/fields read
-      self.topics_read_list.append([new_curve["y_topic"], config_field])
+      # update list of topics/fields/indexes read for y axis
+      self.topics_read_list.append([new_curve["y_topic"], config_field, index_read])
+      # self.topics_read_list.append([new_curve["y_topic"], config_field])
 
       # if no curve was found to be plotted
       if new_curve["y"] is None:
@@ -192,8 +247,8 @@ class PlotData(object):
       for curve, config_topic in zip(self.curves, plot_value["axes"]["y"]["topics"]):
         curve["x"], curve["x_topic"] = self.__getTimeDataFromConfigTopic(bag, curve["y_topic"])
     else: # if x axis data comes from a specific topic
-      for curve, config_topic, config_field in zip(self.curves, plot_value["axes"]["x"]["topics"], plot_value["axes"]["x"]["fields"]):
-        curve["x"], curve["x_topic"], _ = self.__getDataFromConfigTopic(bag, config_topic, config_field)
+      for i, (curve, config_topic, config_field) in enumerate(zip(self.curves, plot_value["axes"]["x"]["topics"], plot_value["axes"]["x"]["fields"])):
+        curve["x"], curve["x_topic"], _, __ = self.__getDataFromConfigTopic("x", bag, config_topic, config_field, plot_value, i)
 
     # set plot title
     if plot_value["name"] is None:

@@ -70,6 +70,23 @@ class Plotter(object):
 
     return ""
 
+  def __getLayoutXAxis(self, plot_data, nrticks):
+    # if x axis is time
+    if any(curve["x_topic"] == "time" for curve in plot_data.curves):
+      # return the x axis layout defining the correct labels for each tick in the plot (%H:%M:%S.%f)
+      return dict(title=plot_data.axes_labels["x"], nticks=nrticks, tickformat='%H:%M:%S:%f')
+
+    # if x axis is not time, return the usual layout without specified tick labels
+    return dict(title=plot_data.axes_labels["x"], nticks=nrticks)
+
+  def __getLayoutYAxis(self, plot_data):
+    # if x axis is time
+    if any(curve["x_topic"] == "time" for curve in plot_data.curves):
+      return dict(title=plot_data.axes_labels["y"])
+    
+    # scale if the x axis is not time
+    return dict(title=plot_data.axes_labels["y"], scaleanchor = "x", scaleratio = 1)
+
   def __makePlotFromPlotData(self, plot_data, path_to_plots, config_type, bag_filename, overall_folder):
     # check if there are any curves to plot
     if plot_data.curves is None:
@@ -83,7 +100,7 @@ class Plotter(object):
                                    y=curve["y"], 
                                    mode=curve["plot_marker"], 
                                    name=curve["label"]))
-
+    
     # page title
     page_title = plot_data.title + ": \n"
     try:
@@ -91,10 +108,11 @@ class Plotter(object):
         page_title += topic_name + " \n"
     except:
       print("[Warning] " + config_type + "(" + plot_data.id + "): failed to create page title.")
-
+    
     layout = dict(title = page_title,
-                  xaxis=dict(title=plot_data.axes_labels["x"], nticks=50, tickformat='%H:%M:%S'), 
-                  yaxis=dict(title=plot_data.axes_labels["y"], scaleanchor = "x", scaleratio = 1))
+                  xaxis=self.__getLayoutXAxis(plot_data, 50),
+                  yaxis=self.__getLayoutYAxis(plot_data))
+
     fig_data = dict(data=trace_data, layout=layout)
 
     # topic name from the first curve in the plot
@@ -165,6 +183,7 @@ class Plotter(object):
         print("TOPICS READ LIST: " + str(topics_read_list))
     except:
       # ignores yaml files with no info
+      print("[Error] Something went wrong while loading plot data.")
       pass
 
   def __saveMissionBags(self, bag, missions, path_to_plots):

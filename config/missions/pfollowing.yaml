@@ -20,7 +20,7 @@ plots:
     plot_markers:
       - "lines"
       - "lines"
-  overview:
+  overview_pf:
     name: "Overview of Path Following"
     axes:
       x:
@@ -39,32 +39,78 @@ plots:
           - ["position", "north"]
     plot_markers:
       - "lines"
-  # test:
-  #   name: "Overview of Filter/DR/USBL"
-  #   axes:
-  #     x:
-  #       vehicles: # for all vehicles
-  #       label: "Easting [m]"
-  #       topics:
-  #         - "/mvector0/nav/filter/state"
-  #         - "/mvector0/State_dr"
-  #         - "/mvector0/State_usbl_est"
-  #       fields:
-  #         - ["position", "east"]
-  #         - "X"
-  #         - "X"
-  #     y:
-  #       vehicles: # for all vehicles
-  #       label: "Northing [m]"
-  #       topics:
-  #         - "/mvector0/nav/filter/state"
-  #         - "/mvector0/State_dr"
-  #         - "/mvector0/State_usbl_est"
-  #       fields:
-  #         - ["position", "north"]
-  #         - "Y"
-  #         - "Y"
-  #   plot_markers:
-  #     - "lines"
-  #     - "lines"
-  #     - "lines"
+  overview_filter_dr_usbl:
+    name: "Overview of Filter/DR/USBL"
+    axes:
+      x:
+        vehicles: # for all vehicles
+        label: "Easting [m]"
+        topics:
+          - "/mvector0/nav/filter/state"
+          - "/mvector0/State_dr"
+          - "/mvector0/State_usbl_est"
+        fields:
+          - ["position", "east"]
+          - "X"
+          - "X"
+      y:
+        vehicles: # for all vehicles
+        label: "Northing [m]"
+        topics:
+          - "/mvector0/nav/filter/state"
+          - "/mvector0/State_dr"
+          - "/mvector0/State_usbl_est"
+        fields:
+          - ["position", "north"]
+          - "Y"
+          - "Y"
+    plot_markers:
+      - "lines"
+      - "lines"
+      - "lines+markers"
+  filter_vs_virtual_target:
+    name: "Filter vs. Virtual Target"
+    axes:
+      x:
+        vehicles: # for all vehicles
+        label: "Easting [m]"
+        topics:
+          - "/nav/filter/state"
+          - "/PathData"
+        fields:
+          - ["position", "east"]
+          - "pd"
+        indexes:
+          - 
+          - 1
+      y:
+        vehicles: # for all vehicles
+        label: "Northing [m]"
+        topics:
+          - "/nav/filter/state"
+          - "/PathData"
+        fields:
+          - ["position", "north"]
+          - "pd"
+        indexes:
+          - 
+          - 0
+    plot_markers:
+      - "lines"
+      - "lines"
+  control_surge:
+    name: "Surge Control and Reference"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Surge speed [m/s]"
+        topics:
+          - "/ref/surge"
+          - "/nav/filter/state"
+        fields:
+          - "data"
+          - ["body_velocity", "x"]
+    plot_markers:
+      - "lines"
+      - "lines"

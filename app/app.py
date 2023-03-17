@@ -6,7 +6,6 @@ import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import file_navigation as fn
 import base64
-#import webbrowser
 from bs4 import BeautifulSoup
 import copy
 
@@ -20,7 +19,6 @@ import copy
 print("		(callback) <function_name>: other useful things")
 print("")
 """
-
 
 ##############################
 ###        Constants       ###
@@ -112,6 +110,44 @@ def merge_html_files(files):
         file.write(str(output_file))
 
 
+def treat_sixth_level_dropdown(input_value):
+
+    # Roll back to parent directory
+    fn.change_directory(last_directories[5])
+
+    #print("(callback) update_sixth_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+    #print("     (callback) update_sixth_level_dir: fn.get_directories()", fn.get_directories())
+    #print("     (callback) update_sixth_level_dir: fn.get_html_files()", fn.get_html_files())
+    #print("     (callback) update_sixth_level_dir: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
+    #print("     (callback) update_sixth_level_dir: input_value in fn.get_html_files()", str(input_value in fn.get_html_files()))
+    if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value))):
+        # If the path actually changed
+        if (input_value in fn.get_directories()):
+            # Extend path if it was a directory
+            fn.change_directory(last_directories[5])
+            path = fn.extend_dir(input_value)
+            fn.change_directory(str(path))
+            last_directories[6] = path
+
+            options = []
+            options.extend(fn.get_directories())
+            options.extend(fn.get_html_files())
+
+            #print("     (callback) update_sixth_level_dir: options = ", options)
+            #print("")
+
+            return [{'label': i, 'value': i} for i in options], (), "", ""
+        elif (input_value in fn.get_html_files()):
+            # Prepare plot if it was an html file
+                #print("\t\tupdate_sixth_level_dir: Adding html file to the plot")
+                path = fn.extend_dir(str(input_value))
+
+                return (), (), path, path_cat(path)
+    
+    #print("")
+    return (), (), "", ""
+
+
 def treat_seventh_lvl_dropdown(input_value_dir):
     # Roll back directory
     fn.change_directory(last_directories[6])
@@ -123,9 +159,10 @@ def treat_seventh_lvl_dropdown(input_value_dir):
     #print("")
 
     if (type(input_value_dir) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value_dir)):
+
+        seventh_dropdown_options = fn.get_directories() + fn.get_html_files()
         if (input_value_dir in fn.get_directories()):
             # Extend path if it was a directory
-
             path = fn.extend_dir(input_value_dir)
             fn.change_directory(path)
 
@@ -133,20 +170,25 @@ def treat_seventh_lvl_dropdown(input_value_dir):
             options.extend(fn.get_directories())
             options.extend(fn.get_html_files())
 
-            return [{'label': i, 'value': i} for i in options], '', ''
+            return seventh_dropdown_options, [{'label': i, 'value': i} for i in options], '', '' # TODO o primeiro () devia ter lá merdas do dropdown anterior
 
         elif (input_value_dir in fn.get_html_files()):
             # Prepare plot if it was an html file
                 path = fn.extend_dir(str(input_value_dir))
 
-                return (), path, path_cat(path)
+                return seventh_dropdown_options, (), path, path_cat(path)
 
-    return (), '', ''
+    return (), (), '', ''
 
 
 def eighth_level_dir_dropdown(input_value_dir):
 
-    print("     eight_level_dir_dropdown: input_value_dir = ", input_value_dir)
+    #print("     eight_level_dir_dropdown: input_value_dir = ", input_value_dir)
+    if (last_directories[6] != home):
+        pwd = fn.get_pwd() # Save current directory
+        fn.change_directory(last_directories[6]) # Roll back to seventh dropdown
+        seventh_dropdown_options = fn.get_directories() + fn.get_html_files() # Get options for seventh dropdown
+        fn.change_directory(pwd) # Roll back to current directory
 
     if (input_value_dir in fn.get_html_files()):
         # Prepare plot if it was an html file
@@ -156,9 +198,9 @@ def eighth_level_dir_dropdown(input_value_dir):
             options.extend(fn.get_directories())
             options.extend(fn.get_html_files())
 
-            return [{'label': i, 'value': i} for i in options], path, path_cat(path)
+            return seventh_dropdown_options, [{'label': i, 'value': i} for i in options], path, path_cat(path) # TODO o primeiro () devia ter lá merdas do dropdown anterior
 
-    return (), '', ''
+    return (), (), '', ''
 
 
 def merge_button_click():
@@ -170,9 +212,9 @@ def merge_button_click():
 
         path = fn.extend_dir(ALL_HTML2)
 
-        return [{'label': i, 'value': i} for i in files], path, path_cat(path)
+        return (), [{'label': i, 'value': i} for i in files], path, path_cat(path)
     
-    return [{'label': i, 'value': i} for i in files], '', ''
+    return (), [{'label': i, 'value': i} for i in files], '', ''
 
 
 def toggle_modal(n1, n2, is_open):
@@ -445,9 +487,9 @@ def update_fourth_level_dir(input_value):
     # Roll back to parent directory
     fn.change_directory(last_directories[2])
 
-    #print("(callback) update_fourth_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
-    #print("     (callback) update_fourth_level_dir: fn.get_directories()", fn.get_directories())
-    #print("     (callback) update_fourth_level_dir: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
+    print("(callback) update_fourth_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+    print("     (callback) update_fourth_level_dir: fn.get_directories()", fn.get_directories())
+    print("     (callback) update_fourth_level_dir: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories())):
         # If the path actually changed
         fn.change_directory(last_directories[2])
@@ -460,12 +502,12 @@ def update_fourth_level_dir(input_value):
         options.extend(fn.get_directories())
         options.extend(fn.get_html_files())
 
-        #print("     (callback) update_fourth_level_dir: options = ", options)
-        #print("")
+        print("     (callback) update_fourth_level_dir: options = ", options)
+        print("")
 
         return [{'label': i, 'value': i} for i in options]
     
-    #print("")
+    print("")
     return ()
 
 @app.callback(
@@ -532,7 +574,7 @@ def update_sixth_level_dir(input_value):
     #print("")
     return ()
 
-@app.callback(
+"""@app.callback(
     Output('Seventh level dir', 'options'),
     Input('Sixth level dir', 'value'),
 )
@@ -561,43 +603,51 @@ def update_seventh_level_dir(input_value):
         return [{'label': i, 'value': i} for i in options]
     
     #print("")
-    return ()
+    return ()"""
 
 
 @app.callback(
+    Output('Seventh level dir', 'options'),
     Output('Eighth level dir', 'options'),
     Output('plot', 'children'),
     Output('plot', 'href'),
     Input('Seventh level dir', 'value'),
     Input('Eighth level dir', 'value'),
     Input('plot button', 'n_clicks'),
+    Input('Sixth level dir', 'value'),
 )
-def update_eighth_level_dir(seventh_dir, eighth_dir, n_clicks_plot):
+def update_eighth_level_dir(seventh_dir, eighth_dir, n_clicks_plot, sixth_level_dir):
     callback_trigger = ctx.triggered_id
 
-    print("(callback) update_eighth_level_dir: Input = {" + str(seventh_dir) + ", " + str(eighth_dir) + ", " + str(n_clicks_plot) + "} ; path = ", fn.get_pwd())
+    #print("(callback) update_eighth_level_dir: \n\tInput = {" + str(sixth_level_dir) + ", " + str(seventh_dir) + ", " + str(eighth_dir) + ", " + str(n_clicks_plot) + "}")
+    #print("\tpath = ", fn.get_pwd())
 
-    if (seventh_dir == None and eighth_dir == None and n_clicks_plot == 0):
-        return (), '', ''
+    if (seventh_dir == None and eighth_dir == None and n_clicks_plot == 0 and sixth_level_dir == None):
+        return (), (), '', ''
 
     if callback_trigger == 'Seventh level dir':
         # Triggered by directory change
-        print("     (callback) update_eighth_level_dir: Callback triggered by directory change (Seventh level dir)")
+        #print("     (callback) update_eighth_level_dir: Callback triggered by directory change (Seventh level dir)")
         return treat_seventh_lvl_dropdown(seventh_dir)
 
     elif callback_trigger == 'plot button':
         # Triggered by merge button
 
-        print("     (callback) update_eighth_level_dir: Callback triggered by merge button")
+        #print("     (callback) update_eighth_level_dir: Callback triggered by merge button")
         return merge_button_click()
 
     elif callback_trigger == 'Eighth level dir':
         # Triggered by directory change
 
-        print("     (callback) update_eighth_level_dir: Callback triggered by directory change (Eighth level dir)")
+        #print("     (callback) update_eighth_level_dir: Callback triggered by directory change (Eighth level dir)")
         return eighth_level_dir_dropdown(eighth_dir)
 
-    return (), '', ''
+    elif callback_trigger == 'Sixth level dir':
+
+        #print("     (callback) update_eighth_level_dir: Callback triggered by directory change (Sixth level dir)")
+        return treat_sixth_level_dropdown(sixth_level_dir)
+
+    return (), (), '', ''
 
 
 app.callback(

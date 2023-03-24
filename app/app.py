@@ -164,11 +164,11 @@ def treat_sixth_lvl_dropdown(input_value):
     if (not fn.is_html_file(input_value)):
         fn.change_directory(last_directories[5])
 
-    print("(callback) treat_sixth_lvl_dropdown: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
-    print("     (callback) treat_sixth_lvl_dropdown: fn.get_directories()", fn.get_directories())
-    print("     (callback) treat_sixth_lvl_dropdown: fn.get_html_files()", fn.get_html_files())
-    print("     (callback) treat_sixth_lvl_dropdown: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
-    print("     (callback) treat_sixth_lvl_dropdown: input_value in fn.get_html_files()", str(input_value in fn.get_html_files()))
+    #print("(callback) treat_sixth_lvl_dropdown: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+    #print("     (callback) treat_sixth_lvl_dropdown: fn.get_directories()", fn.get_directories())
+    #print("     (callback) treat_sixth_lvl_dropdown: fn.get_html_files()", fn.get_html_files())
+    #print("     (callback) treat_sixth_lvl_dropdown: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
+    #print("     (callback) treat_sixth_lvl_dropdown: input_value in fn.get_html_files()", str(input_value in fn.get_html_files()))
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value))):
         # If the path actually changed
         if (input_value in fn.get_directories()):
@@ -183,22 +183,20 @@ def treat_sixth_lvl_dropdown(input_value):
             options.extend(fn.get_directories())
             options.extend(fn.get_html_files())
 
-            print("     (callback) treat_sixth_lvl_dropdown: options = ", options)
-            print("")
+            #print("     (callback) treat_sixth_lvl_dropdown: options = ", options)
+            #print("")
 
             return last_dir_options, [{'label': i, 'value': i} for i in options], "", "", '6. Drivers', '7. Plots'
         elif (input_value in fn.get_html_files()):
             # Prepare plot if it was an html file
-                print("\t\tupdate_sixth_level_dir: Adding html file to the plot")
+                #print("\t\tupdate_sixth_level_dir: Adding html file to the plot")
                 last_dir_options = fn.get_html_files()
-                print("CCCCCCCCCCCCCCCCC")
-                print("last_dir_options = ", last_dir_options)
-                print("DDDDDDDDDDDDDDDD")
+                #print("last_dir_options = ", last_dir_options)
                 path = fn.extend_dir(str(input_value))
 
                 return last_dir_options, (), path, path_cat(path), '6. Plots', '7. '
     
-    print("")
+    #print("")
     return (), (), "", "", '6. ', '7. '
 
 
@@ -264,14 +262,34 @@ def merge_button_click():
     files = fn.get_html_files()
     if (len(files) != 0):
         # html files found on present working directory
-            
+        print("     (callback) merge_button_click: Going to merge files")
+        print("     (callback) merge_button_click: last_directories = ", last_directories)
         merge_html_files(files)
-
         path = fn.extend_dir(ALL_HTML2)
 
-        return (), [{'label': i, 'value': i} for i in files], path, path_cat(path), '6. '
+        sixth_dir_options = ()
+        seventh_dir_options = ()
+        if (last_directories[4] != home):
+            # The sixth directory has already been reached
+            fn.change_directory(last_directories[4])
+            print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
+            sixth_dir_options = fn.get_html_files()
+            print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
+            pass
+        if (last_directories[5] != home):
+            # The seventh directory has already been reached
+            fn.change_directory(last_directories[5])
+            print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
+            seventh_dir_options = fn.get_html_files()
+            print("     (callback) merge_button_click: seventh_dir_options = ", seventh_dir_options)
+            pass
+            
+        print("     (callback) merge_button_click: pwd = ", fn.get_pwd())
+        return sixth_dir_options, seventh_dir_options, path, path_cat(path), '6. Plots', '7. '
     
-    return (), [{'label': i, 'value': i} for i in files], '', '', '6, '
+    print("     (callback) merge_button_click: No html files found on present working directory. Not merging files.")
+    
+    return [{'label': i, 'value': i} for i in files], (), '', '', '6, ', '7. '
 
 
 def toggle_modal(n1, n2, is_open):
@@ -669,33 +687,27 @@ def update_seventh_level_dir(sixth_dir, seventh_dir, n_clicks_plot, fifth_dir):
     #print("\tpath = ", fn.get_pwd())
 
     if (seventh_dir == None and fifth_dir == None and n_clicks_plot == 0 and sixth_dir == None):
-        print("Problemático 1")
         return (), (), '', '', '6. ', '7. '
 
     if callback_trigger == 'Sixth level dir':
         # Triggered by directory change
         #print("     (callback) update_seventh_level_dir: Callback triggered by directory change (Seventh level dir)")
-        print("Problemático 2")
         return treat_sixth_lvl_dropdown(sixth_dir)
 
     elif callback_trigger == 'plot button':
         # Triggered by merge button
-        print("Problemático 3")
         #print("     (callback) update_seventh_level_dir: Callback triggered by merge button")
         return merge_button_click()
 
     elif callback_trigger == 'Seventh level dir':
         # Triggered by directory change
-        print("Problemático 4")
         #print("     (callback) update_seventh_level_dir: Callback triggered by directory change (Eighth level dir)")
         return treat_seventh_lvl_dropdown(seventh_dir)
 
     elif callback_trigger == 'Fifth level dir':
-        print("Problemático 5")
         #print("     (callback) update_seventh_level_dir: Callback triggered by directory change (Sixth level dir)")
         return treat_fifth_level_dropdown(fifth_dir)
 
-    print("Problemático 6")
     return (), (), '', '', '6. ', '7. '
 
 

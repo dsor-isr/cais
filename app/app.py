@@ -31,6 +31,8 @@ PLOTS = 'plots'
 DRIVERS = 'drivers'
 VEHICLES = 'vehicles'
 
+USBL_EXTENSIONS = ["USBL (send)", "USBL (recv)", "USBL (sensors_usbl_fix)"]
+
 HELP = """The Cluster of Analysis for Intelligent Systems (CAIS) is a data visualization tool, developed for analysis of data gathered by the vehicles and robots developed at ISR\'s Dynamical Systems and Ocean Robotics lab."""
 HELP2 = """\nIt works by taking advantage of the tree like nature of the machine\'s file system. Any directory or html file placed somewhere on the Assets/ directories sub-tree (Assets is on the same folder as the executable) will be detected by CAIS. All one has to do is select what they wish to see on each dropdown menu. CAIS then follows that path on the file system to display the already plotted graphs."""
 HELP3 = """\nAfter a particular .html file is selected, a hyperlink will appear. Once clicked, it opens a new tab with the plot."""
@@ -112,15 +114,26 @@ def merge_html_files(files):
         file.write(str(output_file))
 
 
+def reset_upper_directories(dropdown_index):
+    """Resets the directories of the upper dropdowns, so that they don't point irrelevant directories"""
+
+    #global last_directories
+    #print("reset_upper_directories: home = ", home)
+
+    for i in range(dropdown_index, len(last_directories)):
+        #print("reset_upper_directories: (before) i = " + str(i) + " ; last_directories[i] = ", last_directories[i])
+        last_directories[i] = home
+        #print("reset_upper_directories: (after) i = " + str(i) + " ; last_directories[i] = ", last_directories[i])
+
+
 def treat_fifth_level_dropdown(input_value):
 
     # Roll back to parent directory
-    # Roll back to parent directory
     fn.change_directory(last_directories[4])
 
-    #print("(callback) treat_fifth_level_dropdown: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
-    #print("     (callback) treat_fifth_level_dropdown: fn.get_directories()", fn.get_directories())
-    #print("     (callback) treat_fifth_level_dropdown: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
+    print("(callback) treat_fifth_level_dropdown: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+    print("     (callback) treat_fifth_level_dropdown: fn.get_directories()", fn.get_directories())
+    print("     (callback) treat_fifth_level_dropdown: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories()) or input_value == 'mission specific graphics'):
         # If the path actually changed
         fn.change_directory(last_directories[4])
@@ -130,17 +143,22 @@ def treat_fifth_level_dropdown(input_value):
             path = fn.extend_dir(input_value)
             fn.change_directory(str(path))
             last_directories[5] = path
+            reset_upper_directories(6)
+
             label = ""
             if (fn.is_part_of_path(fn.get_pwd(), 'overall')):
                 label = '6. Plots'
                 options.extend(fn.get_html_files())
             else:
                 label = '6. Drivers'
+                options = [option for option in USBL_EXTENSIONS]
                 options.extend(fn.get_directories())
+                options.remove("USBL")
         else:
-            #print("AAAAAAAAAAAAAAAAAA")
+            print("AAAAAAAAAAAAAAAAAA")
+            reset_upper_directories(5)
             options.extend(fn.get_html_files())
-            #print("fn.get_html_files() = ", fn.get_html_files())
+            print("fn.get_html_files() = ", fn.get_html_files())
             label = '6. Plots'
 
         
@@ -149,12 +167,12 @@ def treat_fifth_level_dropdown(input_value):
         #fn.change_directory(str(path))
         #last_directories[5] = path
 
-        #print("     (callback) treat_fifth_level_dropdown: options = ", options)
-        #print("")
+        print("     (callback) treat_fifth_level_dropdown: options = ", options)
+        print("")
 
         return [{'label': i, 'value': i} for i in options], (), "", "", label, '7. '
     
-    #print("")
+    print("")
     return (), (), "", "", '6. ', '7. '
 
 
@@ -171,17 +189,34 @@ def treat_sixth_lvl_dropdown(input_value):
     #print("     (callback) treat_sixth_lvl_dropdown: input_value in fn.get_html_files()", str(input_value in fn.get_html_files()))
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value))):
         # If the path actually changed
-        if (input_value in fn.get_directories()):
+        if (input_value in (fn.get_directories() + USBL_EXTENSIONS)):
             # Extend path if it was a directory
-            last_dir_options = fn.get_directories()
+            last_dir_options = fn.get_directories() + USBL_EXTENSIONS
+            last_dir_options.remove("USBL")
             fn.change_directory(last_directories[5])
             path = fn.extend_dir(input_value)
-            fn.change_directory(str(path))
-            last_directories[6] = path
-
+            #fn.change_directory(str(path))
             options = []
+            #print("input value = " + input_value +" ; USBL_EXTENSIONS = ", USBL_EXTENSIONS)
+            #print("input_value in USBL_EXTENSIONS = ", str(input_value in USBL_EXTENSIONS))
+            if (input_value in USBL_EXTENSIONS):
+                # USBL requires an extra directory jump to reach the html files
+                #print("     (callback) treat_sixth_lvl_dropdown: Picked a type of USBL. Extending accordingly")
+                path = fn.extend_dir("USBL")
+                fn.change_directory(str(path))
+                if (re.search("(send)", input_value) != None):
+                    path = fn.extend_dir("send")
+                elif (re.search("(sensors_usbl_fix)", input_value) != None):
+                    path = fn.extend_dir("sensors_usbl_fix")
+                elif (re.search("(recv)", input_value) != None):
+                    path = fn.extend_dir("recv")
+            fn.change_directory(str(path))
+            
+            print("     (callback) treat_sixth_lvl_dropdown: pwd = ", fn.get_pwd())
             options.extend(fn.get_directories())
             options.extend(fn.get_html_files())
+            
+            last_directories[6] = path
 
             #print("     (callback) treat_sixth_lvl_dropdown: options = ", options)
             #print("")
@@ -193,6 +228,7 @@ def treat_sixth_lvl_dropdown(input_value):
                 last_dir_options = fn.get_html_files()
                 #print("last_dir_options = ", last_dir_options)
                 path = fn.extend_dir(str(input_value))
+                reset_upper_directories(6) # TODO maybe este não é preciso ???
 
                 return last_dir_options, (), path, path_cat(path), '6. Plots', '7. '
     
@@ -215,7 +251,7 @@ def treat_seventh_lvl_dropdown(input_value_dir):
         seventh_dropdown_options = fn.get_directories() + fn.get_html_files()
         if (input_value_dir in fn.get_directories()):
             # Extend path if it was a directory
-            path = fn.extend_dir(input_value_dir)
+            path = fn.extend_dir(input_value_dir) # TODO este branch provavelmente já não é usado
             fn.change_directory(path)
 
             options = []
@@ -226,7 +262,7 @@ def treat_seventh_lvl_dropdown(input_value_dir):
         elif (input_value_dir in fn.get_html_files()):
             # Prepare plot if it was an html file
                 fn.change_directory(last_directories[5])
-                sixth_dir_options = fn.get_directories()
+                sixth_dir_options = fn.get_directories() + USBL_EXTENSIONS
                 fn.change_directory(last_directories[6])
                 seventh_dir_options = fn.get_html_files()
                 path = fn.extend_dir(str(input_value_dir))
@@ -264,25 +300,33 @@ def merge_button_click():
         # html files found on present working directory
         print("     (callback) merge_button_click: Going to merge files")
         print("     (callback) merge_button_click: last_directories = ", last_directories)
+        print("     (callback) merge_button_click: last_directories[5] = ", last_directories[5])
+        print("     (callback) merge_button_click: last_directories[6] = ", last_directories[6])
         merge_html_files(files)
         path = fn.extend_dir(ALL_HTML2)
 
         sixth_dir_options = ()
         seventh_dir_options = ()
-        if (last_directories[4] != home):
-            # The sixth directory has already been reached
-            fn.change_directory(last_directories[4])
-            print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
-            sixth_dir_options = fn.get_html_files()
-            print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
-            pass
         if (last_directories[5] != home):
-            # The seventh directory has already been reached
+            # The fifth directory has already been reached
             fn.change_directory(last_directories[5])
+            print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
+            sixth_dir_options = fn.get_html_files() + fn.get_directories()
+            print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
+        elif (last_directories[4] != home):
+            fn.change_directory(last_directories[4])
+            print("     (callback) merge_button_click: last_directories[4] = ", last_directories[4])
+            print("     (callback) merge_button_click: fn.get_directories()", fn.get_directories())
+            print("     (callback) merge_button_click: fn.get_html_files()", fn.get_html_files())
+            sixth_dir_options = fn.get_html_files() + fn.get_directories()
+            sixth_dir_options.remove("drivers")
+            print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
+        if (last_directories[6] != home):
+            # The sixth directory has already been reached
+            fn.change_directory(last_directories[6])
             print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
             seventh_dir_options = fn.get_html_files()
             print("     (callback) merge_button_click: seventh_dir_options = ", seventh_dir_options)
-            pass
             
         print("     (callback) merge_button_click: pwd = ", fn.get_pwd())
         return sixth_dir_options, seventh_dir_options, path, path_cat(path), '6. Plots', '7. '
@@ -507,6 +551,7 @@ def update_second_level_dir(input_value):
         path = fn.build_dir(VEHICLES, path)
         fn.change_directory(str(path))
         last_directories[1] = path
+        reset_upper_directories(2)
 
         options = []
         options.extend(fn.get_directories())
@@ -540,6 +585,7 @@ def update_third_level_dir(input_value):
         path = fn.build_dir(PLOTS, path)
         fn.change_directory(str(path))
         last_directories[2] = path
+        reset_upper_directories(3)
 
         options = []
         options.extend(fn.get_directories())
@@ -573,6 +619,7 @@ def update_fourth_level_dir(input_value):
         path = fn.extend_dir(input_value)
         fn.change_directory(str(path))
         last_directories[3] = path
+        reset_upper_directories(4)
 
         options = []
         options.extend(fn.get_directories())
@@ -611,6 +658,7 @@ def update_fifth_level_dir(input_value):
         path = fn.extend_dir(input_value)
         fn.change_directory(str(path))
         last_directories[4] = path
+        reset_upper_directories(5)
 
         options = []
         options.extend(fn.get_directories())

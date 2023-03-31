@@ -131,9 +131,9 @@ def treat_fifth_level_dropdown(input_value):
     # Roll back to parent directory
     fn.change_directory(last_directories[4])
 
-    print("(callback) treat_fifth_level_dropdown: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
-    print("     (callback) treat_fifth_level_dropdown: fn.get_directories()", fn.get_directories())
-    print("     (callback) treat_fifth_level_dropdown: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
+    #print("(callback) treat_fifth_level_dropdown: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
+    #print("     (callback) treat_fifth_level_dropdown: fn.get_directories()", fn.get_directories())
+    #print("     (callback) treat_fifth_level_dropdown: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories()) or input_value == 'mission specific graphics'):
         # If the path actually changed
         fn.change_directory(last_directories[4])
@@ -155,10 +155,10 @@ def treat_fifth_level_dropdown(input_value):
                 options.extend(fn.get_directories())
                 options.remove("USBL")
         else:
-            print("AAAAAAAAAAAAAAAAAA")
+            #print("AAAAAAAAAAAAAAAAAA")
             reset_upper_directories(5)
             options.extend(fn.get_html_files())
-            print("fn.get_html_files() = ", fn.get_html_files())
+            #print("fn.get_html_files() = ", fn.get_html_files())
             label = '6. Plots'
 
         
@@ -167,12 +167,12 @@ def treat_fifth_level_dropdown(input_value):
         #fn.change_directory(str(path))
         #last_directories[5] = path
 
-        print("     (callback) treat_fifth_level_dropdown: options = ", options)
-        print("")
+        #print("     (callback) treat_fifth_level_dropdown: options = ", options)
+        #print("")
 
         return [{'label': i, 'value': i} for i in options], (), "", "", label, '7. '
     
-    print("")
+    #print("")
     return (), (), "", "", '6. ', '7. '
 
 
@@ -212,7 +212,7 @@ def treat_sixth_lvl_dropdown(input_value):
                     path = fn.extend_dir("recv")
             fn.change_directory(str(path))
             
-            print("     (callback) treat_sixth_lvl_dropdown: pwd = ", fn.get_pwd())
+            #print("     (callback) treat_sixth_lvl_dropdown: pwd = ", fn.get_pwd())
             options.extend(fn.get_directories())
             options.extend(fn.get_html_files())
             
@@ -298,10 +298,10 @@ def merge_button_click():
     files = fn.get_html_files()
     if (len(files) != 0):
         # html files found on present working directory
-        print("     (callback) merge_button_click: Going to merge files")
-        print("     (callback) merge_button_click: last_directories = ", last_directories)
-        print("     (callback) merge_button_click: last_directories[5] = ", last_directories[5])
-        print("     (callback) merge_button_click: last_directories[6] = ", last_directories[6])
+        #print("     (callback) merge_button_click: Going to merge files")
+        #print("     (callback) merge_button_click: last_directories = ", last_directories)
+        #print("     (callback) merge_button_click: last_directories[5] = ", last_directories[5])
+        #print("     (callback) merge_button_click: last_directories[6] = ", last_directories[6])
         merge_html_files(files)
         path = fn.extend_dir(ALL_HTML2)
 
@@ -310,28 +310,28 @@ def merge_button_click():
         if (last_directories[5] != home):
             # The fifth directory has already been reached
             fn.change_directory(last_directories[5])
-            print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
+            #print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
             sixth_dir_options = fn.get_html_files() + fn.get_directories()
-            print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
+            #print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
         elif (last_directories[4] != home):
             fn.change_directory(last_directories[4])
-            print("     (callback) merge_button_click: last_directories[4] = ", last_directories[4])
-            print("     (callback) merge_button_click: fn.get_directories()", fn.get_directories())
-            print("     (callback) merge_button_click: fn.get_html_files()", fn.get_html_files())
+            #print("     (callback) merge_button_click: last_directories[4] = ", last_directories[4])
+            #print("     (callback) merge_button_click: fn.get_directories()", fn.get_directories())
+            #print("     (callback) merge_button_click: fn.get_html_files()", fn.get_html_files())
             sixth_dir_options = fn.get_html_files() + fn.get_directories()
             sixth_dir_options.remove("drivers")
-            print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
+            #print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
         if (last_directories[6] != home):
             # The sixth directory has already been reached
             fn.change_directory(last_directories[6])
-            print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
+            #print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
             seventh_dir_options = fn.get_html_files()
-            print("     (callback) merge_button_click: seventh_dir_options = ", seventh_dir_options)
+            #print("     (callback) merge_button_click: seventh_dir_options = ", seventh_dir_options)
             
-        print("     (callback) merge_button_click: pwd = ", fn.get_pwd())
+        #print("     (callback) merge_button_click: pwd = ", fn.get_pwd())
         return sixth_dir_options, seventh_dir_options, path, path_cat(path), '6. Plots', '7. '
     
-    print("     (callback) merge_button_click: No html files found on present working directory. Not merging files.")
+    #print("     (callback) merge_button_click: No html files found on present working directory. Not merging files.")
     
     return [{'label': i, 'value': i} for i in files], (), '', '', '6, ', '7. '
 

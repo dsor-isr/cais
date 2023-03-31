@@ -137,7 +137,8 @@ def treat_fifth_level_dropdown(input_value):
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories()) or input_value == 'mission specific graphics'):
         # If the path actually changed
         fn.change_directory(last_directories[4])
-        label = '6. '
+        label_6 = '6. '
+        label_7 = '7. '
         options = []
         if (re.search("mission specific graphics", input_value) == None):
             path = fn.extend_dir(input_value)
@@ -145,12 +146,19 @@ def treat_fifth_level_dropdown(input_value):
             last_directories[5] = path
             reset_upper_directories(6)
 
-            label = ""
+            label_6 = ""
             if (fn.is_part_of_path(fn.get_pwd(), 'overall')):
-                label = '6. Plots'
-                options.extend(fn.get_html_files())
+                # If previously chose overall on the Overview (3rd dropdown)
+                if (input_value == "USBL"):
+                    label_6 = '6. USBL Type'
+                    label_7 = '7. Plots'
+                else:
+                    label_6 = '6. Plots'
+                options.extend(fn.get_html_files() + fn.get_directories())
             else:
-                label = '6. Drivers'
+                # If previously chose missions on the Overview (3rd dropdown)
+                label_6 = '6. Drivers'
+                label_7 = '7. Plots'
                 options = [option for option in USBL_EXTENSIONS]
                 options.extend(fn.get_directories())
                 options.remove("USBL")
@@ -159,7 +167,7 @@ def treat_fifth_level_dropdown(input_value):
             reset_upper_directories(5)
             options.extend(fn.get_html_files())
             #print("fn.get_html_files() = ", fn.get_html_files())
-            label = '6. Plots'
+            label_6 = '6. Plots'
 
         
         #fn.change_directory(last_directories[4])
@@ -170,7 +178,7 @@ def treat_fifth_level_dropdown(input_value):
         #print("     (callback) treat_fifth_level_dropdown: options = ", options)
         #print("")
 
-        return [{'label': i, 'value': i} for i in options], (), "", "", label, '7. '
+        return [{'label': i, 'value': i} for i in options], (), "", "", label_6, '7. '
     
     #print("")
     return (), (), "", "", '6. ', '7. '
@@ -191,8 +199,11 @@ def treat_sixth_lvl_dropdown(input_value):
         # If the path actually changed
         if (input_value in (fn.get_directories() + USBL_EXTENSIONS)):
             # Extend path if it was a directory
-            last_dir_options = fn.get_directories() + USBL_EXTENSIONS
-            last_dir_options.remove("USBL")
+            last_dir_options = fn.get_directories()
+            if (re.search("missions", fn.get_pwd()) != None):
+                # If previously chose missions, instead of overall
+                last_dir_options += USBL_EXTENSIONS
+                last_dir_options.remove("USBL")
             fn.change_directory(last_directories[5])
             path = fn.extend_dir(input_value)
             #fn.change_directory(str(path))

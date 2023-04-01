@@ -151,7 +151,7 @@ def treat_fifth_level_dropdown(input_value):
                 # If previously chose overall on the Overview (3rd dropdown)
                 if (input_value == "USBL"):
                     label_6 = '6. USBL Type'
-                    label_7 = '7. Plots'
+                    label_7 = '7.'
                 else:
                     label_6 = '6. Plots'
                 options.extend(fn.get_html_files() + fn.get_directories())

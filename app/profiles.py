@@ -2,8 +2,47 @@ import json
 import pickle
 
 class Profile:
+    """
+    A class to represent a profile. A profile is a set of filters that can be applied to a list of strings.
+
+    Attributes
+    ----------
+    name : str
+        name of the profile
+    usbl : bool
+        boolean flag to determine if the profile cares about USBL
+    altimeter : bool
+        boolean flag to determine if the profile cares about altimeter
+
+    Methods
+    -------
+    __validateConstructorAttributes(name, usbl, altimeter):
+        Private method. Validates the attributes of the constructor
+    setName(name):
+        Sets the name of the profile
+    getName():
+        Returns the name of the profile
+    setUsbl(usbl):
+        Sets the usbl flag for the profile. If true, it will show USBL related plots.
+    getUsbl():
+        Returns the USBL status of the profile
+    setAltimeter(altimeter):
+        Sets the altimeter flag for the profile. If true, it will show altimeter related plots.
+    getAltimeter():
+        Returns the altimeter status of the profile
+    deserializeClass(jsonData):
+        Deserializes a JSON data into a Profile object
+    deserializeFile(filePath):
+        Deserializes a JSON file into a Profile object
+    serializeClass():
+        Serializes the Profile object into a JSON file
+    serializeProfiles(profiles):
+        Serializes a list or tuple of Profile objects into a JSON string
+    """
+
     # TODO - add filter functions
     # TODO - Add more fields
+    # TODO - Create default profiles
     # TODO - Delete Profiles from CAIS
     #           - Find way to ask if user is sure
     #           - Find way to ask for a password for deletion (store encrypted version of password?)
@@ -29,28 +68,28 @@ class Profile:
     ########################################
 
     def __init__(self, name, usbl=True, altimeter=True):
-        """Creates a Profile object"""
+        """
+        Creates a Profile object
+        
+        Parameters
+        ----------
+            name: str
+                The name of the profile
+            usbl: bool
+                The USBL status of the profile. If true, it will show USBL related plots.
+                (optional, default=True)
+            altimeter: bool
+                The altimeter status of the profile. If true, it will show altimeter related plots.
+                (optional, default=True)
+        """
         try:
             self.__validateConstructorAttributes(name, usbl, altimeter)
         except Exception as e:
             raise e
 
-        #print("Before setting attributes:")
-        #print("name = " + name)
-        #print("usbl = " + str(usbl))
-        #print("altimeter = " + str(altimeter))
-        #print("self.name = " + self.name)
-        #print("self.usbl = " + str(self.usbl))
-        #print("self.altimeter = " + str(self.altimeter))
-
         self.name = name
         self.usbl = usbl
         self.altimeter = altimeter
-
-        #print("After setting attributes:")
-        #print("self.name = " + self.name)
-        #print("self.usbl = " + str(self.usbl))
-        #print("self.altimeter = " + str(self.altimeter))
     
 
     @classmethod
@@ -67,7 +106,12 @@ class Profile:
 
 
     def setName(self, name):
-        """Sets the name of the profile"""
+        """Sets the name of the profile
+        
+        Parameters
+        ----------
+            name: str
+                The name of the profile"""
         if (type(name) != str):
             raise TypeError("Name must be a string")
         elif (name == None or name == ""):
@@ -77,12 +121,22 @@ class Profile:
 
 
     def getName(self):
-        """Returns the name of the profile"""
+        """Returns the name of the profile
+        
+        Returns
+        -------
+            str
+                The name of the profile"""
         return self.name
 
     
     def setUsbl(self, usbl):
-        """Sets the usbl flag for the profile. If true, it will show USBL related plots."""
+        """Sets the usbl flag for the profile. If true, it will show USBL related plots.
+        
+        Parameters
+        ----------
+            usbl: bool
+                The USBL status of the profile. If true, it will show USBL related plots."""
         if (type(usbl) != bool):
             raise TypeError("USBL must be a boolean")
 
@@ -90,12 +144,22 @@ class Profile:
 
     
     def getUsbl(self):
-        """Returns the USBL status of the profile"""
+        """Returns the USBL status of the profile
+        
+        Returns
+        -------
+            bool
+                The USBL status of the profile"""
         return self.usbl
 
     
     def setAltimeter(self, altimeter):
-        """Sets the altimeter flag for the profile. If true, it will show altimeter related plots."""
+        """Sets the altimeter flag for the profile. If true, it will show altimeter related plots.
+        
+        Parameters
+        ----------
+            altimeter: bool
+                The altimeter status of the profile. If true, it will show altimeter related plots."""
         if (type(altimeter) != bool):
             raise TypeError("Altimeter must be a boolean")
 
@@ -103,7 +167,12 @@ class Profile:
 
 
     def getAltimeter(self):
-        """Returns the altimeter status of the profile"""
+        """Returns the altimeter status of the profile
+        
+        Returns
+        -------
+            bool
+                The altimeter status of the profile"""
         return self.altimeter
 
 

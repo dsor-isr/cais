@@ -299,7 +299,7 @@ class Profile:
                 raise ValueError("Profile doesn't exist")
             profiles = deserializedProfiles
         except FileNotFoundError as e:
-            json.dump(profile, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
+            raise e
         except PermissionError as e:
             raise e
         except Exception as e:

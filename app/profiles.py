@@ -233,12 +233,6 @@ class Profile:
         elif (profile.getName() == None or profile.getName() == ""):
             raise ValueError("Profile name can't be None/Null or empty")
 
-        # TODO - read profiles.json
-        #            - Catch exception if file doesn't exist
-        #      - check if profile already exists
-        #      - append profile to profiles
-        #      - sort by name
-        #      - write profiles to profiles.json
         profiles = [profile]
         try:
             deserializedProfiles = Profile.deserializeFile("profiles.json")

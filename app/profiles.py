@@ -41,18 +41,14 @@ class Profile:
         Serializes a list or tuple of Profile objects into a JSON string
     """
 
-    # TODO - add filter functions
     # TODO - Add more fields
     # TODO - Create default profiles
+    # TODO - serialize profiles in constructor
     # TODO - Delete Profiles from CAIS
     #           - Find way to ask if user is sure
     #           - Find way to ask for a password for deletion (store encrypted version of password?)
     # TODO - Add Profiles to CAIS
     # TODO - Update Profiles in CAIS
-
-    # TODO - See the differences between pickle and json
-    # TODO - I think we no longer use pickle. Remove from here and requirements.txt
-
 
     ########################################
     ######     JSON Enconder Class    ######
@@ -87,10 +83,16 @@ class Profile:
             self.__validateConstructorAttributes(name, usbl, altimeter)
         except Exception as e:
             raise e
+        
 
         self.name = name
         self.usbl = usbl
         self.altimeter = altimeter
+
+        if (Profile.profileAlreadyExists(self)):
+            raise ValueError("A profile with that name already exists")
+
+        Profile.serializeClass(self)
     
 
     ########################################
@@ -203,8 +205,8 @@ class Profile:
         self.setUsbl(usbl)
         self.setAltimeter(altimeter)
         try:
-            Profile.deleteProfile(self) # Remove old version from profiles.json
-        except ValueError as e:
+            Profile.deleteProfile(oldProfile) # Remove old version from profiles.json
+        except ValueError:
             pass
         Profile.serializeClass(self) # Add new version to profiles.json
 
@@ -382,6 +384,32 @@ class Profile:
         json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
 
     
+    @staticmethod
+    def profileAlreadyExists(profile):
+    
+        if (type(profile) != Profile):
+            raise TypeError("Profile must be a Profile object")
+        elif (profile == None):
+            raise ValueError("Profile can't be None/Null")
+        elif (profile.getName() == None or profile.getName() == ""):
+            raise ValueError("Profile name can't be None/Null or empty")
+        
+        try:
+            deserializedProfiles = Profile.deserializeFile("profiles.json")
+            for deserializedProfile in deserializedProfiles:
+                if (deserializedProfile.getName().lower() == profile.getName().lower()):
+                    return
+                
+        except FileNotFoundError as e:
+            raise e
+        except PermissionError as e:
+            raise e
+        except Exception as e:
+            raise e
+        
+        return False
+
+    
     ########################################
     ######       To String method     ######
     ########################################
@@ -442,9 +470,6 @@ def readJSONfile(file):
         raise e
     except PermissionError as e:
         raise e
-
-
-
 
 
 ############################################

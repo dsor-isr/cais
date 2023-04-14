@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 class Profile:
     """
@@ -109,6 +110,10 @@ class Profile:
             raise TypeError("Altimeter must be a boolean")
 
 
+    ########################################
+    ######     normal  methods        ######
+    ########################################
+
     def setName(self, name):
         """Sets the name of the profile
         
@@ -178,6 +183,66 @@ class Profile:
             bool
                 The altimeter status of the profile"""
         return self.altimeter
+
+
+    def update(self, name, usbl, altimeter):
+        """Updates the profile with the given parameters
+        
+        Parameters
+        ----------
+            name: str
+                The name of the profile
+            usbl: bool
+                The USBL status of the profile. If true, it will show USBL related plots.
+            altimeter: bool
+                The altimeter status of the profile. If true, it will show altimeter related plots.
+        """
+        self.setName(name)
+        self.setUsbl(usbl)
+        self.setAltimeter(altimeter)
+
+
+    def filter(self, files):
+        """Filters the files based on the profile
+        
+        Parameters
+        ----------
+            files: list
+                list of files to filter
+        Returns
+        -------
+            list
+                list of relevant files for this profile"""
+        if (type(files) not in (list, tuple)):
+            raise TypeError("Files must be a list")
+        elif (files == [] or files == ()):
+            raise ValueError("Files can't be empty")
+
+        filtered_files = files
+        for file in files:
+            if (type(file) != str):
+                raise TypeError("Files must be a list of strings")
+            elif (file == None or file == ""):
+                raise ValueError("Files can't contain None/Null or empty strings")
+            
+            filtered_files = self.__filter_aux(files)
+
+        return filtered_files
+            
+
+    def __filter_aux(self, files):
+        """Auxiliary function to filter files based on the profile"""
+        for file in files:
+            lowerCaseFile = file.lower()
+            if (self.getAltimeter() and re.search("altimeter", lowerCaseFile) != None):
+                files.remove(file)
+            elif (self.getUsbl() and re.search("usbl", lowerCaseFile) != None):
+                files.remove(file)
+
+        return files
+
+        
+
 
 
     ########################################
@@ -389,49 +454,49 @@ if __name__ == '__main__':
     #    print(profile)
 
     # Serialize profiles to JSON with repeated profiles
-    if os.path.exists("profiles.json"):
-        # Delete file for testing purposes
-        os.remove("profiles.json")
-    try:
-        Profile.serializeClass(Profile("Eletronics", True, False))
-    except Exception as e:
-        print("Something very weird happened")
-        raise e
-    try:
-        Profile.serializeClass(Profile("Eletronics", False, False)) # Should throw an exception
-        print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
-    except Exception as e:
-        print("Profile already exists")
-    try:
-        Profile.serializeClass(Profile("Control", False, False))
-    except Exception as e:
-        print("Something very weird happened")
-        raise e
-    try:
-        Profile.serializeClass(Profile("Admin", True, True))
-    except Exception as e:
-        print("Something very weird happened")
-        raise e
-    try:
-        Profile.serializeClass(Profile("Admin", True, True)) # Should throw an exception
-        print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
-    except Exception as e:
-        print("Profile already exists")
-    try:
-        Profile.serializeClass(Profile("Eletronics", True, False)) # Should throw an exception
-        print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
-    except Exception as e:
-        print("Profile already exists")
-    try:
-        Profile.serializeClass(Profile("Robotics", False, False))
-    except Exception as e:
-        print("Something very weird happened")
-        raise e
+    # if os.path.exists("profiles.json"):
+    #     # Delete file for testing purposes
+    #     os.remove("profiles.json")
+    # try:
+    #     Profile.serializeClass(Profile("Eletronics", True, False))
+    # except Exception as e:
+    #     print("Something very weird happened")
+    #     raise e
+    # try:
+    #     Profile.serializeClass(Profile("Eletronics", False, False)) # Should throw an exception
+    #     print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
+    # except Exception as e:
+    #     print("Profile already exists")
+    # try:
+    #     Profile.serializeClass(Profile("Control", False, False))
+    # except Exception as e:
+    #     print("Something very weird happened")
+    #     raise e
+    # try:
+    #     Profile.serializeClass(Profile("Admin", True, True))
+    # except Exception as e:
+    #     print("Something very weird happened")
+    #     raise e
+    # try:
+    #     Profile.serializeClass(Profile("Admin", True, True)) # Should throw an exception
+    #     print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
+    # except Exception as e:
+    #     print("Profile already exists")
+    # try:
+    #     Profile.serializeClass(Profile("Eletronics", True, False)) # Should throw an exception
+    #     print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
+    # except Exception as e:
+    #     print("Profile already exists")
+    # try:
+    #     Profile.serializeClass(Profile("Robotics", False, False))
+    # except Exception as e:
+    #     print("Something very weird happened")
+    #     raise e
 
-    deserializedProfiles = Profile.deserializeFile("profiles.json")
-    print("Printing all previously serialized classes from profiles.json")
-    for profile in deserializedProfiles:
-        print(profile)
+    # deserializedProfiles = Profile.deserializeFile("profiles.json")
+    # print("Printing all previously serialized classes from profiles.json")
+    # for profile in deserializedProfiles:
+    #     print(profile)
 
     # Delete a profile
     # try:
@@ -449,3 +514,12 @@ if __name__ == '__main__':
     # except Exception as e:
     #     print("Something very weird happened")
     #     raise e
+
+    # filter files
+    files = ['Altimeter', 'USBL', 'altimeter', 'drivers', 'ALTIMETER']
+    expected = ['USBL', 'drivers']
+    profile = Profile("Eletronics", False, True)
+    print("Profile: " + str(profile))
+    filteredFiles = profile.filter(files)
+    print("Filtered files: " + str(filteredFiles))
+    print("filteredFiles == expected: " + str(filteredFiles == expected))

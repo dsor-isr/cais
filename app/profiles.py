@@ -1,5 +1,5 @@
 import json
-import pickle
+import os
 
 class Profile:
     """
@@ -91,6 +91,10 @@ class Profile:
         self.usbl = usbl
         self.altimeter = altimeter
     
+
+    ########################################
+    ######     private methods        ######
+    ########################################
 
     @classmethod
     def __validateConstructorAttributes(self, name, usbl, altimeter):
@@ -188,28 +192,35 @@ class Profile:
         if (jsonData == None): # TODO - Check if jsonData is a JSON object / better input validation
             raise ValueError("JSON data can't be None/Null")
 
-        #print("jsonData['name'] = " + jsonData['name'])
-        #print("jsonData['usbl'] = " + str(jsonData['usbl']))
-        #print("jsonData['altimeter'] = " + str(jsonData['altimeter']))
-
         return Profile(jsonData['name'], jsonData['usbl'], jsonData['altimeter'])
 
     
     @staticmethod
-    def deserializeFile(filePath): # TODO - create override method that takes jsonData instead of filePath
-        """Deserializes a JSON file into a Profile object"""
+    def deserializeFile(filePath): # TODO - create overriden method that takes jsonData instead of filePath
+        """Deserializes a JSON file a list of Profile objects"""
         if (type(filePath) != str):
-            raise TypeError("File path must be a string") # TODO - Check if file exists
+            raise TypeError("File path must be a string")
         elif (filePath == None or filePath == ""):
             raise ValueError("File path can't be None/Null or empty")
 
         try:
             with open(filePath) as jsonFile:
-                jsonData = json.load(jsonFile)
-                print("jsonData = " + str(jsonData))
-                #return Profile.deserializeClass(jsonData)
-        except Exception as e: # TODO - Catch specific exceptions
+                jsonData = json.load(jsonFile) # Read JSON
+                if (type(jsonData) != list):
+                    # If there was only one profile on the json file
+                    jsonData = [jsonData]
+
+                deserializedProfiles = []
+                for profile in jsonData: # Convert JSON into list of Profile objects
+                    deserializedProfiles.append(Profile.deserializeClass(profile))
+        except FileNotFoundError as e:
             raise e
+        except PermissionError as e:
+            raise e
+        except Exception as e:
+            raise e
+    
+        return deserializedProfiles
     
 
     @staticmethod
@@ -219,9 +230,33 @@ class Profile:
             raise TypeError("Profile must be a Profile object")
         elif (profile == None):
             raise ValueError("Profile can't be None/Null")
+        elif (profile.getName() == None or profile.getName() == ""):
+            raise ValueError("Profile name can't be None/Null or empty")
 
+        # TODO - read profiles.json
+        #            - Catch exception if file doesn't exist
+        #      - check if profile already exists
+        #      - append profile to profiles
+        #      - sort by name
+        #      - write profiles to profiles.json
+        profiles = [profile]
+        try:
+            deserializedProfiles = Profile.deserializeFile("profiles.json")
+            for deserializedProfile in deserializedProfiles:
+                if (deserializedProfile.getName().lower() == profile.getName().lower()):
+                    raise ValueError("Profile already exists")
+            
+            deserializedProfiles.append(profile)
+            profiles = deserializedProfiles
+            profiles.sort()
+        except FileNotFoundError as e:
+            json.dump(profile, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
+        except PermissionError as e:
+            raise e
+        except Exception as e:
+            raise e
 
-        json.dump(profile, open("profile.json", "w"), indent=4, cls=Profile.ProfileEncoder)
+        json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
         return Profile.ProfileEncoder().encode(profile)
 
     
@@ -236,9 +271,41 @@ class Profile:
         for profile in profiles:
             if (type(profile) != Profile):
                 raise TypeError("Profile must be a Profile object")
+            
+        # TODO call serializeClass for each profile in profiles
 
         json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
         return json.dumps([profile.__dict__ for profile in profiles])
+    
+
+    @staticmethod
+    def deleteProfile(profile):
+        """Deletes a profile from the profiles.json file"""
+        if (type(profile) != Profile):
+            raise TypeError("Profile must be a Profile object")
+        elif (profile == None):
+            raise ValueError("Profile can't be None/Null")
+
+        profiles = []
+        try:
+            deserializedProfiles = Profile.deserializeFile("profiles.json")
+            foundProfile = False
+            for deserializedProfile in deserializedProfiles:
+                if (deserializedProfile.getName().lower() == profile.getName().lower()):
+                    deserializedProfiles.remove(deserializedProfile)
+                    foundProfile = True
+                    break
+            if (not foundProfile):
+                raise ValueError("Profile doesn't exist")
+            profiles = deserializedProfiles
+        except FileNotFoundError as e:
+            json.dump(profile, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
+        except PermissionError as e:
+            raise e
+        except Exception as e:
+            raise e
+
+        json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
 
     
     ########################################
@@ -247,6 +314,18 @@ class Profile:
 
     def __str__(self):
         return "Profile = {name: " + self.getName() + ", USBL: " + str(self.getUsbl()) + ", Altimeter: " + str(self.getAltimeter()) + "}"
+    
+    ########################################
+    ######       Less Than method     ######
+    ########################################
+
+    def __lt__(self, other):
+        if (type(other) != Profile):
+            raise TypeError("Other must be a Profile object")
+        if (self.getName() == None or other.getName() == None):
+            raise ValueError("Name can't be None/Null")
+        
+        return self.getName() < other.getName()
 
 
 ############################################
@@ -254,7 +333,16 @@ class Profile:
 ############################################
 
 def readJSONfile(file):
-    """Reads a JSON file and returns the data"""
+    """Reads a JSON file and returns the data
+    
+    Parameters
+    ----------
+        file: str
+            The path to the JSON file
+    Returns
+    -------
+        dict
+            The data from the JSON file"""
     if (type(file) != str):
         raise TypeError("File must be a string")
     elif (file == None or file == ""):
@@ -264,7 +352,9 @@ def readJSONfile(file):
         with open(file) as jsonFile:
             data = json.load(jsonFile)
             return data
-    except Exception as e: # TODO - Catch specific exceptions
+    except FileNotFoundError as e:
+        raise e
+    except PermissionError as e:
         raise e
 
 
@@ -300,9 +390,68 @@ if __name__ == '__main__':
     #print(deserializedProfile)
 
     # Deserialize json data corresponding to 3 profiles
+    # deserializedProfiles = Profile.deserializeFile("profiles.json")
+    # for profile in deserializedProfiles:
+    #    print(profile)
+
+    # Serialize profiles to JSON with repeated profiles
+    if os.path.exists("profiles.json"):
+        # Delete file for testing purposes
+        os.remove("profiles.json")
+    try:
+        Profile.serializeClass(Profile("Eletronics", True, False))
+    except Exception as e:
+        print("Something very weird happened")
+        raise e
+    try:
+        Profile.serializeClass(Profile("Eletronics", False, False)) # Should throw an exception
+        print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
+    except Exception as e:
+        print("Profile already exists")
+    try:
+        Profile.serializeClass(Profile("Control", False, False))
+    except Exception as e:
+        print("Something very weird happened")
+        raise e
+    try:
+        Profile.serializeClass(Profile("Admin", True, True))
+    except Exception as e:
+        print("Something very weird happened")
+        raise e
+    try:
+        Profile.serializeClass(Profile("Admin", True, True)) # Should throw an exception
+        print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
+    except Exception as e:
+        print("Profile already exists")
+    try:
+        Profile.serializeClass(Profile("Eletronics", True, False)) # Should throw an exception
+        print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
+    except Exception as e:
+        print("Profile already exists")
+    try:
+        Profile.serializeClass(Profile("Robotics", False, False))
+    except Exception as e:
+        print("Something very weird happened")
+        raise e
+
     deserializedProfiles = Profile.deserializeFile("profiles.json")
-    print(deserializedProfiles)
+    print("Printing all previously serialized classes from profiles.json")
+    for profile in deserializedProfiles:
+        print(profile)
 
-    #second_profile = Profile.deserializeClass("profile.json")
+    # Delete a profile
+    # try:
+    #     Profile.deleteProfile(Profile("Eletronics", True, False))
+    # except Exception as e:
+    #     print("Something very weird happened")
+    #     raise e
 
-    #print(second_profile)
+    # Delete a profile that doesn't exist
+    # try:
+    #     Profile.deleteProfile(Profile("Eletronics", True, False)) # Should throw a ValueError
+    #     print("This should have never been printed. An exception due to non-existing profile should have been thrown")
+    # except ValueError as e:
+    #     print("Profile doesn't exist")
+    # except Exception as e:
+    #     print("Something very weird happened")
+    #     raise e

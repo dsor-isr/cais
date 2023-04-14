@@ -197,9 +197,19 @@ class Profile:
             altimeter: bool
                 The altimeter status of the profile. If true, it will show altimeter related plots.
         """
+
+        oldProfile = self.clone()
         self.setName(name)
         self.setUsbl(usbl)
         self.setAltimeter(altimeter)
+        Profile.deleteProfile(self) # Remove old version from profiles.json
+        Profile.serializeClass(self) # Add new version to profiles.json
+
+
+    def delete(self):
+        """Removes itself from profiles.json"""
+
+        Profile.deleteProfile(self)
 
 
     def filter(self, files):
@@ -242,7 +252,9 @@ class Profile:
         return files
 
         
-
+    def clone(self):
+        """Clones the profile"""
+        return Profile(self.getName(), self.getUsbl(), self.getAltimeter())
 
 
     ########################################
@@ -385,6 +397,18 @@ class Profile:
             raise ValueError("Name can't be None/Null")
         
         return self.getName() < other.getName()
+    
+    ########################################
+    ######       Equals   method      ######
+    ########################################
+
+    def __eq__(self, other):
+        if not isinstance(other, Profile):
+            return False
+        
+        return (self.getAltimeter() == other.getAltimeter() and 
+                self.getUsbl() == other.getUsbl() and
+                self.getName() == other.getName())
 
 
 ############################################
@@ -516,10 +540,19 @@ if __name__ == '__main__':
     #     raise e
 
     # filter files
-    files = ['Altimeter', 'USBL', 'altimeter', 'drivers', 'ALTIMETER']
-    expected = ['USBL', 'drivers']
+    # files = ['Altimeter', 'USBL', 'altimeter', 'drivers', 'ALTIMETER']
+    # expected = ['USBL', 'drivers']
+    # profile = Profile("Eletronics", False, True)
+    # print("Profile: " + str(profile))
+    # filteredFiles = profile.filter(files)
+    # print("Filtered files: " + str(filteredFiles))
+    # print("filteredFiles == expected: " + str(filteredFiles == expected))
+
+    # update profile
     profile = Profile("Eletronics", False, True)
-    print("Profile: " + str(profile))
-    filteredFiles = profile.filter(files)
-    print("Filtered files: " + str(filteredFiles))
-    print("filteredFiles == expected: " + str(filteredFiles == expected))
+    oldProfile = profile.clone()
+    print(str(profile))
+    print("Before update: oldProfile == profile: " + str(oldProfile == profile))
+    profile.update("Robotics", True, False) # TODO - need to remove old version from profiles.json and add new updated one
+    print(str(profile))
+    print("After update: oldProfile == profile: " + str(oldProfile == profile))

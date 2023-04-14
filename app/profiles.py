@@ -43,7 +43,6 @@ class Profile:
 
     # TODO - Add more fields
     # TODO - Create default profiles
-    # TODO - serialize profiles in constructor
     # TODO - Delete Profiles from CAIS
     #           - Find way to ask if user is sure
     #           - Find way to ask for a password for deletion (store encrypted version of password?)
@@ -64,7 +63,8 @@ class Profile:
     ######          methods           ######
     ########################################
 
-    def __init__(self, name, usbl=True, altimeter=True):
+    def __init__(self, name, usbl=True, altimeter=True, depthCell=True,
+                  gps=True, imu=True, insidePressure=True, batMonit=True):
         """
         Creates a Profile object
         
@@ -78,6 +78,21 @@ class Profile:
             altimeter: bool
                 The altimeter status of the profile. If true, it will show altimeter related plots.
                 (optional, default=True)
+            depthCell: bool
+                The depthCell status of the profile. If true, it will show depthCell related plots.
+                (optional, default=True)
+            gps: bool
+                The gps status of the profile. If true, it will show gps related plots.
+                (optional, default=True)
+            imu: bool
+                The imu status of the profile. If true, it will show imu related plots.
+                (optional, default=True)
+            insidePressure: bool
+                The insidePressure status of the profile. If true, it will show insidePressure related plots.
+                (optional, default=True)
+            batMonit: bool
+                The batMonit status of the profile. If true, it will show batMonit related plots.
+                (optional, default=True)
         """
         try:
             self.__validateConstructorAttributes(name, usbl, altimeter)
@@ -88,6 +103,11 @@ class Profile:
         self.name = name
         self.usbl = usbl
         self.altimeter = altimeter
+        self.depthCell = depthCell
+        self.gps = gps
+        self.imu = imu
+        self.insidePressure = insidePressure
+        self.batMonit = batMonit
 
         if (Profile.profileAlreadyExists(self)):
             raise ValueError("A profile with that name already exists")
@@ -140,6 +160,121 @@ class Profile:
                 The name of the profile"""
         return self.name
 
+
+    def setBatMonit(self, batMonit):
+        """Sets the batMonit flag for the profile. If true, it will show batMonit related plots.
+        
+        Parameters
+        ----------
+            batMonit: bool
+                The batMonit status of the profile. If true, it will show batMonit related plots."""
+        if (type(batMonit) != bool):
+            raise TypeError("batMonit must be a boolean")
+
+        self.batMonit = batMonit
+
+
+    def getBatMonit(self):
+        """Returns the batMonit status of the profile
+        
+        Returns
+        -------
+            bool
+                The batMonit status of the profile"""
+        return self.batMonit
+    
+
+    def setInsidePressure(self, insidePressure):
+        """Sets the insidePressure flag for the profile. If true, it will show insidePressure related plots.
+        
+        Parameters
+        ----------
+            insidePressure: bool
+                The insidePressure status of the profile. If true, it will show insidePressure related plots."""
+        if (type(insidePressure) != bool):
+            raise TypeError("insidePressure must be a boolean")
+
+        self.insidePressure = insidePressure
+
+
+    def getInsidePressure(self):
+        """Returns the insidePressure status of the profile
+        
+        Returns
+        -------
+            bool
+                The insidePressure status of the profile"""
+        return self.insidePressure
+    
+
+    def setImu(self, imu):
+        """Sets the imu flag for the profile. If true, it will show imu related plots.
+        
+        Parameters
+        ----------
+            imu: bool
+                The imu status of the profile. If true, it will show imu related plots."""
+        if (type(imu) != bool):
+            raise TypeError("imu must be a boolean")
+
+        self.imu = imu
+
+
+    def getImu(self):
+        """Returns the imu status of the profile
+        
+        Returns
+        -------
+            bool
+                The imu status of the profile"""
+        return self.imu
+    
+
+    def setGps(self, gps):
+        """Sets the gps flag for the profile. If true, it will show gps related plots.
+        
+        Parameters
+        ----------
+            gps: bool
+                The gps status of the profile. If true, it will show gps related plots."""
+        if (type(gps) != bool):
+            raise TypeError("gps must be a boolean")
+
+        self.gps = gps
+
+
+    def getGps(self):
+        """Returns the gps status of the profile
+        
+        Returns
+        -------
+            bool
+                The gps status of the profile"""
+        return self.gps
+    
+
+    def setDepthCell(self, depthCell):
+        """Sets the depthCell flag for the profile. If true, it will show depthCell related plots.
+        
+        Parameters
+        ----------
+            depthCell: bool
+                The depthCell status of the profile. If true, it will show depthCell related plots."""
+        if (type(depthCell) != bool):
+            raise TypeError("depthCell must be a boolean")
+
+        self.depthCell = depthCell
+
+
+    def getDepthCell(self):
+        """Returns the depthCell status of the profile
+        
+        Returns
+        -------
+            bool
+                The depthCell status of the profile"""
+        return self.depthCell
+     
     
     def setUsbl(self, usbl):
         """Sets the usbl flag for the profile. If true, it will show USBL related plots.
@@ -187,8 +322,11 @@ class Profile:
         return self.altimeter
 
 
-    def update(self, name, usbl, altimeter):
-        """Updates the profile with the given parameters
+    def update(self, name=None, usbl=False, altimeter=False, batMonit=False,
+                insidePressure=False, imu=False, gps=False, depthCell=False):
+        """Updates the profile with the given parameters. If no name is given,
+        the name will remain unchanged. If any of the other parameters are not given,
+        they will be set to false.
         
         Parameters
         ----------
@@ -198,12 +336,29 @@ class Profile:
                 The USBL status of the profile. If true, it will show USBL related plots.
             altimeter: bool
                 The altimeter status of the profile. If true, it will show altimeter related plots.
+            batMonit: bool
+                The batMonit status of the profile. If true, it will show batMonit related plots.
+            insidePressure: bool
+                The insidePressure status of the profile. If true, it will show insidePressure related plots.
+            imu: bool
+                The imu status of the profile. If true, it will show imu related plots.
+            gps: bool
+                The gps status of the profile. If true, it will show gps related plots.
+            depthCell: bool
+                The depthCell status of the profile. If true, it will show depthCell related plots.
         """
-
+        if (name == None):
+            name = self.getName()
+        
         oldProfile = self.clone()
         self.setName(name)
         self.setUsbl(usbl)
         self.setAltimeter(altimeter)
+        self.setBatMonit(batMonit)
+        self.setInsidePressure(insidePressure)
+        self.setImu(imu)
+        self.setGps(gps)
+        self.setDepthCell(depthCell)
         try:
             Profile.deleteProfile(oldProfile) # Remove old version from profiles.json
         except ValueError:
@@ -253,6 +408,16 @@ class Profile:
                 files.remove(file)
             elif (self.getUsbl() and re.search("usbl", lowerCaseFile) != None):
                 files.remove(file)
+            elif (self.getBatMonit() and re.search("batmonit", lowerCaseFile) != None):
+                files.remove(file)
+            elif (self.getInsidePressure() and re.search("insidepressure", lowerCaseFile) != None):
+                files.remove(file)
+            elif (self.getImu() and re.search("imu", lowerCaseFile) != None):
+                files.remove(file)
+            elif (self.getGps() and re.search("gps", lowerCaseFile) != None):
+                files.remove(file)
+            elif (self.getDepthCell() and re.search("depthcell", lowerCaseFile) != None):
+                files.remove(file)
 
         return files
 
@@ -274,8 +439,9 @@ class Profile:
         if (jsonData == None): # TODO - Check if jsonData is a JSON object / better input validation
             raise ValueError("JSON data can't be None/Null")
 
-        return Profile(jsonData['name'], jsonData['usbl'], jsonData['altimeter'])
-
+        return Profile(jsonData['name'], jsonData['usbl'], jsonData['altimeter'],
+                        jsonData['depthCell'], jsonData['gps'], jsonData['imu'],
+                        jsonData['insidePressure'], jsonData['batMonit'])
     
     @staticmethod
     def deserializeFile(filePath): # TODO - create overriden method that takes jsonData instead of filePath
@@ -415,7 +581,7 @@ class Profile:
     ########################################
 
     def __str__(self):
-        return "Profile = {name: " + self.getName() + ", USBL: " + str(self.getUsbl()) + ", Altimeter: " + str(self.getAltimeter()) + "}"
+        return "Profile = {name: " + self.getName() + ", USBL: " + str(self.getUsbl()) + ", Altimeter: " + str(self.getAltimeter()) + ", Depth Cell: " + str(self.getDepthCell()) + ", GPS: " + str(self.getGps()) + ", IMU: " + str(self.getImu()) + ", Inside Pressure: " + str(self.getInsidePressure()) + ", Battery Monitor: " + str(self.getBatMonit()) + "}"
     
     ########################################
     ######       Less Than method     ######
@@ -439,7 +605,12 @@ class Profile:
         
         return (self.getAltimeter() == other.getAltimeter() and 
                 self.getUsbl() == other.getUsbl() and
-                self.getName() == other.getName())
+                self.getName() == other.getName() and
+                self.getDepthCell() == other.getDepthCell() and
+                self.getGps() == other.getGps() and
+                self.getImu() == other.getImu() and
+                self.getInsidePressure() == other.getInsidePressure() and
+                self.getBatMonit() == other.getBatMonit())
 
 
 ############################################

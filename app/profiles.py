@@ -202,7 +202,10 @@ class Profile:
         self.setName(name)
         self.setUsbl(usbl)
         self.setAltimeter(altimeter)
-        Profile.deleteProfile(self) # Remove old version from profiles.json
+        try:
+            Profile.deleteProfile(self) # Remove old version from profiles.json
+        except ValueError as e:
+            pass
         Profile.serializeClass(self) # Add new version to profiles.json
 
 
@@ -553,6 +556,6 @@ if __name__ == '__main__':
     oldProfile = profile.clone()
     print(str(profile))
     print("Before update: oldProfile == profile: " + str(oldProfile == profile))
-    profile.update("Robotics", True, False) # TODO - need to remove old version from profiles.json and add new updated one
+    profile.update("DSOR", True, True)
     print(str(profile))
     print("After update: oldProfile == profile: " + str(oldProfile == profile))

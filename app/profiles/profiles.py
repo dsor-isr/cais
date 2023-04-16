@@ -95,11 +95,14 @@ class Profile:
                 (optional, default=True)
         """
         try:
-            self.__validateConstructorAttributes(name, usbl, altimeter)
-        except Exception as e:
-            raise e
+            self.__validateConstructorAttributes(name, usbl, altimeter,
+                                                 depthCell, gps, imu,
+                                                 insidePressure, batMonit)
+        except ValueError as valueError:
+            raise valueError
+        except TypeError as typeError:
+            raise typeError
         
-
         self.name = name
         self.usbl = usbl
         self.altimeter = altimeter
@@ -109,18 +112,13 @@ class Profile:
         self.insidePressure = insidePressure
         self.batMonit = batMonit
 
-        if (Profile.profileAlreadyExists(self)):
-            raise ValueError("A profile with that name already exists")
-
-        Profile.serializeClass(self)
-    
 
     ########################################
     ######     private methods        ######
     ########################################
 
     @classmethod
-    def __validateConstructorAttributes(self, name, usbl, altimeter):
+    def __validateConstructorAttributes(self, name, usbl, altimeter, depthCell, gps, imu, insidePressure, batMonit):
         """Validates the attributes of the constructor"""
         if (type(name) != str):
             raise TypeError("Name must be a string")
@@ -130,6 +128,16 @@ class Profile:
             raise TypeError("USBL must be a boolean")
         if (type(altimeter) != bool):
             raise TypeError("Altimeter must be a boolean")
+        if (type(depthCell) != bool):
+            raise TypeError("DepthCell must be a boolean")
+        if (type(gps) != bool):
+            raise TypeError("GPS must be a boolean")
+        if (type(imu) != bool):
+            raise TypeError("IMU must be a boolean")
+        if (type(insidePressure) != bool):
+            raise TypeError("InsidePressure must be a boolean")
+        if (type(batMonit) != bool):
+            raise TypeError("BatMonit must be a boolean")
 
 
     ########################################
@@ -438,7 +446,7 @@ class Profile:
         """Deserializes a JSON data into a Profile object"""
         if (jsonData == None): # TODO - Check if jsonData is a JSON object / better input validation
             raise ValueError("JSON data can't be None/Null")
-
+        
         return Profile(jsonData['name'], jsonData['usbl'], jsonData['altimeter'],
                         jsonData['depthCell'], jsonData['gps'], jsonData['imu'],
                         jsonData['insidePressure'], jsonData['batMonit'])
@@ -461,14 +469,42 @@ class Profile:
                 deserializedProfiles = []
                 for profile in jsonData: # Convert JSON into list of Profile objects
                     deserializedProfiles.append(Profile.deserializeClass(profile))
-        except FileNotFoundError as e:
-            raise e
-        except PermissionError as e:
-            raise e
-        except Exception as e:
-            raise e
+        except FileNotFoundError as fileNotFoundError:
+            raise fileNotFoundError
+        except PermissionError as permissionError:
+            raise permissionError
+        except Exception as exception:
+            raise exception
     
         return deserializedProfiles
+    
+
+    @staticmethod
+    def deserializeFileWithoutCreatingProfiles(filePath):
+        """Deserializes a JSON file into a list of JSON objects.
+        
+        Use this method to avoid recursion errors when creating Profile objects.
+        The recursion would occur when calling deserializeClass() which calls
+        the constructor."""
+        if (type(filePath) != str):
+            raise TypeError("File path must be a string")
+        elif (filePath == None or filePath == ""):
+            raise ValueError("File path can't be None/Null or empty")
+
+        try:
+            with open(filePath) as jsonFile:
+                jsonData = json.load(jsonFile) # Read JSON
+                if (type(jsonData) != list):
+                    # If there was only one profile on the json file
+                    jsonData = [jsonData]
+        except FileNotFoundError as fileNotFoundError:
+            raise fileNotFoundError
+        except PermissionError as permissionError:
+            raise permissionError
+        except Exception as exception:
+            raise exception
+    
+        return jsonData
     
 
     @staticmethod
@@ -480,23 +516,26 @@ class Profile:
             raise ValueError("Profile can't be None/Null")
         elif (profile.getName() == None or profile.getName() == ""):
             raise ValueError("Profile name can't be None/Null or empty")
+        elif (Profile.profileAlreadyExists(profile)):
+            raise ValueError("Profile already exists")
 
-        profiles = [profile]
+        deserializedProfiles = []
         try:
             deserializedProfiles = Profile.deserializeFile("profiles.json")
-            for deserializedProfile in deserializedProfiles:
-                if (deserializedProfile.getName().lower() == profile.getName().lower()):
-                    raise ValueError("Profile already exists")
-            
-            deserializedProfiles.append(profile)
-            profiles = deserializedProfiles
-            profiles.sort()
-        except FileNotFoundError as e:
+        except FileNotFoundError as fileNotFoundError:
             json.dump(profile, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
-        except PermissionError as e:
-            raise e
-        except Exception as e:
-            raise e
+        except PermissionError as permissionError:
+            raise permissionError
+        except Exception as exception:
+            raise exception
+        
+        for deserializedProfile in deserializedProfiles:
+            if (deserializedProfile.getName().lower() == profile.getName().lower()):
+                raise ValueError("Profile already exists")
+            
+        deserializedProfiles.append(profile)
+        profiles = deserializedProfiles
+        profiles.sort()
 
         json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
         return Profile.ProfileEncoder().encode(profile)
@@ -540,12 +579,12 @@ class Profile:
             if (not foundProfile):
                 raise ValueError("Profile doesn't exist")
             profiles = deserializedProfiles
-        except FileNotFoundError as e:
-            raise e
-        except PermissionError as e:
-            raise e
-        except Exception as e:
-            raise e
+        except FileNotFoundError as fileNotFoundError:
+            raise fileNotFoundError
+        except PermissionError as permissionError:
+            raise permissionError
+        except Exception as exception:
+            raise exception
 
         json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
 
@@ -561,17 +600,17 @@ class Profile:
             raise ValueError("Profile name can't be None/Null or empty")
         
         try:
-            deserializedProfiles = Profile.deserializeFile("profiles.json")
+            deserializedProfiles = Profile.deserializeFileWithoutCreatingProfiles("profiles.json")
             for deserializedProfile in deserializedProfiles:
-                if (deserializedProfile.getName().lower() == profile.getName().lower()):
-                    return
+                if (profile.getName().lower() == deserializedProfile['name'].lower()):
+                    return True
                 
-        except FileNotFoundError as e:
-            raise e
-        except PermissionError as e:
-            raise e
-        except Exception as e:
-            raise e
+        except FileNotFoundError as fileNotFoundError:
+            return False
+        except PermissionError as permissionError:
+            raise permissionError
+        except Exception as exception:
+            raise exception
         
         return False
 
@@ -637,10 +676,10 @@ def readJSONfile(file):
         with open(file) as jsonFile:
             data = json.load(jsonFile)
             return data
-    except FileNotFoundError as e:
-        raise e
-    except PermissionError as e:
-        raise e
+    except FileNotFoundError as fileNotFoundError:
+        raise fileNotFoundError
+    except PermissionError as permissionError:
+        raise permissionError
 
 
 ############################################
@@ -748,10 +787,13 @@ if __name__ == '__main__':
     # print("filteredFiles == expected: " + str(filteredFiles == expected))
 
     # update profile
-    profile = Profile("Eletronics", False, True)
-    oldProfile = profile.clone()
-    print(str(profile))
-    print("Before update: oldProfile == profile: " + str(oldProfile == profile))
-    profile.update("DSOR", True, True)
-    print(str(profile))
-    print("After update: oldProfile == profile: " + str(oldProfile == profile))
+    # profile = Profile("Eletronics", False, True)
+    # oldProfile = profile.clone()
+    # print(str(profile))
+    # print("Before update: oldProfile == profile: " + str(oldProfile == profile))
+    # profile.update("DSOR", True, True)
+    # print(str(profile))
+    # print("After update: oldProfile == profile: " + str(oldProfile == profile))
+
+    # update profile with invalid name
+    pass

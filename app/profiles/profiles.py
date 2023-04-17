@@ -396,38 +396,40 @@ class Profile:
         elif (files == [] or files == ()):
             raise ValueError("Files can't be empty")
 
-        filtered_files = files
+        #filtered_files = files
         for file in files:
             if (type(file) != str):
                 raise TypeError("Files must be a list or tuple of strings")
             elif (file == None or file == ""):
                 raise ValueError("Files can't contain None/Null or empty strings")
             
-            filtered_files = self.__filter_aux(files)
+        filtered_files = self.__filter_aux(files)
 
         return filtered_files
             
 
     def __filter_aux(self, files):
         """Auxiliary function to filter files based on the profile"""
+
+        output_files = [file for file in files]
         for file in files:
             lowerCaseFile = file.lower()
             if (self.getAltimeter() and re.search("altimeter", lowerCaseFile) != None):
-                files.remove(file)
+                output_files.remove(file)
             elif (self.getUsbl() and re.search("usbl", lowerCaseFile) != None):
-                files.remove(file)
+                output_files.remove(file)
             elif (self.getBatMonit() and re.search("batmonit", lowerCaseFile) != None):
-                files.remove(file)
+                output_files.remove(file)
             elif (self.getInsidePressure() and re.search("insidepressure", lowerCaseFile) != None):
-                files.remove(file)
+                output_files.remove(file)
             elif (self.getImu() and re.search("imu", lowerCaseFile) != None):
-                files.remove(file)
+                output_files.remove(file)
             elif (self.getGps() and re.search("gps", lowerCaseFile) != None):
-                files.remove(file)
+                output_files.remove(file)
             elif (self.getDepthCell() and re.search("depthcell", lowerCaseFile) != None):
-                files.remove(file)
+                output_files.remove(file)
 
-        return files
+        return output_files
 
         
     def clone(self):

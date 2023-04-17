@@ -37,19 +37,15 @@ def test_read_json_file_doesnt_exist():
     with pytest.raises(FileNotFoundError) as e:
         profiles.readJSONfile("read_json_test.json")
     
-    # assert "File not found" in str(e.value)
-
 
 def test_read_json_permission_error():
     clean_files()
     with open("read_json_test.json", "w") as f:
         f.write("")
-        os.chmod("read_json_test.json", 0o222) # Set write only
+        os.chmod("read_json_test.json", 0o222) # Set as write only
 
     with pytest.raises(PermissionError) as e:
         profiles.readJSONfile("read_json_test.json")
-
-    # assert "Permission denied" in str(e.value)
 
     clean_files()
     

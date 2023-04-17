@@ -392,14 +392,14 @@ class Profile:
             list
                 list of relevant files for this profile"""
         if (type(files) not in (list, tuple)):
-            raise TypeError("Files must be a list")
+            raise TypeError("Files must be a list or tuple")
         elif (files == [] or files == ()):
             raise ValueError("Files can't be empty")
 
         filtered_files = files
         for file in files:
             if (type(file) != str):
-                raise TypeError("Files must be a list of strings")
+                raise TypeError("Files must be a list or tuple of strings")
             elif (file == None or file == ""):
                 raise ValueError("Files can't contain None/Null or empty strings")
             

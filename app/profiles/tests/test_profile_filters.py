@@ -13,6 +13,7 @@ FILES_CANT_BE_NONE_OR_EMPTY_STRINGS = "Files can't contain None/Null or empty st
 UPPER_CASE_BASIC_FILTER_TEST = ['DEPTHCELL', 'GPS', 'IMU', 'INSIDEPRESSURE', 'USBL', 'ALTIMETER', 'BATMONIT']
 LOWER_CASE_BASIC_FILTER_TEST = ['depthcell', 'gps', 'imu', 'insidepressure', 'usbl', 'altimeter', 'batmonit']
 MIXED_CASE_BASIC_FILTER_TEST = ['DepthCell', 'Gps', 'Imu', 'InsidePressure', 'Usbl', 'Altimeter', 'BatMonit']
+COMPLEX_REGEC_FILTER_TEST_CASE = ['_DepthCell', 'GPSGPS', '!3?Imu', '##USbL##']
 
 
 def test_filter_invalid_input_type():
@@ -72,8 +73,6 @@ def test_filter_empty_string():
     assert FILES_CANT_BE_NONE_OR_EMPTY_STRINGS in str(e.value)
 
 
-# TODO - Add tests for filter() with valid input
-
 def test_filter_everything():
     profile = profiles.Profile(TEST_PROFILES[0], True, True, True, True, True, True, True)
 
@@ -90,6 +89,25 @@ def test_dont_filter_anything():
     assert profile.filter(MIXED_CASE_BASIC_FILTER_TEST) == MIXED_CASE_BASIC_FILTER_TEST
 
 
-#def test_filter_some_flags():
+def test_filter_some_flags():
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
 
-#def test_non_simple_regex():
+    assert profile.filter(UPPER_CASE_BASIC_FILTER_TEST) == ['INSIDEPRESSURE', 'ALTIMETER', 'BATMONIT']
+    assert profile.filter(LOWER_CASE_BASIC_FILTER_TEST) == ['insidepressure', 'altimeter', 'batmonit']
+    assert profile.filter(MIXED_CASE_BASIC_FILTER_TEST) == ['InsidePressure', 'Altimeter', 'BatMonit']
+
+    profile = profiles.Profile(TEST_PROFILES[0], False, True, False, False, False, True, True)
+
+    assert profile.filter(UPPER_CASE_BASIC_FILTER_TEST) == ['DEPTHCELL', 'GPS', 'IMU', 'USBL']
+    assert profile.filter(LOWER_CASE_BASIC_FILTER_TEST) == ['depthcell', 'gps', 'imu', 'usbl']
+    assert profile.filter(MIXED_CASE_BASIC_FILTER_TEST) == ['DepthCell', 'Gps', 'Imu', 'Usbl']
+
+
+def test_non_simple_regex():
+    profile = profiles.Profile(TEST_PROFILES[0], True, True, True, True, True, True, True)
+
+    assert profile.filter(COMPLEX_REGEC_FILTER_TEST_CASE) == []
+
+    profile = profiles.Profile(TEST_PROFILES[0], False, False, False, False, False, False, False)
+
+    assert profile.filter(COMPLEX_REGEC_FILTER_TEST_CASE) == COMPLEX_REGEC_FILTER_TEST_CASE

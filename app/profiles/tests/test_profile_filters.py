@@ -5,7 +5,14 @@ TEST_PROFILES = ["TEST_PROFILE", "SECOND_TEST_PROFILE", "THIRD_TEST_PROFILE", "F
 INVALID_LIST = [None]
 INVALID_TUPLE = (3, 4, 5)
 EMPTY_STRING = ""
+LIST_OR_TUPLE_EXCEPTION = "Files must be a list or tuple"
+LIST_OR_TUPLE_OF_STRINGS_EXCEPTION = "Files must be a list or tuple of strings"
+FILES_CANT_BE_EMPTY_EXCEPTION = "Files can't be empty"
+FILES_CANT_BE_NONE_OR_EMPTY_STRINGS = "Files can't contain None/Null or empty strings"
 
+UPPER_CASE_BASIC_FILTER_TEST = ['DEPTHCELL', 'GPS', 'IMU', 'INSIDEPRESSURE', 'USBL', 'ALTIMETER', 'BATMONIT']
+LOWER_CASE_BASIC_FILTER_TEST = ['depthcell', 'gps', 'imu', 'insidepressure', 'usbl', 'altimeter', 'batmonit']
+MIXED_CASE_BASIC_FILTER_TEST = ['DepthCell', 'Gps', 'Imu', 'InsidePressure', 'Usbl', 'Altimeter', 'BatMonit']
 
 
 def test_filter_invalid_input_type():
@@ -14,27 +21,27 @@ def test_filter_invalid_input_type():
     with pytest.raises(TypeError) as e:
         profile.filter(None)
 
-    assert "Files must be a list or tuple" in str(e.value)
+    assert LIST_OR_TUPLE_EXCEPTION in str(e.value)
 
     with pytest.raises(TypeError) as e:
         profile.filter(3)
 
-    assert "Files must be a list or tuple" in str(e.value)
+    assert LIST_OR_TUPLE_EXCEPTION in str(e.value)
 
     with pytest.raises(TypeError) as e:
         profile.filter(TEST_PROFILES[0])
 
-    assert "Files must be a list or tuple" in str(e.value)
+    assert LIST_OR_TUPLE_EXCEPTION in str(e.value)
 
     with pytest.raises(TypeError) as e:
         profile.filter(INVALID_LIST)
 
-    assert "Files must be a list or tuple of strings" in str(e.value)
+    assert LIST_OR_TUPLE_OF_STRINGS_EXCEPTION in str(e.value)
 
     with pytest.raises(TypeError) as e:
         profile.filter(INVALID_TUPLE)
     
-    assert "Files must be a list or tuple of strings" in str(e.value)
+    assert LIST_OR_TUPLE_OF_STRINGS_EXCEPTION in str(e.value)
 
 
 def test_filter_empty_input():
@@ -43,12 +50,12 @@ def test_filter_empty_input():
     with pytest.raises(ValueError) as e:
         profile.filter([])
 
-    assert "Files can't be empty" in str(e.value)
+    assert FILES_CANT_BE_EMPTY_EXCEPTION in str(e.value)
 
     with pytest.raises(ValueError) as e:
         profile.filter(())
 
-    assert "Files can't be empty" in str(e.value)
+    assert FILES_CANT_BE_EMPTY_EXCEPTION in str(e.value)
 
 
 def test_filter_empty_string():
@@ -57,12 +64,32 @@ def test_filter_empty_string():
     with pytest.raises(ValueError) as e:
         profile.filter([EMPTY_STRING])
 
-    assert "Files can't contain None/Null or empty strings" in str(e.value)
+    assert FILES_CANT_BE_NONE_OR_EMPTY_STRINGS in str(e.value)
 
     with pytest.raises(ValueError) as e:
         profile.filter((EMPTY_STRING,))
 
-    assert "Files can't contain None/Null or empty strings" in str(e.value)
+    assert FILES_CANT_BE_NONE_OR_EMPTY_STRINGS in str(e.value)
 
 
 # TODO - Add tests for filter() with valid input
+
+def test_filter_everything():
+    profile = profiles.Profile(TEST_PROFILES[0], True, True, True, True, True, True, True)
+
+    assert profile.filter(UPPER_CASE_BASIC_FILTER_TEST) == []
+    assert profile.filter(LOWER_CASE_BASIC_FILTER_TEST) == []
+    assert profile.filter(MIXED_CASE_BASIC_FILTER_TEST) == []
+
+
+def test_dont_filter_anything():
+    profile = profiles.Profile(TEST_PROFILES[0], False, False, False, False, False, False, False)
+
+    assert profile.filter(UPPER_CASE_BASIC_FILTER_TEST) == UPPER_CASE_BASIC_FILTER_TEST
+    assert profile.filter(LOWER_CASE_BASIC_FILTER_TEST) == LOWER_CASE_BASIC_FILTER_TEST
+    assert profile.filter(MIXED_CASE_BASIC_FILTER_TEST) == MIXED_CASE_BASIC_FILTER_TEST
+
+
+#def test_filter_some_flags():
+
+#def test_non_simple_regex():

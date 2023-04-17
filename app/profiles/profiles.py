@@ -432,7 +432,9 @@ class Profile:
         
     def clone(self):
         """Clones the profile"""
-        return Profile(self.getName(), self.getUsbl(), self.getAltimeter())
+        return Profile(self.getName(), self.getUsbl(), self.getAltimeter(),
+                       self.getDepthCell(), self.getGps(), self.getImu(),
+                       self.getInsidePressure(), self.getBatMonit())
 
 
     ########################################
@@ -620,7 +622,7 @@ class Profile:
     ########################################
 
     def __str__(self):
-        return "Profile = {name: " + self.getName() + ", USBL: " + str(self.getUsbl()) + ", Altimeter: " + str(self.getAltimeter()) + ", Depth Cell: " + str(self.getDepthCell()) + ", GPS: " + str(self.getGps()) + ", IMU: " + str(self.getImu()) + ", Inside Pressure: " + str(self.getInsidePressure()) + ", Battery Monitor: " + str(self.getBatMonit()) + "}"
+        return "Profile = { name: " + self.getName() + ", USBL: " + str(self.getUsbl()) + ", Altimeter: " + str(self.getAltimeter()) + ", DepthCell: " + str(self.getDepthCell()) + ", GPS: " + str(self.getGps()) + ", IMU: " + str(self.getImu()) + ", InsidePressure: " + str(self.getInsidePressure()) + ", BatMonit: " + str(self.getBatMonit()) + "}"
     
     ########################################
     ######       Less Than method     ######
@@ -631,7 +633,7 @@ class Profile:
             raise TypeError("Other must be a Profile object")
         if (self.getName() == None or other.getName() == None):
             raise ValueError("Name can't be None/Null")
-        
+
         return self.getName() < other.getName()
     
     ########################################

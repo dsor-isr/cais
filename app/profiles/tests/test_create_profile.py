@@ -144,9 +144,3 @@ def test_create_profile_with_invalid_boolean_flags():
 
 
 # def test_create_profile_thrown_exceptions():
-
-# def test_set_valid_attributes():
-
-# def test_set_invalid_attributes():
-
-# def test_profile_setters_and_getters():

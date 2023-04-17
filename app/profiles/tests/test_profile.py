@@ -1,6 +1,5 @@
 from profiles import profiles
 import pytest
-import os
 
 
 TEST_PROFILES = ["TEST_PROFILE", "SECOND_TEST_PROFILE", "THIRD_TEST_PROFILE", "FOURTH_TEST_PROFILE", "FIFTH_TEST_PROFILE"]
@@ -70,6 +69,7 @@ def test_comparisson_with_different_type():
         profile < 3
 
     assert "Other must be a Profile object" in str(e.value)
+
 
 def test_comparisson():
     profile = profiles.Profile(ALPHABETICAL_PROFILES[0], True, False, True, True, True, False, False)

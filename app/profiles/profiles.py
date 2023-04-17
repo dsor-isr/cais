@@ -103,14 +103,14 @@ class Profile:
         except TypeError as typeError:
             raise typeError
         
-        self.name = name
-        self.usbl = usbl
-        self.altimeter = altimeter
-        self.depthCell = depthCell
-        self.gps = gps
-        self.imu = imu
-        self.insidePressure = insidePressure
-        self.batMonit = batMonit
+        self.setName(name)
+        self.setUsbl(usbl)
+        self.setAltimeter(altimeter)
+        self.setBatMonit(batMonit)
+        self.setInsidePressure(insidePressure)
+        self.setImu(imu)
+        self.setGps(gps)
+        self.setDepthCell(depthCell)
 
 
     ########################################

@@ -534,6 +534,26 @@ app.layout = html.Div([
             n_clicks=0,
             style={'margin-left': '25px'}
         ),
+
+        #dbc.Button("Create Profile", id="create profile button", n_clicks=0),
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Header")),
+                dbc.ModalBody("This is the content of the modal"),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close",
+                        id="create modal close button",
+                        className="ms-auto",
+                        n_clicks=0
+                    )
+                ),
+            ],
+            id="create profile modal",
+            scrollable=True,
+            is_open=False,
+            style={'white-space':'pre-line'}
+        ),
         html.Div(id="output"),
 
         ##############################
@@ -814,6 +834,15 @@ app.callback(
     [State("modal-help-body-scroll", "is_open")],
 )(toggle_modal)
 
+app.callback(
+    Output("create profile modal", "is_open"),
+    [
+        Input("create profile button", "n_clicks"),
+        Input("create modal close button", "n_clicks"),
+    ],
+    [State("modal-help-body-scroll", "is_open")],
+)(toggle_modal)
+
 @app.callback(
         Output("load delete label", "children"),
         Output("Load Delete Dropdown", "options"),
@@ -840,12 +869,12 @@ def display_value(value):
     return f"{value}", profiles
 
 
-@app.callback(
-        Input("Create Profile", "n_clicks"),
-)
-def create_profile(n_clicks):
-    # TODO - implement
-    pass
+# @app.callback(
+#         Input("Create Profile", "n_clicks"),
+# )
+# def create_profile(n_clicks):
+#     # TODO - implement
+#     pass
 
 ##############################
 ###      Main Function     ###

@@ -200,7 +200,7 @@ def get_directories(ignore_hidden_files=True, path=None):
     return filter_out_files(files)
 
 
-def get_files(ignore_hidden_files=True):
+def get_files(ignore_hidden_files=True, path=None):
     """Lists all files in the current working directory. Default behaviour
     is to remove hidden files. To include hidden files, set ignore_hidden_files
     to False.
@@ -210,7 +210,10 @@ def get_files(ignore_hidden_files=True):
     information, check the documentation for python's os module
     https://docs.python.org/3/library/os.html#"""
 
-    files = os.listdir(path='.')
+    if (path == None):
+        files = os.listdir(path='.')
+    else:
+        files = os.listdir(path=path)
 
     if (ignore_hidden_files == True):
         files = filter_out_hidden_files(files)

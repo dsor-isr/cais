@@ -5,6 +5,7 @@ from dash import Dash, html, dcc, Input, Output, ctx, State
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import file_navigation as fn
+from profiles import profiles
 import base64
 from bs4 import BeautifulSoup
 import copy
@@ -43,6 +44,8 @@ HELP7 = """a) Refresh the web page"""
 HELP8 = """b) Change the first drop down"""
 HELP9 = """c) Run app.py again"""
 HELP += '\n' + HELP2 + '\n' + HELP3 + '\n' + HELP4 + '\n' + HELP5 + '\n' + HELP6 + '\n' + HELP7 + '\n' + HELP8 + '\n' + HELP9
+
+PATH_TO_PROFILES = fn.extend_dir('assets/profiles')
 
 ##############################
 ###    Global Variables    ###
@@ -480,7 +483,6 @@ app.layout = html.Div([
         html.Br(),
         html.Label(children='4. ',
         id='Fourth level dir label'),
-        #html.Label('4. Fourth level Directory'),
         dcc.Dropdown((),
         id='Fourth level dir'),
 
@@ -505,14 +507,47 @@ app.layout = html.Div([
     ##############################
 
     html.Div(children=[
+    
+        ##############################
+        ####     Radio Items       ###
+        ##############################
+
+        dbc.RadioItems(
+            id="radios",
+            className="btn-group",
+            inputClassName="btn-check",
+            labelClassName="btn btn-outline-primary",
+            labelCheckedClassName="active",
+            options=[
+                {"label": "Load Profile", "value": 'Load Profile', "id": "load profile button"},
+                {"label": "Delete Profile", "value": 'Delete Profile', "id": "delete profile button"},
+            ],
+            value='Load Profile',
+        ),
+
+        ##############################
+        ####        Buttons        ###
+        ##############################
+
+        dbc.Button('Create Profile',
+            id='create profile button',
+            n_clicks=0,
+            style={'margin-left': '25px'}
+        ),
+        html.Div(id="output"),
 
         ##############################
         ####   Right   Dropdowns   ###
         ##############################
 
-        html.P(id='center dropdowns', # This is here so the dropdowns won't show up at the top of the page
-        style={'height': '28%'}),
+        html.Label(children='placeholder',
+        id='load delete label'),
+        dcc.Dropdown((),
+        id='Load Delete Dropdown',
+        ),
 
+        html.P(id='center dropdowns', # This is here so the dropdowns won't show up at the top of the page
+        style={'height': '13%'}),
 
         html.Br(),
         html.Label(children='5. ',
@@ -779,6 +814,38 @@ app.callback(
     [State("modal-help-body-scroll", "is_open")],
 )(toggle_modal)
 
+@app.callback(
+        Output("load delete label", "children"),
+        Output("Load Delete Dropdown", "options"),
+        [Input("radios", "value"),],)
+def display_value(value):
+    print("display_value")
+    if (value == None):
+        return "Pick if you want to Load or Delete a profile", []
+    
+    print("PATH_TO_PROFILES = ", PATH_TO_PROFILES)
+    print("value = ", value)
+    path = fn.build_dir("profiles.json", PATH_TO_PROFILES)
+    print("path = ", path)
+    profiles = []
+    if (fn.is_valid_file(path)):
+        print("Going to deserialize file")
+        profiles = profiles.Profile.deserializeFile(path)
+        print("profiles = ", profiles)
+    else:
+        print("File does not exist")
+        # TODO - show error message warning that there is no profiles.json to delete or load files from
+        pass
+
+    return f"{value}", profiles
+
+
+@app.callback(
+        Input("Create Profile", "n_clicks"),
+)
+def create_profile(n_clicks):
+    # TODO - implement
+    pass
 
 ##############################
 ###      Main Function     ###

@@ -526,7 +526,7 @@ class Profile:
         deserializedProfiles = []
         try:
             deserializedProfiles = Profile.deserializeFile("profiles.json")
-        except FileNotFoundError as fileNotFoundError:
+        except FileNotFoundError as fileNotFoundError: # TODO - remove "as" keyword?
             json.dump(profile, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
         except PermissionError as permissionError:
             raise permissionError
@@ -571,12 +571,23 @@ class Profile:
         elif (profile == None):
             raise ValueError("Profile can't be None/Null")
 
+        Profile.deleteProfileByName(profile.getName())
+
+
+    @staticmethod
+    def deleteProfileByName(profileName):
+        """Deletes a profile from the profiles.json file"""
+        if (type(profileName) != str):
+            raise TypeError("Profile name must be a string")
+        elif (profileName == None or profileName == ""):
+            raise ValueError("Profile name can't be None/Null or empty")
+
         profiles = []
         try:
             deserializedProfiles = Profile.deserializeFile("profiles.json")
             foundProfile = False
             for deserializedProfile in deserializedProfiles:
-                if (deserializedProfile.getName().lower() == profile.getName().lower()):
+                if (deserializedProfile.getName().lower() == profileName.lower()):
                     deserializedProfiles.remove(deserializedProfile)
                     foundProfile = True
                     break
@@ -617,6 +628,31 @@ class Profile:
             raise exception
         
         return False
+    
+
+    @staticmethod
+    def loadProfile(profileName):
+        """Loads a profile from the profiles.json file"""
+        if (type(profileName) != str):
+            raise TypeError("Profile name must be a string")
+        elif (profileName == ""):
+            raise ValueError("Profile name can't be None/Null or empty")
+
+        deserializedProfiles = []
+        try:
+            deserializedProfiles = Profile.deserializeFile("profiles.json")
+        except FileNotFoundError as fileNotFoundError:
+            raise fileNotFoundError
+        except PermissionError as permissionError:
+            raise permissionError
+        except Exception as exception:
+            raise exception
+
+        for deserializedProfile in deserializedProfiles:
+            if (deserializedProfile.getName().lower() == profileName.lower()):
+                return deserializedProfile
+        
+        raise ValueError("Profile doesn't exist")
 
     
     ########################################
@@ -800,4 +836,12 @@ if __name__ == '__main__':
     # print("After update: oldProfile == profile: " + str(oldProfile == profile))
 
     # update profile with invalid name
-    pass
+    #pass
+
+
+    profile = Profile("Eletronics", False, True)
+    profile1 = Profile("Control")
+    profile2 = Profile("default", False, False, False, False, False, False, False)
+    Profile.serializeClass(profile)
+    Profile.serializeClass(profile1)
+    Profile.serializeClass(profile2)

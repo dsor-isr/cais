@@ -4,7 +4,7 @@
 from dash import Dash, html, dcc, Input, Output, ctx, State
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
-import file_navigation as fn
+from file_navigation import file_navigation as fn
 from profiles import profiles
 import base64
 from bs4 import BeautifulSoup
@@ -32,6 +32,8 @@ PLOTS = 'plots'
 DRIVERS = 'drivers'
 VEHICLES = 'vehicles'
 
+FILTER_NAMES = ["USBL", "Altimeter", "Depth Cell", "GPS", "IMU", "Inside Pressure", "Bat Monit"]
+NUM_FILTERS = len(FILTER_NAMES)
 USBL_EXTENSIONS = ["USBL (send)", "USBL (recv)", "USBL (sensors_usbl_fix)"]
 
 HELP = """The Cluster of Analysis for Intelligent Systems (CAIS) is a data visualization tool, developed for analysis of data gathered by the vehicles and robots developed at ISR\'s Dynamical Systems and Ocean Robotics lab."""
@@ -45,7 +47,7 @@ HELP8 = """b) Change the first drop down"""
 HELP9 = """c) Run app.py again"""
 HELP += '\n' + HELP2 + '\n' + HELP3 + '\n' + HELP4 + '\n' + HELP5 + '\n' + HELP6 + '\n' + HELP7 + '\n' + HELP8 + '\n' + HELP9
 
-PATH_TO_PROFILES = fn.extend_dir('assets/profiles')
+PATH_TO_PROFILES = fn.extend_dir('profiles')
 
 ##############################
 ###    Global Variables    ###
@@ -54,6 +56,7 @@ PATH_TO_PROFILES = fn.extend_dir('assets/profiles')
 #home = fn.get_pwd()
 home = fn.extend_dir('assets')
 home = fn.build_dir('days', home)
+loaded_profile = None
 #print("home = ", home)
 #print("content = ", fn.get_directories(path=home))
 last_directories = [home, home, home, home, home, home, home]
@@ -65,6 +68,7 @@ dsor_logo = 'assets/logos/DSOR_logo_v05a.jpg'
 isr_logo = 'assets/logos/isr_logo_red_background.png'
 
 last_dropdown_changed = 0
+
 
 
 ##############################
@@ -83,6 +87,17 @@ def b64_image(image_filename):
 
 def path_cat(path):
     return path[path.find('assets'):]
+
+
+def filter(files):
+    """Take a list or tuple of files and filter them based on the current
+    loaded profile."""
+    if type(files) != str or type(files) != tuple:
+        raise TypeError("filter: Expect a list or tuple of files but received ", str(type(files)))
+    if loaded_profile == None:
+        raise RuntimeError("filter: No profile has been loaded")
+    
+    return loaded_profile.filter(files)
 
 
 def merge_html_files(files):
@@ -115,6 +130,87 @@ def merge_html_files(files):
     merged_html = fn.get_pwd() + ALL_HTML
     with open(merged_html, "w", encoding='utf-8') as file:
         file.write(str(output_file))
+
+
+def create_profile(checklist_values, profile_name):
+    """Creates a new profile with the given checklist values"""
+
+    if (checklist_values == None):
+        boolean_filters = [False for i in range(NUM_FILTERS)]
+    else:
+        boolean_filters = checklist_filters_to_booleans(checklist_values)
+    if (type(profile_name) != str):
+        raise TypeError("create_profile: Expected a string for profile_name but received ", str(type(profile_name)))
+    elif (profile_name == ""):
+        raise ValueError("create_profile: profile_name is empty")
+
+    new_profile = profiles.Profile(profile_name, *boolean_filters)
+    pwd = fn.get_pwd()
+    fn.change_directory(PATH_TO_PROFILES)
+    profiles.Profile.serializeClass(new_profile)
+    fn.change_directory(pwd)
+
+
+def delete_profile(profile_name):
+    """Deletes a profile with the given name"""
+
+    if (type(profile_name) != str):
+        raise TypeError("delete_profile: Expected a string for profile_name but received ", str(type(profile_name)))
+    elif (profile_name == ""):
+        raise ValueError("delete_profile: profile_name is empty")
+
+    pwd = fn.get_pwd()
+    fn.change_directory(PATH_TO_PROFILES)
+    profiles.Profile.deleteProfileByName(profile_name)
+    fn.change_directory(pwd)
+
+
+def load_profiles():
+    path = fn.build_dir("profiles.json", PATH_TO_PROFILES)
+    profile_names = []
+    if (fn.is_valid_file(path)):
+        deserialized_profiles = profiles.Profile.deserializeFile(path)
+        for profile in deserialized_profiles:
+            profile_names.append(profile.getName())
+
+    return profile_names
+
+
+def load_profile(profile_name):
+    """Loads a profile with the given name"""
+
+    if (type(profile_name) != str):
+        raise TypeError("load_profile: Expected a string for profile_name but received ", str(type(profile_name)))
+    elif (profile_name == ""):
+        raise ValueError("load_profile: profile_name is empty")
+
+    pwd = fn.get_pwd()
+    fn.change_directory(PATH_TO_PROFILES)
+    global loaded_profile
+    loaded_profile = profiles.Profile.loadProfile(profile_name)
+    fn.change_directory(pwd)
+
+
+def checklist_filters_to_booleans(checklist_values):
+    """Converts the values of the checklist to booleans"""
+
+    if (checklist_values == None):
+        raise ValueError("checklist_filters_to_booleans: checklist_values is None")
+    if (type(checklist_values) != list and type(checklist_values) != tuple):
+        raise TypeError("checklist_filters_to_booleans: Expected a list or tuple, but received ", str(type(checklist_values)))
+
+    booleans = [False for i in range(NUM_FILTERS)]
+    for i in checklist_values:
+        if (type(i) != str):
+            raise TypeError("checklist_filters_to_booleans: Expected a list of strings, but received a list with a non-string element")
+        
+        if (i in FILTER_NAMES):
+            index = FILTER_NAMES.index(i)
+            booleans[index] = True
+        else:
+            raise ValueError("checklist_filters_to_booleans: At least one of the values of the checklist is not a valid filter")
+
+    return booleans
 
 
 def reset_upper_directories(dropdown_index):
@@ -535,25 +631,39 @@ app.layout = html.Div([
             style={'margin-left': '25px'}
         ),
 
-        #dbc.Button("Create Profile", id="create profile button", n_clicks=0),
         dbc.Modal(
             [
-                dbc.ModalHeader(dbc.ModalTitle("Header")),
-                dbc.ModalBody("This is the content of the modal"),
+                dbc.ModalHeader(dbc.ModalTitle("Create Profile")),
+                dbc.ModalBody("Pick the name of the new profile and the filters you want to apply to it. It isn't possible to create a profile if another one already exists with that name."),
+                html.Label('Enter the profile name:'),
+                dcc.Input(value='', type='text', id='profile name'),
+                dcc.Checklist(['GPS', 'Depth Cell', 'Altimeter', 'Inside Pressure', 'USBL', 'IMU', 'Bat Monit'],
+                    inputStyle={"margin-right": "5px", 'margin-left': '20px'},
+                    id='create profile checklist',
+                ),
                 dbc.ModalFooter(
-                    dbc.Button(
-                        "Close",
-                        id="create modal close button",
-                        className="ms-auto",
-                        n_clicks=0
-                    )
+                    dbc.ButtonGroup(
+                        [
+                            dbc.Button(
+                                "create",
+                                id="create modal create button",
+                                className="ms-auto",
+                                n_clicks=0),
+                            dbc.Button("Cancel",
+                                id="create modal cancel button",
+                                className="ms-auto",
+                                n_clicks=0),
+                        ],
+                    ),
                 ),
             ],
             id="create profile modal",
             scrollable=True,
             is_open=False,
-            style={'white-space':'pre-line'}
+            style={'white-space':'pre-line'},
+            size="lg",
         ),
+        dcc.Store(id='create profile checklist memory'),
         html.Div(id="output"),
 
         ##############################
@@ -744,43 +854,6 @@ def update_fifth_level_dir(input_value):
     #print("")
     return (), '5. '
 
-#@app.callback(
-#    Output('Sixth level dir', 'options'),
-#    Output('Sixth level dir label', 'children'),
-#    Input('Fifth level dir', 'value'),
-#)
-#def update_sixth_level_dir(input_value):
-
-    # Roll back to parent directory
-#    fn.change_directory(last_directories[4])
-
-    #print("(callback) update_sixth_level_dir: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
-    #print("     (callback) update_sixth_level_dir: fn.get_directories()", fn.get_directories())
-    #print("     (callback) update_sixth_level_dir: input_value in fn.get_directories()", str(input_value in fn.get_directories()))
-#    if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories()) or input_value == 'mission specific graphics'):
-#        # If the path actually changed
-#        fn.change_directory(last_directories[4])
-#        label = '6. '
-#        options = []
-#        if (re.search("mission specific graphics", input_value) == None):
-#            path = fn.extend_dir(input_value)
-#            fn.change_directory(str(path))
-#            last_directories[5] = path
-#            label = '6. Drivers'
-#            options.extend(fn.get_directories())
-#        else:
-#            options.extend(fn.get_html_files())
-#            label = '6. Plots'
-
-
-        #print("     (callback) update_sixth_level_dir: options = ", options)
-        #print("")
-
-#        return [{'label': i, 'value': i} for i in options], label
-    
-    #print("")
-#    return (), '6. '
-
 
 @app.callback(
     Output('Sixth level dir', 'options'),
@@ -834,47 +907,50 @@ app.callback(
     [State("modal-help-body-scroll", "is_open")],
 )(toggle_modal)
 
-app.callback(
+
+@app.callback(
     Output("create profile modal", "is_open"),
+    Output("Load Delete Dropdown", "options"),
     [
         Input("create profile button", "n_clicks"),
-        Input("create modal close button", "n_clicks"),
+        Input("create modal cancel button", "n_clicks"),
+        Input("create modal create button", "n_clicks"),
+        Input("Load Delete Dropdown", "value"),
     ],
-    [State("modal-help-body-scroll", "is_open")],
-)(toggle_modal)
+    [State("create profile modal", "is_open"),
+     State("create profile checklist", "value"),
+     State('profile name', 'value'),
+     State("radios", "value"),],
+)
+def create_profile_callback(n_create_button, n_cancel_button, n_confirm_create,
+                             dropdown_val, is_open, checklist_value, 
+                             profile_name, radio_value):
+    callback_trigger = ctx.triggered_id
+
+    if (callback_trigger == "create profile button"):
+        return True, load_profiles()
+    
+    elif (callback_trigger == "create modal create button"):
+        create_profile(checklist_value, profile_name)
+
+    elif (callback_trigger == "Load Delete Dropdown"):
+        if (radio_value == "Load Profile"):
+            load_profile(dropdown_val)
+        elif (radio_value == "Delete Profile"):
+            delete_profile(dropdown_val)
+
+    return False, load_profiles()
+
 
 @app.callback(
         Output("load delete label", "children"),
-        Output("Load Delete Dropdown", "options"),
         [Input("radios", "value"),],)
-def display_value(value):
-    print("display_value")
+def change_load_delete_dropdown_label(value):
     if (value == None):
         return "Pick if you want to Load or Delete a profile", []
     
-    print("PATH_TO_PROFILES = ", PATH_TO_PROFILES)
-    print("value = ", value)
-    path = fn.build_dir("profiles.json", PATH_TO_PROFILES)
-    print("path = ", path)
-    profiles = []
-    if (fn.is_valid_file(path)):
-        print("Going to deserialize file")
-        profiles = profiles.Profile.deserializeFile(path)
-        print("profiles = ", profiles)
-    else:
-        print("File does not exist")
-        # TODO - show error message warning that there is no profiles.json to delete or load files from
-        pass
+    return f"{value}"
 
-    return f"{value}", profiles
-
-
-# @app.callback(
-#         Input("Create Profile", "n_clicks"),
-# )
-# def create_profile(n_clicks):
-#     # TODO - implement
-#     pass
 
 ##############################
 ###      Main Function     ###

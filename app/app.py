@@ -184,6 +184,19 @@ def load_profile(profile_name):
     fn.change_directory(pwd)
 
 
+def unload_profile():
+    """Unloads the currently loaded profile"""
+
+    global loaded_profile
+    loaded_profile = None
+
+
+def build_current_profile_label_string():
+    """Builds the string that will be displayed in the current profile label"""
+
+    return "Current Profile: {}".format(str(get_loaded_profile_name()))
+
+
 def checklist_filters_to_booleans(checklist_values):
     """Converts the values of the checklist to booleans"""
 
@@ -206,6 +219,15 @@ def checklist_filters_to_booleans(checklist_values):
     return booleans
 
 
+def get_loaded_profile_name():
+    """Returns the name of the loaded profile"""
+
+    if (loaded_profile == None):
+        return None
+    else:
+        return loaded_profile.getName()
+
+
 def apply_profile_filters(data):
     """Applies the filters of the loaded profile to the data"""
 
@@ -214,7 +236,7 @@ def apply_profile_filters(data):
     elif (len(data) == 0):
         raise ValueError("apply_profile_filters: data is empty")
 
-    if (loaded_profile == None):
+    if (get_loaded_profile_name() == None):
         # No filters to be applied
         return data
 
@@ -676,9 +698,12 @@ app.layout = html.Div([
         dcc.Dropdown((),
         id='Load Delete Dropdown',
         ),
+        html.Label(
+            children="Current Profile: {}".format(str(get_loaded_profile_name())),
+            id='current profile name',),
 
         html.P(id='center dropdowns', # This is here so the dropdowns won't show up at the top of the page
-        style={'height': '13%'}),
+        style={'height': '9.5%'}),
 
         html.Br(),
         html.Label(children='5. ',
@@ -913,6 +938,7 @@ app.callback(
 @app.callback(
     Output("create profile modal", "is_open"),
     Output("Load Delete Dropdown", "options"),
+    Output("current profile name", "children"),
     [
         Input("create profile button", "n_clicks"),
         Input("create modal cancel button", "n_clicks"),
@@ -930,18 +956,24 @@ def profile_callback(n_create_button, n_cancel_button, n_confirm_create,
     callback_trigger = ctx.triggered_id
 
     if (callback_trigger == "create profile button"):
-        return True, load_profiles()
+        return True, load_profiles(), build_current_profile_label_string()
     
     elif (callback_trigger == "create modal create button"):
         create_profile(checklist_value, profile_name)
 
-    elif (callback_trigger == "Load Delete Dropdown"):
+    elif (callback_trigger == "Load Delete Dropdown" and dropdown_val != None):
         if (radio_value == "Load Profile"):
             load_profile(dropdown_val)
         elif (radio_value == "Delete Profile"):
+
+            if ((get_loaded_profile_name() != None) and 
+                (dropdown_val == get_loaded_profile_name())):
+                # If the profile to delete is the loaded one
+                unload_profile()
+
             delete_profile(dropdown_val)
 
-    return False, load_profiles()
+    return False, load_profiles(), build_current_profile_label_string()
 
 
 @app.callback(

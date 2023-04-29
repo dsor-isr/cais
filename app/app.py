@@ -53,22 +53,15 @@ PATH_TO_PROFILES = fn.extend_dir('profiles')
 ###    Global Variables    ###
 ##############################
 
-#home = fn.get_pwd()
 home = fn.extend_dir('assets')
 home = fn.build_dir('days', home)
 loaded_profile = None
-#print("home = ", home)
-#print("content = ", fn.get_directories(path=home))
 last_directories = [home, home, home, home, home, home, home]
-#fn.change_directory(home)
 
 host = 'http://127.0.0.1:8050/'
 
 dsor_logo = 'assets/logos/DSOR_logo_v05a.jpg'
 isr_logo = 'assets/logos/isr_logo_red_background.png'
-
-last_dropdown_changed = 0
-
 
 
 ##############################
@@ -515,19 +508,11 @@ app.layout = html.Div([
         ##############################
         ####        Buttons        ###
         ##############################
-        
-        #html.Button('Plot Directory',
-        #id='plot button',
-        #n_clicks=0,
-        #style={'display':'inline'},
-        #style={'margin-left': '40px'}
-        #),
 
         dbc.Button('Plot Directory',
         id='plot button',
         n_clicks=0,
         style={'display':'inline'},
-        #style={'margin-left': '40px'}
         ),
 
         dbc.Button(
@@ -922,7 +907,7 @@ app.callback(
      State('profile name', 'value'),
      State("radios", "value"),],
 )
-def create_profile_callback(n_create_button, n_cancel_button, n_confirm_create,
+def profile_callback(n_create_button, n_cancel_button, n_confirm_create,
                              dropdown_val, is_open, checklist_value, 
                              profile_name, radio_value):
     callback_trigger = ctx.triggered_id

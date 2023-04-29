@@ -51,7 +51,8 @@ def test_is_valid_file_invalid_input():
 
 
 def test_is_valid_file_valid_input():
-    # TODO change the hardcoded file name for a function that returns the name of the caller file
-    assert fn.is_valid_file("test_navigation.py") == True
+    path = os.getcwd() + "/file_navigation/tests/test_navigation.py"
+
+    assert fn.is_valid_file(path) == True
 
 

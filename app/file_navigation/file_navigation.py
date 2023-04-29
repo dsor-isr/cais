@@ -47,7 +47,7 @@ def is_txt_file(file):
     """Takes a string and checks if it has a .txt extension."""
 
     if not (type(file) == str):
-        raise TypeError("Input should be of type str, but an object of type {t} was received.".format(type(file)))
+        raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
 
     return re.search("\.txt$", file) != None
 
@@ -56,7 +56,7 @@ def is_jpg_file(file):
     """Takes a string and checks if it has a .jpg extension."""
 
     if not (type(file) == str):
-        raise TypeError("Input should be of type str, but an object of type {t} was received.".format(type(file)))
+        raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
 
     return re.search("\.jpg$", file) != None
 
@@ -65,7 +65,7 @@ def is_png_file(file):
     """Takes a string and checks if it has a .png extension."""
 
     if not (type(file) == str):
-        raise TypeError("Input should be of type str, but an object of type {t} was received.".format(type(file)))
+        raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
 
     return re.search("\.png$", file) != None
 
@@ -77,7 +77,7 @@ def is_html_file(file):
     # text/html. This ought to work for files without an html extension, but that are html files
 
     if not (type(file) == str):
-        raise TypeError("Input should be of type str, but an object of type {t} was received.".format(type(file)))
+        raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
 
     return re.search("\.html$", file) != None
 
@@ -86,7 +86,7 @@ def is_image(file):
     """Takes a string and checks if it has a .png or .jpg extension"""
 
     if not (type(file) == str):
-        raise TypeError("Input should be of type str, but an object of type {t} was received.".format(type(file)))
+        raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
     
     return is_png_file(file) or is_jpg_file(file)
 
@@ -95,7 +95,7 @@ def is_hidden_file(file):
     """Takes a string and checks if it is a hidden file (starts with '.')"""
 
     if not (type(file) == str):
-        raise TypeError("Input should be of type str, but an object of type {t} was received.".format(type(file)))
+        raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
     
     return file[0] == '.'
 
@@ -104,7 +104,7 @@ def is_valid_directory(file):
     """Takes a string and checks if it is a valid directory."""
 
     if not (type(file) == str):
-        raise TypeError("Input should be of type str, but an object of type {t} was received.".format(type(file)))
+        raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
     
     return os.path.isdir(file)
 
@@ -114,7 +114,7 @@ def filter_out_hidden_files(files):
     start with '.')."""
 
     if not (type(files) == list):
-        raise TypeError("Input should be a list, but an object of type {t} was received.".format(type(files)))
+        raise TypeError("Input should be a list, but an object of type {} was received.".format(type(files)))
 
     return [file for file in files if not (is_hidden_file(file))]
 
@@ -123,7 +123,7 @@ def filter_out_text_files(files):
     """Takes a list of files and removes all files with a .txt extension"""
 
     if not (type(files) == list):
-        raise TypeError("Input should be a list, but an object of type {t} was received.".format(type(files)))
+        raise TypeError("Input should be a list, but an object of type {} was received.".format(type(files)))
     
     return [file for file in files if not (is_txt_file(file))]
 
@@ -132,7 +132,7 @@ def filter_out_html_files(files):
     """Takes a list of files and removes all files with a .html extension"""
 
     if not (type(files) == list):
-        raise TypeError("Input should be a list, but an object of type {t} was received.".format(type(files)))
+        raise TypeError("Input should be a list, but an object of type {} was received.".format(type(files)))
     
     return [file for file in files if not (is_html_file(file))]
 
@@ -141,7 +141,7 @@ def filter_out_images(files):
     """Takes a list of files and removes all files with a jpg or png extension"""
 
     if not (type(files) == list):
-        raise TypeError("Input should be a list, but an object of type {t} was received.".format(type(files)))
+        raise TypeError("Input should be a list, but an object of type {} was received.".format(type(files)))
     
     return [file for file in files if not (is_image(file))]
 
@@ -151,7 +151,7 @@ def filter_out_directories(files, filter_out_text_files=False):
     If filter_out_text_files is set to True, then .txt files are also excluded"""
 
     if not (type(files) == list):
-        raise TypeError("Input should be a list, but an object of type {t} was received.".format(type(files)))
+        raise TypeError("Input should be a list, but an object of type {} was received.".format(type(files)))
 
     filtered = []
     for file in files:
@@ -170,7 +170,7 @@ def filter_out_files(files):
     """Takes a list of files and directories and removes all files."""
 
     if not (type(files) == list):
-        raise TypeError("Input should be a list, but an object of type {t} was received.".format(type(files)))
+        raise TypeError("Input should be a list, but an object of type {} was received.".format(type(files)))
 
     filtered = []
     for file in files:

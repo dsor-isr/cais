@@ -206,6 +206,21 @@ def checklist_filters_to_booleans(checklist_values):
     return booleans
 
 
+def apply_profile_filters(data):
+    """Applies the filters of the loaded profile to the data"""
+
+    if (type(data) != list and type(data) != tuple):
+        raise TypeError("apply_profile_filters: Expected a list or tuple, but received ", str(type(data)))
+    elif (len(data) == 0):
+        raise ValueError("apply_profile_filters: data is empty")
+
+    if (loaded_profile == None):
+        # No filters to be applied
+        return data
+
+    return loaded_profile.filter(data)
+
+
 def reset_upper_directories(dropdown_index):
     """Resets the directories of the upper dropdowns, so that they don't point irrelevant directories"""
 
@@ -254,6 +269,7 @@ def treat_fifth_level_dropdown(input_value):
                 options = [option for option in USBL_EXTENSIONS]
                 options.extend(fn.get_directories())
                 options.remove("USBL")
+                options = apply_profile_filters(options)
         else:
             #print("AAAAAAAAAAAAAAAAAA")
             reset_upper_directories(5)
@@ -828,7 +844,8 @@ def update_fifth_level_dir(input_value):
             options.extend(["mission specific graphics"])
             label = '5. Mission details'
         else:
-            options.extend(fn.get_html_files())
+            options.extend(fn.get_html_files()) # TODO - is this extended necessary?
+            options = apply_profile_filters(options)
             label = '5. Drivers'
 
         #print("     (callback) update_fifth_level_dir: options = ", options)

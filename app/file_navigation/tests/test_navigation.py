@@ -54,5 +54,3 @@ def test_is_valid_file_valid_input():
     path = os.getcwd() + "/file_navigation/tests/test_navigation.py"
 
     assert fn.is_valid_file(path) == True
-
-

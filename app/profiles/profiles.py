@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import portalocker
 
 class Profile:
     """
@@ -465,6 +466,7 @@ class Profile:
 
         try:
             with open(filePath) as jsonFile:
+                portalocker.lock(jsonFile, portalocker.LockFlags.EXCLUSIVE) # Lock file
                 jsonData = json.load(jsonFile) # Read JSON
                 if (type(jsonData) != list):
                     # If there was only one profile on the json file
@@ -497,6 +499,7 @@ class Profile:
 
         try:
             with open(filePath) as jsonFile:
+                portalocker.lock(jsonFile, portalocker.LockFlags.EXCLUSIVE) # Lock file
                 jsonData = json.load(jsonFile) # Read JSON
                 if (type(jsonData) != list):
                     # If there was only one profile on the json file
@@ -541,7 +544,11 @@ class Profile:
         profiles = deserializedProfiles
         profiles.sort()
 
-        json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
+        file = open("profiles.json", "w")
+        portalocker.lock(file, portalocker.LockFlags.EXCLUSIVE) # Lock file
+        json.dump(profiles, file, indent=4, cls=Profile.ProfileEncoder)
+        file.close()
+
         return Profile.ProfileEncoder().encode(profile)
 
     
@@ -559,7 +566,11 @@ class Profile:
             
         # TODO call serializeClass for each profile in profiles
 
-        json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
+        file = open("profiles.json", "w")
+        portalocker.lock(file, portalocker.LockFlags.EXCLUSIVE) # Lock file
+        json.dump(profiles, file, indent=4, cls=Profile.ProfileEncoder)
+        file.close()
+
         return json.dumps([profile.__dict__ for profile in profiles])
     
 
@@ -601,7 +612,11 @@ class Profile:
         except Exception as exception:
             raise exception
 
-        json.dump(profiles, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
+
+        file = open("profiles.json", "w")
+        portalocker.lock(file, portalocker.LockFlags.EXCLUSIVE) # Lock file
+        json.dump(profiles, file, indent=4, cls=Profile.ProfileEncoder)
+        file.close()
 
     
     @staticmethod
@@ -714,6 +729,7 @@ def readJSONfile(file):
 
     try:
         with open(file) as jsonFile:
+            portalocker.lock(jsonFile, portalocker.LockFlags.SHARED) # Lock file
             data = json.load(jsonFile)
             return data
     except FileNotFoundError as fileNotFoundError:
@@ -728,120 +744,4 @@ def readJSONfile(file):
 
 if __name__ == '__main__':
 
-    # Create a profile
-    #profile = Profile("Eletronics", True, False)
-    #print(profile)
-
-    # Serialize profile to JSON
-    #Profile.serializeClass(profile)
-    #print(Profile.serializeClass(profile))
-
-    # Serialize 3 profiles to JSON
-    #Profile.serializeProfiles([profile, Profile("Control", False, False), Profile("Admin", True, True)])
-    #print(Profile.serializeProfiles([profile, Profile("Control", False, False), Profile("Admin", True, True)]))
-
-    # Read the json file with one profile
-    #print(readJSONfile("profile.json"))
-
-    # Read the json file with 3 profiles
-    #print(readJSONfile("profiles.json"))
-
-    # Deserialize json data corresponding to one profile
-    #deserializedProfile = Profile.deserializeClass(readJSONfile("profile.json"))
-    #print(deserializedProfile)
-
-    # Deserialize json data corresponding to 3 profiles
-    # deserializedProfiles = Profile.deserializeFile("profiles.json")
-    # for profile in deserializedProfiles:
-    #    print(profile)
-
-    # Serialize profiles to JSON with repeated profiles
-    # if os.path.exists("profiles.json"):
-    #     # Delete file for testing purposes
-    #     os.remove("profiles.json")
-    # try:
-    #     Profile.serializeClass(Profile("Eletronics", True, False))
-    # except Exception as e:
-    #     print("Something very weird happened")
-    #     raise e
-    # try:
-    #     Profile.serializeClass(Profile("Eletronics", False, False)) # Should throw an exception
-    #     print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
-    # except Exception as e:
-    #     print("Profile already exists")
-    # try:
-    #     Profile.serializeClass(Profile("Control", False, False))
-    # except Exception as e:
-    #     print("Something very weird happened")
-    #     raise e
-    # try:
-    #     Profile.serializeClass(Profile("Admin", True, True))
-    # except Exception as e:
-    #     print("Something very weird happened")
-    #     raise e
-    # try:
-    #     Profile.serializeClass(Profile("Admin", True, True)) # Should throw an exception
-    #     print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
-    # except Exception as e:
-    #     print("Profile already exists")
-    # try:
-    #     Profile.serializeClass(Profile("Eletronics", True, False)) # Should throw an exception
-    #     print("This should have never been printed. An exception due to pre-existing profile should have been thrown")
-    # except Exception as e:
-    #     print("Profile already exists")
-    # try:
-    #     Profile.serializeClass(Profile("Robotics", False, False))
-    # except Exception as e:
-    #     print("Something very weird happened")
-    #     raise e
-
-    # deserializedProfiles = Profile.deserializeFile("profiles.json")
-    # print("Printing all previously serialized classes from profiles.json")
-    # for profile in deserializedProfiles:
-    #     print(profile)
-
-    # Delete a profile
-    # try:
-    #     Profile.deleteProfile(Profile("Eletronics", True, False))
-    # except Exception as e:
-    #     print("Something very weird happened")
-    #     raise e
-
-    # Delete a profile that doesn't exist
-    # try:
-    #     Profile.deleteProfile(Profile("Eletronics", True, False)) # Should throw a ValueError
-    #     print("This should have never been printed. An exception due to non-existing profile should have been thrown")
-    # except ValueError as e:
-    #     print("Profile doesn't exist")
-    # except Exception as e:
-    #     print("Something very weird happened")
-    #     raise e
-
-    # filter files
-    # files = ['Altimeter', 'USBL', 'altimeter', 'drivers', 'ALTIMETER']
-    # expected = ['USBL', 'drivers']
-    # profile = Profile("Eletronics", False, True)
-    # print("Profile: " + str(profile))
-    # filteredFiles = profile.filter(files)
-    # print("Filtered files: " + str(filteredFiles))
-    # print("filteredFiles == expected: " + str(filteredFiles == expected))
-
-    # update profile
-    # profile = Profile("Eletronics", False, True)
-    # oldProfile = profile.clone()
-    # print(str(profile))
-    # print("Before update: oldProfile == profile: " + str(oldProfile == profile))
-    # profile.update("DSOR", True, True)
-    # print(str(profile))
-    # print("After update: oldProfile == profile: " + str(oldProfile == profile))
-
-    # update profile with invalid name
-    #pass
-
-
-    profile = Profile("Eletronics", False, True)
-    profile1 = Profile("Control")
-    profile2 = Profile("default", False, False, False, False, False, False, False)
-    Profile.serializeClass(profile)
-    Profile.serializeClass(profile1)
-    Profile.serializeClass(profile2)
+   pass

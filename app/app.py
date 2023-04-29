@@ -127,7 +127,7 @@ def merge_html_files(files):
 
 def create_profile(checklist_values, profile_name):
     """Creates a new profile with the given checklist values"""
-
+    
     if (checklist_values == None):
         boolean_filters = [False for i in range(NUM_FILTERS)]
     else:

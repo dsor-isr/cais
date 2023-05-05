@@ -96,3 +96,18 @@ def test_is_valid_dir_invalid_dir():
     path = "/invalid"
 
     assert fn.is_valid_directory(path) == False
+
+
+def test_change_dir():
+    path = os.getcwd()
+    create_dir()
+
+    fn.change_directory(path + "/test")
+
+    assert os.getcwd() == (path + "/test")
+
+    fn.change_directory(path)
+
+    assert os.getcwd() == path
+
+    remove_dir()

@@ -38,7 +38,6 @@ def is_valid_file(file):
 
     if not (type(file) == str):
         raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
-    
 
     return os.path.isfile(file)
 

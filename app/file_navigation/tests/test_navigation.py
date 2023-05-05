@@ -2,6 +2,24 @@ import pytest
 from file_navigation import file_navigation as fn
 import os
 
+
+def create_file():
+    with open("test.txt", "w") as f:
+        f.write("test")
+
+
+def create_dir():
+    os.mkdir("test")
+
+
+def remove_file():
+    os.remove("test.txt")
+
+
+def remove_dir():
+    os.rmdir("test")
+
+
 def test_get_pwd():
     pwd_sys_call = os.getcwd()
     pwd_fn = fn.get_pwd()
@@ -46,11 +64,35 @@ def test_is_valid_file_invalid_input():
     with pytest.raises(TypeError) as e:
         fn.is_valid_file(1)
 
-    print("error = ", str(e.value))
     assert "Input should be of type str, but an object of type {} was received.".format(type(1)) in str(e.value)
 
 
 def test_is_valid_file_valid_input():
-    path = os.getcwd() + "/file_navigation/tests/test_navigation.py"
+    path = os.getcwd() + "/test.txt"
+    create_file()
 
     assert fn.is_valid_file(path) == True
+
+    remove_file()
+
+
+def test_is_valid_dir_invalid_input():
+    with pytest.raises(TypeError) as e:
+        fn.is_valid_directory(1)
+
+    assert "Input should be of type str, but an object of type {} was received.".format(type(1)) in str(e.value)
+
+
+def test_is_valid_dir_valid_input():
+    path = os.getcwd() + "/test"
+    create_dir()
+
+    assert fn.is_valid_directory(path) == True
+
+    remove_dir()
+
+
+def test_is_valid_dir_invalid_dir():
+    path = "/invalid"
+
+    assert fn.is_valid_directory(path) == False

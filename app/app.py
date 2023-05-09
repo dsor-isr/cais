@@ -687,7 +687,7 @@ def update_third_level_dir(input_value):
             # Check if plots subdirectory exists
             path = fn.build_dir(PLOTS, path)
             valid_dir = fn.is_valid_directory(path)
-        if (valid_dir):
+        if (valid_dir and len(fn.get_directories(True, path)) > 0):
             # Check if any plots were actually produced
             path = fn.build_dir(fn.get_directories(True, path)[0], path)
         else:

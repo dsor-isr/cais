@@ -194,6 +194,7 @@ def get_directories(ignore_hidden_files=True, path=None):
     if (path == None):
         files = os.listdir(path='.')
     else:
+        print("path = {}".format(path))
         files = os.listdir(path=path)
 
     if (ignore_hidden_files == True):

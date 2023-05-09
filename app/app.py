@@ -266,7 +266,7 @@ def treat_fifth_level_dropdown(input_value):
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories()) or input_value == 'mission specific graphics'):
         # If the path actually changed
         fn.change_directory(last_directories[4])
-        label_6 = '6. '
+        label_6 = '6. Plots'
         label_7 = '7. '
         options = []
         if (re.search("mission specific graphics", input_value) == None):
@@ -275,29 +275,10 @@ def treat_fifth_level_dropdown(input_value):
             last_directories[5] = path
             reset_upper_directories(6)
 
-            label_6 = ""
-            if (fn.is_part_of_path(fn.get_pwd(), 'overall')):
-                # If previously chose overall on the Overview (3rd dropdown)
-                if (input_value == "USBL"):
-                    label_6 = '6. USBL Type'
-                    label_7 = '7.'
-                else:
-                    label_6 = '6. Plots'
-                options.extend(fn.get_html_files() + fn.get_directories())
-            else:
-                # If previously chose missions on the Overview (3rd dropdown)
-                label_6 = '6. Drivers'
-                label_7 = '7. Plots'
-                options = [option for option in USBL_EXTENSIONS]
-                options.extend(fn.get_directories())
-                options.remove("USBL")
-                options = apply_profile_filters(options)
+            options.extend(fn.get_html_files())
         else:
-            #print("AAAAAAAAAAAAAAAAAA")
             reset_upper_directories(5)
             options.extend(fn.get_html_files())
-            #print("fn.get_html_files() = ", fn.get_html_files())
-            label_6 = '6. Plots'
 
         
         #fn.change_directory(last_directories[4])
@@ -308,10 +289,10 @@ def treat_fifth_level_dropdown(input_value):
         #print("     (callback) treat_fifth_level_dropdown: options = ", options)
         #print("")
 
-        return [{'label': i, 'value': i} for i in options], (), "", "", label_6, '7. '
+        return [{'label': i, 'value': i} for i in options], (), ""
     
     #print("")
-    return (), (), "", "", '6. ', '7. '
+    return (), (), ""
 
 
 def treat_sixth_lvl_dropdown(input_value):
@@ -362,7 +343,7 @@ def treat_sixth_lvl_dropdown(input_value):
             #print("     (callback) treat_sixth_lvl_dropdown: options = ", options)
             #print("")
 
-            return last_dir_options, [{'label': i, 'value': i} for i in options], "", "", '6. Drivers', '7. Plots'
+            return last_dir_options, [{'label': i, 'value': i} for i in options], ""
         elif (input_value in fn.get_html_files()):
             # Prepare plot if it was an html file
                 #print("\t\tupdate_sixth_level_dir: Adding html file to the plot")
@@ -371,68 +352,10 @@ def treat_sixth_lvl_dropdown(input_value):
                 path = fn.extend_dir(str(input_value))
                 reset_upper_directories(6) # TODO maybe este não é preciso ???
 
-                return last_dir_options, (), path, path_cat(path), '6. Plots', '7. '
+                return last_dir_options, path, path_cat(path)
     
     #print("")
-    return (), (), "", "", '6. ', '7. '
-
-
-def treat_seventh_lvl_dropdown(input_value_dir):
-    # Roll back directory
-    fn.change_directory(last_directories[6])
-
-    #print("")
-    #print("(aux function) treat__seventh_level_dir: Input = " + str(input_value_dir) + " ; path = ", fn.get_pwd())
-    #print("     (aux) treat_seventh_level_dir: fn.get_directories()", fn.get_directories())
-    #print("     (aux) treat_seventh_level_dir: input_value in fn.get_directories()", str(input_value_dir in fn.get_directories()))
-    #print("")
-
-    if (type(input_value_dir) == str) and not (fn.is_part_of_path(fn.get_pwd(), input_value_dir)):
-
-        seventh_dropdown_options = fn.get_directories() + fn.get_html_files()
-        if (input_value_dir in fn.get_directories()):
-            # Extend path if it was a directory
-            path = fn.extend_dir(input_value_dir) # TODO este branch provavelmente já não é usado
-            fn.change_directory(path)
-
-            options = []
-            options.extend(fn.get_html_files())
-
-            return seventh_dropdown_options, [{'label': i, 'value': i} for i in options], '', '', '6. Drivers', '7. ' # TODO o primeiro () devia ter lá merdas do dropdown anterior
-
-        elif (input_value_dir in fn.get_html_files()):
-            # Prepare plot if it was an html file
-                fn.change_directory(last_directories[5])
-                sixth_dir_options = fn.get_directories() + USBL_EXTENSIONS
-                fn.change_directory(last_directories[6])
-                seventh_dir_options = fn.get_html_files()
-                path = fn.extend_dir(str(input_value_dir))
-
-                return sixth_dir_options, seventh_dir_options, path, path_cat(path), '6. Drivers', '7. Plots'
-
-    return (), (), '', '', '6. '
-
-
-def eighth_level_dir_dropdown(input_value_dir):
-
-    #print("     eight_level_dir_dropdown: input_value_dir = ", input_value_dir)
-    if (last_directories[6] != home):
-        pwd = fn.get_pwd() # Save current directory
-        fn.change_directory(last_directories[6]) # Roll back to seventh dropdown
-        seventh_dropdown_options = fn.get_directories() + fn.get_html_files() # Get options for seventh dropdown
-        fn.change_directory(pwd) # Roll back to current directory
-
-    if (input_value_dir in fn.get_html_files()):
-        # Prepare plot if it was an html file
-            path = fn.extend_dir(str(input_value_dir))
-
-            options = []
-            options.extend(fn.get_directories())
-            options.extend(fn.get_html_files())
-
-            return seventh_dropdown_options, [{'label': i, 'value': i} for i in options], path, path_cat(path) # TODO o primeiro () devia ter lá merdas do dropdown anterior
-
-    return (), (), '', ''
+    return (), (), ""
 
 
 def merge_button_click():
@@ -446,35 +369,14 @@ def merge_button_click():
         merge_html_files(files)
         path = fn.extend_dir(ALL_HTML2)
 
-        sixth_dir_options = ()
-        seventh_dir_options = ()
-        if (last_directories[5] != home):
-            # The fifth directory has already been reached
-            fn.change_directory(last_directories[5])
-            #print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
-            sixth_dir_options = fn.get_html_files() + fn.get_directories()
-            #print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
-        elif (last_directories[4] != home):
-            fn.change_directory(last_directories[4])
-            #print("     (callback) merge_button_click: last_directories[4] = ", last_directories[4])
-            #print("     (callback) merge_button_click: fn.get_directories()", fn.get_directories())
-            #print("     (callback) merge_button_click: fn.get_html_files()", fn.get_html_files())
-            sixth_dir_options = fn.get_html_files() + fn.get_directories()
-            sixth_dir_options.remove("drivers")
-            #print("     (callback) merge_button_click: sixth_dir_options = ", sixth_dir_options)
-        if (last_directories[6] != home):
-            # The sixth directory has already been reached
-            fn.change_directory(last_directories[6])
-            #print("     (callback) merge_button_click: fn.get_directories()", fn.get_html_files())
-            seventh_dir_options = fn.get_html_files()
-            #print("     (callback) merge_button_click: seventh_dir_options = ", seventh_dir_options)
+        sixth_dir_options = fn.get_html_files()
             
         #print("     (callback) merge_button_click: pwd = ", fn.get_pwd())
-        return sixth_dir_options, seventh_dir_options, path, path_cat(path), '6. Plots', '7. '
+        return sixth_dir_options, path, path_cat(path)
     
     #print("     (callback) merge_button_click: No html files found on present working directory. Not merging files.")
     
-    return [{'label': i, 'value': i} for i in files], (), '', '', '6, ', '7. '
+    return [{'label': i, 'value': i} for i in files], (), ''
 
 
 def toggle_modal(n1, n2, is_open):
@@ -599,11 +501,6 @@ app.layout = html.Div([
         dcc.Dropdown((),
         id='Third level dir'),
 
-        html.Br(),
-        html.Label(children='4. ',
-        id='Fourth level dir label'),
-        dcc.Dropdown((),
-        id='Fourth level dir'),
 
         ##############################
         ####     path to HTML      ###
@@ -657,7 +554,7 @@ app.layout = html.Div([
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.ModalTitle("Create Profile")),
-                dbc.ModalBody("Pick the name of the new profile and the filters you want to apply to it. It isn't possible to create a profile if another one already exists with that name."),
+                dbc.ModalBody("Pick the name of the new profile and the filters you want to apply to it (the ones selected won't be displayed on the dropdowns). It isn't possible to create a profile if another one already exists with that name."),
                 html.Label('Enter the profile name:'),
                 dcc.Input(value='', type='text', id='profile name'),
                 dcc.Checklist(['GPS', 'Depth Cell', 'Altimeter', 'Inside Pressure', 'USBL', 'IMU', 'Bat Monit'],
@@ -703,7 +600,13 @@ app.layout = html.Div([
             id='current profile name',),
 
         html.P(id='center dropdowns', # This is here so the dropdowns won't show up at the top of the page
-        style={'height': '9.5%'}),
+        style={'height': '8%'}),
+
+        html.Br(),
+        html.Label(children='4. ',
+        id='Fourth level dir label'),
+        dcc.Dropdown((),
+        id='Fourth level dir'),
 
         html.Br(),
         html.Label(children='5. ',
@@ -713,17 +616,10 @@ app.layout = html.Div([
         ),
 
         html.Br(),
-        html.Label(children='6. ',
+        html.Label(children='6. Plots',
         id='Sixth level dir label'),
         dcc.Dropdown((),
         id='Sixth level dir',
-        ),
-
-        html.Br(),
-        html.Label(children='7. ',
-        id='Seventh level dir label'),
-        dcc.Dropdown((),
-        id='Seventh level dir',
         ),
     
     ], style={'padding': 10, 'flex': 1}),
@@ -783,8 +679,20 @@ def update_third_level_dir(input_value):
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories())):
         # If the path actually changed
         fn.change_directory(last_directories[1])
+
+        # Skip irrelevant directories
         path = fn.extend_dir(input_value)
-        path = fn.build_dir(PLOTS, path)
+        valid_dir = fn.is_valid_directory(path)
+        if (valid_dir):
+            # Check if plots subdirectory exists
+            path = fn.build_dir(PLOTS, path)
+            valid_dir = fn.is_valid_directory(path)
+        if (valid_dir):
+            # Check if any plots were actually produced
+            path = fn.build_dir(fn.get_directories(True, path)[0], path)
+        else:
+            return ()
+        
         fn.change_directory(str(path))
         last_directories[2] = path
         reset_upper_directories(3)
@@ -828,9 +736,9 @@ def update_fourth_level_dir(input_value):
         options.extend(fn.get_html_files())
 
         label = ""
-        if (input_value == "overall"):
+        if (input_value.lower() == "overall"):
             label = "4. Specificity"
-        elif (input_value == "missions"):
+        elif (input_value.lower() == "missions"):
             label = "4. Missions"
 
         #print("     (callback) update_fourth_level_dir: options = ", options)
@@ -870,6 +778,7 @@ def update_fifth_level_dir(input_value):
             label = '5. Mission details'
         else:
             options.extend(fn.get_html_files()) # TODO - is this extended necessary?
+            print("     (callback) update_fifth_level_dir: options = ", options)
             options = apply_profile_filters(options)
             label = '5. Drivers'
 
@@ -884,24 +793,20 @@ def update_fifth_level_dir(input_value):
 
 @app.callback(
     Output('Sixth level dir', 'options'),
-    Output('Seventh level dir', 'options'),
     Output('plot', 'children'),
     Output('plot', 'href'),
-    Output('Sixth level dir label', 'children'),
-    Output('Seventh level dir label', 'children'),
     Input('Sixth level dir', 'value'),
-    Input('Seventh level dir', 'value'),
     Input('plot button', 'n_clicks'),
     Input('Fifth level dir', 'value'),
 )
-def update_seventh_level_dir(sixth_dir, seventh_dir, n_clicks_plot, fifth_dir):
+def update_seventh_level_dir(sixth_dir, n_clicks_plot, fifth_dir):
     callback_trigger = ctx.triggered_id
 
     #print("(callback) update_seventh_level_dir: \n\tInput = {" + str(sixth_level_dir) + ", " + str(seventh_dir) + ", " + str(eighth_dir) + ", " + str(n_clicks_plot) + "}")
     #print("\tpath = ", fn.get_pwd())
 
-    if (seventh_dir == None and fifth_dir == None and n_clicks_plot == 0 and sixth_dir == None):
-        return (), (), '', '', '6. ', '7. '
+    if (fifth_dir == None and n_clicks_plot == 0 and sixth_dir == None):
+        return (), (), ''
 
     if callback_trigger == 'Sixth level dir':
         # Triggered by directory change
@@ -913,16 +818,12 @@ def update_seventh_level_dir(sixth_dir, seventh_dir, n_clicks_plot, fifth_dir):
         #print("     (callback) update_seventh_level_dir: Callback triggered by merge button")
         return merge_button_click()
 
-    elif callback_trigger == 'Seventh level dir':
-        # Triggered by directory change
-        #print("     (callback) update_seventh_level_dir: Callback triggered by directory change (Eighth level dir)")
-        return treat_seventh_lvl_dropdown(seventh_dir)
 
     elif callback_trigger == 'Fifth level dir':
         #print("     (callback) update_seventh_level_dir: Callback triggered by directory change (Sixth level dir)")
         return treat_fifth_level_dropdown(fifth_dir)
 
-    return (), (), '', '', '6. ', '7. '
+    return (), (), ''
 
 
 app.callback(
@@ -939,11 +840,14 @@ app.callback(
     Output("create profile modal", "is_open"),
     Output("Load Delete Dropdown", "options"),
     Output("current profile name", "children"),
+    Output("load delete label", "children"),
+    Output("Load Delete Dropdown", "value"),
     [
         Input("create profile button", "n_clicks"),
         Input("create modal cancel button", "n_clicks"),
         Input("create modal create button", "n_clicks"),
         Input("Load Delete Dropdown", "value"),
+        Input("radios", "value"),
     ],
     [State("create profile modal", "is_open"),
      State("create profile checklist", "value"),
@@ -951,19 +855,23 @@ app.callback(
      State("radios", "value"),],
 )
 def profile_callback(n_create_button, n_cancel_button, n_confirm_create,
-                             dropdown_val, is_open, checklist_value, 
+                             dropdown_val, load_delete_radio_value, is_open, checklist_value, 
                              profile_name, radio_value):
     callback_trigger = ctx.triggered_id
 
     if (callback_trigger == "create profile button"):
-        return True, load_profiles(), build_current_profile_label_string()
+        return True, load_profiles(), build_current_profile_label_string(), "Pick if you want to Load or Delete a profile", get_loaded_profile_name()
     
     elif (callback_trigger == "create modal create button"):
         create_profile(checklist_value, profile_name)
 
+    elif (callback_trigger == "radios" and radio_value == "Delete Profile"):
+        return False, load_profiles(), build_current_profile_label_string(), load_delete_radio_value, None
+
     elif (callback_trigger == "Load Delete Dropdown" and dropdown_val != None):
         if (radio_value == "Load Profile"):
             load_profile(dropdown_val)
+
         elif (radio_value == "Delete Profile"):
 
             if ((get_loaded_profile_name() != None) and 
@@ -973,17 +881,7 @@ def profile_callback(n_create_button, n_cancel_button, n_confirm_create,
 
             delete_profile(dropdown_val)
 
-    return False, load_profiles(), build_current_profile_label_string()
-
-
-@app.callback(
-        Output("load delete label", "children"),
-        [Input("radios", "value"),],)
-def change_load_delete_dropdown_label(value):
-    if (value == None):
-        return "Pick if you want to Load or Delete a profile", []
-    
-    return f"{value}"
+    return False, load_profiles(), build_current_profile_label_string(), load_delete_radio_value, get_loaded_profile_name()
 
 
 ##############################

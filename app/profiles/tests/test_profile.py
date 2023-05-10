@@ -4,10 +4,10 @@ import pytest
 
 TEST_PROFILES = ["TEST_PROFILE", "SECOND_TEST_PROFILE", "THIRD_TEST_PROFILE", "FOURTH_TEST_PROFILE", "FIFTH_TEST_PROFILE"]
 ALPHABETICAL_PROFILES = ['A', 'B', 'Z', 'Bc']
-TO_STRING = "Profile = { name: TEST_PROFILE, USBL: True, Altimeter: False, DepthCell: True, GPS: True, IMU: True, InsidePressure: False, BatMonit: False}"
+TO_STRING = "Profile = { name: TEST_PROFILE, USBL: True, Altimeter: False, DepthCell: True, GPS: True, IMU: True, InsidePressure: False, BatMonit: False, Thrusters: True}"
 
 def test_clone():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     cloned = profile.clone()
 
@@ -19,10 +19,11 @@ def test_clone():
     assert profile.getImu() == cloned.getImu()
     assert profile.getInsidePressure() == cloned.getInsidePressure()
     assert profile.getBatMonit() == cloned.getBatMonit()
+    assert profile.getThrusters() == cloned.getThrusters()
 
 
 def test_clone_deep_copy():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     cloned = profile.clone()
 
@@ -33,7 +34,7 @@ def test_clone_deep_copy():
 
 
 def test_equals_with_equal_profile():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     cloned = profile.clone()
 
@@ -41,7 +42,7 @@ def test_equals_with_equal_profile():
 
 
 def test_equals_with_different_profile():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     cloned = profile.clone()
     cloned.setName(TEST_PROFILES[1])
@@ -50,20 +51,20 @@ def test_equals_with_different_profile():
 
 
 def test_equals_with_non_profile_object():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     assert profile != None
     assert profile != 9
 
 
 def test_to_string():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     assert str(profile) == TO_STRING
 
 
 def test_comparisson_with_different_type():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(TypeError) as e:
         profile < 3
@@ -72,14 +73,14 @@ def test_comparisson_with_different_type():
 
 
 def test_comparisson():
-    profile = profiles.Profile(ALPHABETICAL_PROFILES[0], True, False, True, True, True, False, False)
-    other = profiles.Profile(ALPHABETICAL_PROFILES[1], True, False, True, True, True, False, False)
+    profile = profiles.Profile(ALPHABETICAL_PROFILES[0], True, False, True, True, True, False, False, True)
+    other = profiles.Profile(ALPHABETICAL_PROFILES[1], True, False, True, True, True, False, False, True)
 
     assert profile < other
     assert other > profile
 
-    profile = profiles.Profile(ALPHABETICAL_PROFILES[3], True, False, True, True, True, False, False)
-    other = profiles.Profile(ALPHABETICAL_PROFILES[2], True, False, True, True, True, False, False)
+    profile = profiles.Profile(ALPHABETICAL_PROFILES[3], True, False, True, True, True, False, False, True)
+    other = profiles.Profile(ALPHABETICAL_PROFILES[2], True, False, True, True, True, False, False, True)
 
     assert profile < other
     assert other > profile

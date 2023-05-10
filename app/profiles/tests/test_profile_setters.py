@@ -16,7 +16,7 @@ def delete_json():
     
 
 def test_setters_with_valid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     assert profile.getName() == TEST_PROFILES[0]
     assert profile.getUsbl() == True
@@ -26,6 +26,7 @@ def test_setters_with_valid_values():
     assert profile.getImu() == True
     assert profile.getInsidePressure() == False
     assert profile.getBatMonit() == False
+    assert profile.getThrusters() == True
 
     profile.setName(TEST_PROFILES[1])
     profile.setUsbl(False)
@@ -35,6 +36,7 @@ def test_setters_with_valid_values():
     profile.setImu(False)
     profile.setInsidePressure(True)
     profile.setBatMonit(True)
+    profile.setThrusters(False)
 
     assert profile.getName() == TEST_PROFILES[1]
     assert profile.getUsbl() == False
@@ -44,10 +46,11 @@ def test_setters_with_valid_values():
     assert profile.getImu() == False
     assert profile.getInsidePressure() == True
     assert profile.getBatMonit() == True
+    assert profile.getThrusters() == False
 
 
 def test_set_name_with_invalid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(ValueError) as e:
         profile.setName("")
@@ -66,7 +69,7 @@ def test_set_name_with_invalid_values():
 
 
 def test_set_usbl_with_invalid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(TypeError) as e:
         profile.setUsbl(None)
@@ -80,7 +83,7 @@ def test_set_usbl_with_invalid_values():
 
 
 def test_set_altimeter_with_invalid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(TypeError) as e:
         profile.setAltimeter(None)
@@ -94,7 +97,7 @@ def test_set_altimeter_with_invalid_values():
 
 
 def test_set_depth_cell_with_invalid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(TypeError) as e:
         profile.setDepthCell(None)
@@ -108,7 +111,7 @@ def test_set_depth_cell_with_invalid_values():
 
 
 def test_set_bat_monit_with_invalid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(TypeError) as e:
         profile.setBatMonit(None)
@@ -122,7 +125,7 @@ def test_set_bat_monit_with_invalid_values():
 
 
 def test_set_inside_pressure_with_invalid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(TypeError) as e:
         profile.setInsidePressure(None)
@@ -136,7 +139,7 @@ def test_set_inside_pressure_with_invalid_values():
 
 
 def test_set_imu_with_invalid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(TypeError) as e:
         profile.setImu(None)
@@ -150,7 +153,7 @@ def test_set_imu_with_invalid_values():
 
 
 def test_set_gps_with_invalid_values():
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     with pytest.raises(TypeError) as e:
         profile.setGps(None)
@@ -161,3 +164,17 @@ def test_set_gps_with_invalid_values():
         profile.setGps(2.5)
 
     assert "gps must be a boolean" in str(e.value)
+
+
+def test_set_thrusters_with_invalid_values():
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
+
+    with pytest.raises(TypeError) as e:
+        profile.setThrusters(None)
+
+    assert "thrusters must be a boolean" in str(e.value)
+
+    with pytest.raises(TypeError) as e:
+        profile.setThrusters(2.5)
+
+    assert "thrusters must be a boolean" in str(e.value)

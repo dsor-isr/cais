@@ -32,7 +32,7 @@ PLOTS = 'plots'
 DRIVERS = 'drivers'
 VEHICLES = 'vehicles'
 
-FILTER_NAMES = ["USBL", "Altimeter", "Depth Cell", "GPS", "IMU", "Inside Pressure", "Bat Monit"]
+FILTER_NAMES = ["USBL", "Altimeter", "Depth Cell", "GPS", "IMU", "Inside Pressure", "Bat Monit", 'Thrusters']
 NUM_FILTERS = len(FILTER_NAMES)
 USBL_EXTENSIONS = ["USBL (send)", "USBL (recv)", "USBL (sensors_usbl_fix)"]
 
@@ -45,7 +45,9 @@ HELP6 = """\nWhenever a file is saved (including app.py itself) or a directory i
 HELP7 = """a) Refresh the web page"""
 HELP8 = """b) Change the first drop down"""
 HELP9 = """c) Run app.py again"""
-HELP += '\n' + HELP2 + '\n' + HELP3 + '\n' + HELP4 + '\n' + HELP5 + '\n' + HELP6 + '\n' + HELP7 + '\n' + HELP8 + '\n' + HELP9
+HELP10 = """\nYou can create a new profile to restrict the kind of plots you see. The filters you pick on the profile creation menu are the ones you won't see displayed. You can't create a profile if another one with that name already exists"""
+HELP11 = """\nThe load and delete options are radio buttons (selecting one deselects the other). After picking the action you want, just pick the profile on the dropdown bellow the radio buttons."""
+HELP += '\n' + HELP2 + '\n' + HELP3 + '\n' + HELP4 + '\n' + HELP5 + '\n' + HELP6 + '\n' + HELP7 + '\n' + HELP8 + '\n' + HELP9 + '\n' + HELP10 + '\n' + HELP11
 
 PATH_TO_PROFILES = fn.extend_dir('profiles')
 
@@ -557,7 +559,7 @@ app.layout = html.Div([
                 dbc.ModalBody("Pick the name of the new profile and the filters you want to apply to it (the ones selected won't be displayed on the dropdowns). It isn't possible to create a profile if another one already exists with that name."),
                 html.Label('Enter the profile name:'),
                 dcc.Input(value='', type='text', id='profile name'),
-                dcc.Checklist(['GPS', 'Depth Cell', 'Altimeter', 'Inside Pressure', 'USBL', 'IMU', 'Bat Monit'],
+                dcc.Checklist(['GPS', 'Depth Cell', 'Altimeter', 'Inside Pressure', 'USBL', 'IMU', 'Bat Monit', 'Thrusters'],
                     inputStyle={"margin-right": "5px", 'margin-left': '20px'},
                     id='create profile checklist',
                 ),

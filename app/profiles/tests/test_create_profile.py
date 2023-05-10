@@ -21,7 +21,7 @@ def delete_json():
 
 def test_create_profile():
     delete_json()
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
 
     assert profile.getName() == TEST_PROFILES[0]
     assert profile.getUsbl() == True
@@ -31,6 +31,7 @@ def test_create_profile():
     assert profile.getImu() == True
     assert profile.getInsidePressure() == False
     assert profile.getBatMonit() == False
+    assert profile.getThrusters() == True
 
 
 def test_create_several_profiles():
@@ -38,7 +39,7 @@ def test_create_several_profiles():
 
     num_profiles = len(TEST_PROFILES)
     for i in range(num_profiles):
-        profile = profiles.Profile(TEST_PROFILES[i], True, False, True, True, True, False, False)
+        profile = profiles.Profile(TEST_PROFILES[i], True, False, True, True, True, False, False, True)
 
         assert profile.getName() == TEST_PROFILES[i]
         assert profile.getUsbl() == True
@@ -48,6 +49,7 @@ def test_create_several_profiles():
         assert profile.getImu() == True
         assert profile.getInsidePressure() == False
         assert profile.getBatMonit() == False
+        assert profile.getThrusters() == True
 
 
 # def test_serialize_one_profile():
@@ -56,7 +58,7 @@ def test_create_several_profiles():
 
 def test_serialize_two_equal_profiles():
     delete_json() # Delete the json file to setup the test
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
     profiles.Profile.serializeClass(profile)
 
     assert profile.getName() == TEST_PROFILES[0]
@@ -67,8 +69,9 @@ def test_serialize_two_equal_profiles():
     assert profile.getImu() == True
     assert profile.getInsidePressure() == False
     assert profile.getBatMonit() == False
+    assert profile.getThrusters() == True
 
-    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False)
+    profile = profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, True)
     with pytest.raises(ValueError) as e:
         profiles.Profile.serializeClass(profile)
 
@@ -80,17 +83,17 @@ def test_serialize_two_equal_profiles():
 def test_create_existing_profile_with_invalid_name():
     delete_json()
     with pytest.raises(ValueError) as e:
-        profiles.Profile("", True, False, True, True, True, False, False)
+        profiles.Profile("", True, False, True, True, True, False, False, True)
 
     assert INVALID_NAME_VALUE_EXCEPTION in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(1, True, False, True, True, True, False, False)
+        profiles.Profile(1, True, False, True, True, True, False, False, True)
 
     assert INVALID_NAME_TYPE_EXCEPTION in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(None, True, False, True, True, True, False, False)
+        profiles.Profile(None, True, False, True, True, True, False, False, True)
 
     assert INVALID_NAME_TYPE_EXCEPTION in str(e.value)
 
@@ -98,49 +101,54 @@ def test_create_existing_profile_with_invalid_name():
 def test_create_profile_with_invalid_boolean_flags():
     delete_json()
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], 1, False, True, True, True, False, False)
+        profiles.Profile(TEST_PROFILES[0], 1, False, True, True, True, False, False, True)
 
     assert "USBL must be a boolean" in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], None, False, True, True, True, False, False)
+        profiles.Profile(TEST_PROFILES[0], None, False, True, True, True, False, False, True)
 
     assert "USBL must be a boolean" in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], 2.5, False, True, True, True, False, False)
+        profiles.Profile(TEST_PROFILES[0], 2.5, False, True, True, True, False, False, True)
 
     assert "USBL must be a boolean" in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], True, 1, True, True, True, False, False)
+        profiles.Profile(TEST_PROFILES[0], True, 1, True, True, True, False, False, True)
 
     assert "Altimeter must be a boolean" in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], True, False, 1, True, True, False, False)
+        profiles.Profile(TEST_PROFILES[0], True, False, 1, True, True, False, False, True)
 
     assert "DepthCell must be a boolean" in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], True, False, True, 1, True, False, False)
+        profiles.Profile(TEST_PROFILES[0], True, False, True, 1, True, False, False, True)
 
     assert "GPS must be a boolean" in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], True, False, True, True, 1, False, False)
+        profiles.Profile(TEST_PROFILES[0], True, False, True, True, 1, False, False, True)
     
     assert "IMU must be a boolean" in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, 1, False)
+        profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, 1, False, True)
 
     assert "InsidePressure must be a boolean" in str(e.value)
 
     with pytest.raises(TypeError) as e:
-        profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, 1)
+        profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, 1, True)
 
     assert "BatMonit must be a boolean" in str(e.value)
+
+    with pytest.raises(TypeError) as e:
+        profiles.Profile(TEST_PROFILES[0], True, False, True, True, True, False, False, 1)
+
+    assert "Thrusters must be a boolean" in str(e.value)
 
 
 # def test_create_profile_thrown_exceptions():

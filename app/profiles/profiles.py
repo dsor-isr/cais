@@ -15,6 +15,17 @@ class Profile:
         boolean flag to determine if the profile cares about USBL
     altimeter : bool
         boolean flag to determine if the profile cares about altimeter
+    depthCell : bool
+        boolean flag to determine if the profile cares about depthCell
+    gps : bool
+        boolean flag to determine if the profile cares about gps
+    imu : bool
+        boolean flag to determine if the profile cares about imu
+    insidePressure : bool
+        boolean flag to determine if the profile cares about insidePressure
+    batMonit : bool
+        boolean flag to determine if the profile cares about batMonit
+    
 
     Methods
     -------
@@ -65,7 +76,8 @@ class Profile:
     ########################################
 
     def __init__(self, name, usbl=True, altimeter=True, depthCell=True,
-                  gps=True, imu=True, insidePressure=True, batMonit=True):
+                  gps=True, imu=True, insidePressure=True, batMonit=True,
+                  thrusters=True):
         """
         Creates a Profile object
         
@@ -98,7 +110,7 @@ class Profile:
         try:
             self.__validateConstructorAttributes(name, usbl, altimeter,
                                                  depthCell, gps, imu,
-                                                 insidePressure, batMonit)
+                                                 insidePressure, batMonit, thrusters)
         except ValueError as valueError:
             raise valueError
         except TypeError as typeError:
@@ -112,6 +124,7 @@ class Profile:
         self.setImu(imu)
         self.setGps(gps)
         self.setDepthCell(depthCell)
+        self.setThrusters(thrusters)
 
 
     ########################################
@@ -119,7 +132,7 @@ class Profile:
     ########################################
 
     @classmethod
-    def __validateConstructorAttributes(self, name, usbl, altimeter, depthCell, gps, imu, insidePressure, batMonit):
+    def __validateConstructorAttributes(self, name, usbl, altimeter, depthCell, gps, imu, insidePressure, batMonit, thrusters):
         """Validates the attributes of the constructor"""
         if (type(name) != str):
             raise TypeError("Name must be a string")
@@ -139,6 +152,8 @@ class Profile:
             raise TypeError("InsidePressure must be a boolean")
         if (type(batMonit) != bool):
             raise TypeError("BatMonit must be a boolean")
+        if (type(thrusters) != bool):
+            raise TypeError("Thrusters must be a boolean")
 
 
     ########################################
@@ -168,6 +183,29 @@ class Profile:
             str
                 The name of the profile"""
         return self.name
+    
+
+    def setThrusters(self, thrusters):
+        """Sets the thrusters flag for the profile. If true, it will show thrusters related plots.
+        
+        Parameters
+        ----------
+            thrusters: bool
+                The thrusters status of the profile. If true, it will show thrusters related plots."""
+        if (type(thrusters) != bool):
+            raise TypeError("thrusters must be a boolean")
+
+        self.thrusters = thrusters
+
+
+    def getThrusters(self):
+        """Returns the thrusters status of the profile
+        
+        Returns
+        -------
+            bool
+                The thrusters status of the profile"""
+        return self.thrusters
 
 
     def setBatMonit(self, batMonit):
@@ -332,7 +370,8 @@ class Profile:
 
 
     def update(self, name=None, usbl=False, altimeter=False, batMonit=False,
-                insidePressure=False, imu=False, gps=False, depthCell=False):
+                insidePressure=False, imu=False, gps=False, depthCell=False,
+                thrusters=False):
         """Updates the profile with the given parameters. If no name is given,
         the name will remain unchanged. If any of the other parameters are not given,
         they will be set to false.
@@ -368,6 +407,7 @@ class Profile:
         self.setImu(imu)
         self.setGps(gps)
         self.setDepthCell(depthCell)
+        self.setThrusters(thrusters)
         try:
             Profile.deleteProfile(oldProfile) # Remove old version from profiles.json
         except ValueError:
@@ -429,6 +469,8 @@ class Profile:
                 output_files.remove(file)
             elif (self.getDepthCell() and re.search("depthcell", lowerCaseFile) != None):
                 output_files.remove(file)
+            elif (self.getThrusters() and re.search("thruster", lowerCaseFile) != None):
+                output_files.remove(file)
 
         return output_files
 
@@ -437,7 +479,8 @@ class Profile:
         """Clones the profile"""
         return Profile(self.getName(), self.getUsbl(), self.getAltimeter(),
                        self.getDepthCell(), self.getGps(), self.getImu(),
-                       self.getInsidePressure(), self.getBatMonit())
+                       self.getInsidePressure(), self.getBatMonit(), 
+                       self.getThrusters())
 
 
     ########################################
@@ -454,7 +497,7 @@ class Profile:
         
         return Profile(jsonData['name'], jsonData['usbl'], jsonData['altimeter'],
                         jsonData['depthCell'], jsonData['gps'], jsonData['imu'],
-                        jsonData['insidePressure'], jsonData['batMonit'])
+                        jsonData['insidePressure'], jsonData['batMonit'], jsonData['thrusters'])
     
     @staticmethod
     def deserializeFile(filePath): # TODO - create overriden method that takes jsonData instead of filePath
@@ -675,7 +718,7 @@ class Profile:
     ########################################
 
     def __str__(self):
-        return "Profile = { name: " + self.getName() + ", USBL: " + str(self.getUsbl()) + ", Altimeter: " + str(self.getAltimeter()) + ", DepthCell: " + str(self.getDepthCell()) + ", GPS: " + str(self.getGps()) + ", IMU: " + str(self.getImu()) + ", InsidePressure: " + str(self.getInsidePressure()) + ", BatMonit: " + str(self.getBatMonit()) + "}"
+        return "Profile = { name: " + self.getName() + ", USBL: " + str(self.getUsbl()) + ", Altimeter: " + str(self.getAltimeter()) + ", DepthCell: " + str(self.getDepthCell()) + ", GPS: " + str(self.getGps()) + ", IMU: " + str(self.getImu()) + ", InsidePressure: " + str(self.getInsidePressure()) + ", BatMonit: " + str(self.getBatMonit()) + ", Thrusters: " + str(self.getThrusters()) + "}"
     
     ########################################
     ######       Less Than method     ######
@@ -704,7 +747,8 @@ class Profile:
                 self.getGps() == other.getGps() and
                 self.getImu() == other.getImu() and
                 self.getInsidePressure() == other.getInsidePressure() and
-                self.getBatMonit() == other.getBatMonit())
+                self.getBatMonit() == other.getBatMonit() and 
+                self.getThrusters() == other.getThrusters())
 
 
 ############################################

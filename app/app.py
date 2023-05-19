@@ -563,6 +563,49 @@ app.layout = html.Div([
                     inputStyle={"margin-right": "5px", 'margin-left': '20px'},
                     id='create profile checklist',
                 ),
+                html.Br(),
+                html.Label("Select the drivers you want to see"),
+                dbc.RadioItems(
+                    id="driver radios",
+                    className="btn-group",
+                    inputClassName="btn-check",
+                    labelClassName="btn btn-outline-primary",
+                    labelCheckedClassName="active",
+                    options=[
+                        {"label": "Select All Drivers", "value": 'Select All Drivers', "id": "Select All Drivers"},
+                        {"label": "Deselect All Drivers", "value": 'Deselect All Drivers', "id": "Deselect All Drivers"},
+                    ],
+                    value='Deselect All Drivers',
+                ),
+                dcc.Dropdown(
+                    id='create profile driver dropdown',
+                    placeholder = 'Select drivers',
+                    options=['GPS', 'Depth Cell', 'Altimeter', 'Inside Pressure', 'USBL', 'IMU', 'Bat Monit', 'Thrusters'],
+                    multi=True,
+                    clearable=True,
+                    style={'color': '#49B0EA'},
+                ),
+                html.Label("Select the specific plots you want to see"),
+                dbc.RadioItems(
+                    id="plots radios",
+                    className="btn-group",
+                    inputClassName="btn-check",
+                    labelClassName="btn btn-outline-primary",
+                    labelCheckedClassName="active",
+                    options=[
+                        {"label": "Select All Plots", "value": 'Select All Plots', "id": "Select All Plots"},
+                        {"label": "Deselect All Plots", "value": 'Deselect All Plots', "id": "Deselect All Plots"},
+                    ],
+                    value='Deselect All Plots',
+                ),
+                dcc.Dropdown(
+                    id='create profile plots dropdown',
+                    placeholder = 'Select specific plots',
+                    options=['control_surge.html', 'overview_filter_dr_usbl.html', 'filter_vs_virtual_target.html', 'overview_pf.html', 'crossTrackAlongTrack.html'],
+                    multi=True,
+                    clearable=True,
+                    style={'color': '#49B0EA'},
+                ),
                 dbc.ModalFooter(
                     dbc.ButtonGroup(
                         [
@@ -583,7 +626,7 @@ app.layout = html.Div([
             scrollable=True,
             is_open=False,
             style={'white-space':'pre-line'},
-            size="lg",
+            size="xl",
         ),
         dcc.Store(id='create profile checklist memory'),
         html.Div(id="output"),
@@ -885,6 +928,33 @@ def profile_callback(n_create_button, n_cancel_button, n_confirm_create,
 
     return False, load_profiles(), build_current_profile_label_string(), load_delete_radio_value, get_loaded_profile_name()
 
+
+@app.callback(
+    Output("create profile driver dropdown", "value"),
+    Input("driver radios", "value"),
+    [State("create profile driver dropdown", "options"),],
+)
+def profile_drivers_dropdown(input_value, drivers):
+    if (input_value == "Select All Drivers"):
+        return [driver for driver in drivers]
+    elif (input_value == "Deselect All Drivers"):
+        return []
+    else:
+        return []
+    
+
+@app.callback(
+    Output("create profile plots dropdown", "value"),
+    Input("plots radios", "value"),
+    [State("create profile plots dropdown", "options"),],
+)
+def profile_drivers_dropdown(input_value, plots):
+    if (input_value == "Select All Plots"):
+        return [plot for plot in plots]
+    elif (input_value == "Deselect All Plots"):
+        return []
+    else:
+        return []
 
 ##############################
 ###      Main Function     ###

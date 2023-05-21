@@ -782,6 +782,64 @@ def readJSONfile(file):
         raise permissionError
 
 
+def loadProfile(profileName):
+    """Loads a profile from the profiles.json file"""
+    if (type(profileName) != str):
+        raise TypeError("Profile name must be a string")
+    elif (profileName == ""):
+        raise ValueError("Profile name can't be None/Null or empty")
+
+    deserializedProfiles = []
+    try:
+        deserializedProfiles = readJSONfile("profiles.json")
+    except FileNotFoundError as fileNotFoundError:
+        raise fileNotFoundError
+    except PermissionError as permissionError:
+        raise permissionError
+    except Exception as exception:
+        raise exception
+
+    for deserializedProfile in deserializedProfiles:
+        if (deserializedProfile['name'].lower() == profileName.lower()):
+            return deserializedProfile
+        
+    raise ValueError("Profile doesn't exist")
+
+
+def serializeClass(profile):
+    """Serializes a Profile object into a JSON string"""
+    if (type(profile) != dict):
+        raise TypeError("Profile must be a Profile object")
+    elif (profile == None):
+        raise ValueError("Profile can't be None/Null")
+    elif (profile['name'] == None or profile['name'] == ""):
+        raise ValueError("Profile name can't be None/Null or empty")
+
+    deserializedProfiles = []
+    try:
+        deserializedProfiles = readJSONfile("profiles.json")
+        print("deserializedProfiles = " + str(deserializedProfiles))
+    except FileNotFoundError as fileNotFoundError: # TODO - remove "as" keyword?
+        json.dump(profile, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
+    except PermissionError as permissionError:
+        raise permissionError
+    except Exception as exception:
+        raise exception
+    
+    for deserializedProfile in deserializedProfiles:
+        if (deserializedProfile['name'].lower() == profile['name'].lower()):
+            raise ValueError("Profile already exists")
+            
+    deserializedProfiles.append(profile)
+    profiles = deserializedProfiles
+    print("profiles = " + str(profiles))
+
+    file = open("profiles.json", "w")
+    portalocker.lock(file, portalocker.LockFlags.EXCLUSIVE) # Lock file
+    json.dump(profiles, file, indent=4, cls=Profile.ProfileEncoder)
+    file.close()
+
+
 ############################################
 ######       Test the class           ######
 ############################################

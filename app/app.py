@@ -32,7 +32,7 @@ PLOTS = 'plots'
 DRIVERS = 'drivers'
 VEHICLES = 'vehicles'
 
-FILTER_NAMES = ["USBL", "Altimeter", "Depth Cell", "GPS", "IMU", "Inside Pressure", "Bat Monit", 'Thrusters']
+FILTER_NAMES = ["usbl", "altimeter", "depthCell", "gps", "imu", "insidePressure", "batMonit", 'thrusters']
 NUM_FILTERS = len(FILTER_NAMES)
 USBL_EXTENSIONS = ["USBL (send)", "USBL (recv)", "USBL (sensors_usbl_fix)"]
 
@@ -130,19 +130,18 @@ def merge_html_files(files):
 def create_profile(checklist_values, profile_name):
     """Creates a new profile with the given checklist values"""
     
-    if (checklist_values == None):
-        boolean_filters = [False for i in range(NUM_FILTERS)]
-    else:
-        boolean_filters = checklist_filters_to_booleans(checklist_values)
+    profile = {'name': profile_name, 'filters': checklist_values}
     if (type(profile_name) != str):
         raise TypeError("create_profile: Expected a string for profile_name but received ", str(type(profile_name)))
     elif (profile_name == ""):
         raise ValueError("create_profile: profile_name is empty")
 
-    new_profile = profiles.Profile(profile_name, *boolean_filters)
     pwd = fn.get_pwd()
     fn.change_directory(PATH_TO_PROFILES)
-    profiles.Profile.serializeClass(new_profile)
+    try:
+        profiles.serializeClass(profile)
+    except ValueError as e:
+        pass
     fn.change_directory(pwd)
 
 
@@ -164,9 +163,9 @@ def load_profiles():
     path = fn.build_dir("profiles.json", PATH_TO_PROFILES)
     profile_names = []
     if (fn.is_valid_file(path)):
-        deserialized_profiles = profiles.Profile.deserializeFile(path)
+        deserialized_profiles = profiles.readJSONfile(path)
         for profile in deserialized_profiles:
-            profile_names.append(profile.getName())
+            profile_names.append(profile['name'])
 
     return profile_names
 
@@ -182,7 +181,7 @@ def load_profile(profile_name):
     pwd = fn.get_pwd()
     fn.change_directory(PATH_TO_PROFILES)
     global loaded_profile
-    loaded_profile = profiles.Profile.loadProfile(profile_name)
+    loaded_profile = profiles.loadProfile(profile_name)
     fn.change_directory(pwd)
 
 
@@ -207,6 +206,7 @@ def checklist_filters_to_booleans(checklist_values):
     if (type(checklist_values) != list and type(checklist_values) != tuple):
         raise TypeError("checklist_filters_to_booleans: Expected a list or tuple, but received ", str(type(checklist_values)))
 
+    print("checklist_values: ", checklist_values)
     booleans = [False for i in range(NUM_FILTERS)]
     for i in checklist_values:
         if (type(i) != str):
@@ -227,8 +227,7 @@ def get_loaded_profile_name():
     if (loaded_profile == None):
         return None
     else:
-        return loaded_profile.getName()
-
+        return loaded_profile['name']
 
 def apply_profile_filters(data):
     """Applies the filters of the loaded profile to the data"""
@@ -559,7 +558,7 @@ app.layout = html.Div([
                 dbc.ModalBody("Pick the name of the new profile and the filters you want to apply to it (the ones selected won't be displayed on the dropdowns). It isn't possible to create a profile if another one already exists with that name."),
                 html.Label('Enter the profile name:'),
                 dcc.Input(value='', type='text', id='profile name'),
-                dcc.Checklist(['GPS', 'Depth Cell', 'Altimeter', 'Inside Pressure', 'USBL', 'IMU', 'Bat Monit', 'Thrusters'],
+                dcc.Checklist(['gps', 'depthCell', 'altimeter', 'insidePressure', 'usbl', 'imu', 'batMonit', 'thrusters'],
                     inputStyle={"margin-right": "5px", 'margin-left': '20px'},
                     id='create profile checklist',
                 ),
@@ -580,7 +579,7 @@ app.layout = html.Div([
                 dcc.Dropdown(
                     id='create profile driver dropdown',
                     placeholder = 'Select drivers',
-                    options=['GPS', 'Depth Cell', 'Altimeter', 'Inside Pressure', 'USBL', 'IMU', 'Bat Monit', 'Thrusters'],
+                    options=['gps', 'depthCell', 'altimeter', 'insidePressure', 'usbl', 'imu', 'batMonit', 'thrusters'],
                     multi=True,
                     clearable=True,
                     style={'color': '#49B0EA'},
@@ -895,7 +894,7 @@ app.callback(
         Input("radios", "value"),
     ],
     [State("create profile modal", "is_open"),
-     State("create profile checklist", "value"),
+     State("create profile driver dropdown", "value"),
      State('profile name', 'value'),
      State("radios", "value"),],
 )

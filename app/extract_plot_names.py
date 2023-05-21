@@ -69,9 +69,9 @@ def write_to_file(file_name, output):
         size = len(output)
         for i in range(size):
             if i < size - 1:
-                f.write(output[i] + "\n")
+                f.write('\'' + output[i] + '\'' + ", ")
             else:
-                f.write(output[i])
+                f.write('\'' + output[i] + '\'')
 
 
 def process_dir(input_path):
@@ -121,5 +121,6 @@ if __name__ == "__main__":
 
 
     plots = sorted(dfs(vehicle_path))
+    plots = [plot for plot in plots if not plot.endswith("copy")]
     print_plots(plots)
     write_to_file("plot_names.txt", plots)

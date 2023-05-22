@@ -832,12 +832,114 @@ def serializeClass(profile):
             
     deserializedProfiles.append(profile)
     profiles = deserializedProfiles
-    print("profiles = " + str(profiles))
 
     file = open("profiles.json", "w")
     portalocker.lock(file, portalocker.LockFlags.EXCLUSIVE) # Lock file
     json.dump(profiles, file, indent=4, cls=Profile.ProfileEncoder)
     file.close()
+
+
+
+def deleteProfileByName(profileName):
+    """Deletes a profile from the profiles.json file"""
+    if (type(profileName) != str):
+        raise TypeError("Profile name must be a string")
+    elif (profileName == None or profileName == ""):
+        raise ValueError("Profile name can't be None/Null or empty")
+
+    profiles = []
+    try:
+        deserializedProfiles = readJSONfile("profiles.json")
+        foundProfile = False
+        for deserializedProfile in deserializedProfiles:
+            if (deserializedProfile['name'].lower() == profileName.lower()):
+                deserializedProfiles.remove(deserializedProfile)
+                foundProfile = True
+                break
+
+        if (not foundProfile):
+            raise ValueError("Profile doesn't exist")
+        profiles = deserializedProfiles
+    except FileNotFoundError as fileNotFoundError:
+        raise fileNotFoundError
+    except PermissionError as permissionError:
+        raise permissionError
+    except Exception as exception:
+        raise exception
+
+    file = open("profiles.json", "w")
+    portalocker.lock(file, portalocker.LockFlags.EXCLUSIVE) # Lock file
+    json.dump(profiles, file, indent=4, cls=Profile.ProfileEncoder)
+    file.close()
+
+
+def validate_profile(profile):
+    if (type(profile) != dict):
+        raise TypeError("Profile must be a dictionary")
+    if (not 'name' in profile or not 'driverFilters' in profile or not 'plotFilters' in profile):
+        raise ValueError("Profile must contain name, driverFilters and plotFilters")
+    if (type(profile['name']) != str):
+        raise TypeError("Profile name must be a string")
+    if (['name'] == ""):
+        raise ValueError("Profile name can't be empty")
+    if (type(profile['driverFilters']) != list):
+        raise TypeError("Profile driverFilters must be a list")
+    if (type(profile['plotFilters']) != list):
+        raise TypeError("Profile plotFilters must be a list")
+    
+
+def filter(files, profile, filterDrivers=False, filterPlots=False):
+    """Filters the files based on the profile
+    
+    Parameters
+    ----------
+        files: list
+            list of files to filter
+    Returns
+    -------
+        list
+            list of relevant files for this profile"""
+    if (type(files) not in (list, tuple)):
+        raise TypeError("Files must be a list or tuple")
+    elif (files == [] or files == ()):
+        raise ValueError("Files can't be empty")
+    if (type(profile) != dict):
+        raise TypeError("Profile must be a dictionary")
+
+    for file in files:
+        if (type(file) != str):
+            raise TypeError("Files must be a list or tuple of strings")
+        elif (file == None or file == ""):
+            raise ValueError("Files can't contain None/Null or empty strings")
+        
+    filtered_files = [file for file in files]
+    if (filterDrivers):
+        filtered_files = __filter_drivers(files, profile['driverFilters'])
+    elif (filterPlots):
+        filtered_files = __filter_plots(files, profile['plotFilters'])
+
+    return filtered_files
+            
+
+def __filter_drivers(files, driverFilters):
+    output_files = [file for file in files]
+    for file in files:
+        lowerCaseFile = file
+        if (not lowerCaseFile in driverFilters):
+            output_files.remove(file)
+
+    return output_files
+
+
+def __filter_plots(files, plotFilters):
+    output_files = [file for file in files]
+    for file in files:
+        processedFile = file
+        processedFile = processedFile.replace('.html', '')
+        if (not processedFile in plotFilters):
+            output_files.remove(file)
+
+    return output_files
 
 
 ############################################

@@ -45,7 +45,7 @@ HELP6 = """\nWhenever a file is saved (including app.py itself) or a directory i
 HELP7 = """a) Refresh the web page"""
 HELP8 = """b) Change the first drop down"""
 HELP9 = """c) Run app.py again"""
-HELP10 = """\nYou can create a new profile to restrict the kind of plots you see. The filters you pick on the profile creation menu are the ones you won't see displayed. You can't create a profile if another one with that name already exists"""
+HELP10 = """\nYou can create a new profile to restrict the kind of plots you see. The filters you pick on the profile creation menu are the ones you will see displayed. You can't create a profile if another one with that name already exists"""
 HELP11 = """\nThe load and delete options are radio buttons (selecting one deselects the other). After picking the action you want, just pick the profile on the dropdown bellow the radio buttons."""
 HELP += '\n' + HELP2 + '\n' + HELP3 + '\n' + HELP4 + '\n' + HELP5 + '\n' + HELP6 + '\n' + HELP7 + '\n' + HELP8 + '\n' + HELP9 + '\n' + HELP10 + '\n' + HELP11
 
@@ -127,10 +127,13 @@ def merge_html_files(files):
         file.write(str(output_file))
 
 
-def create_profile(checklist_values, profile_name):
+def create_profile(driver_filters, profile_name, plot_filters):
     """Creates a new profile with the given checklist values"""
     
-    profile = {'name': profile_name, 'filters': checklist_values}
+    #print("profile_name: ", profile_name)
+    #print("driver_filters: ", driver_filters)
+    #print("plot_filters: ", plot_filters)
+    profile = {'name': profile_name, 'driverFilters': driver_filters, 'plotFilters': plot_filters}
     if (type(profile_name) != str):
         raise TypeError("create_profile: Expected a string for profile_name but received ", str(type(profile_name)))
     elif (profile_name == ""):
@@ -155,7 +158,7 @@ def delete_profile(profile_name):
 
     pwd = fn.get_pwd()
     fn.change_directory(PATH_TO_PROFILES)
-    profiles.Profile.deleteProfileByName(profile_name)
+    profiles.deleteProfileByName(profile_name)
     fn.change_directory(pwd)
 
 
@@ -198,29 +201,6 @@ def build_current_profile_label_string():
     return "Current Profile: {}".format(str(get_loaded_profile_name()))
 
 
-def checklist_filters_to_booleans(checklist_values):
-    """Converts the values of the checklist to booleans"""
-
-    if (checklist_values == None):
-        raise ValueError("checklist_filters_to_booleans: checklist_values is None")
-    if (type(checklist_values) != list and type(checklist_values) != tuple):
-        raise TypeError("checklist_filters_to_booleans: Expected a list or tuple, but received ", str(type(checklist_values)))
-
-    print("checklist_values: ", checklist_values)
-    booleans = [False for i in range(NUM_FILTERS)]
-    for i in checklist_values:
-        if (type(i) != str):
-            raise TypeError("checklist_filters_to_booleans: Expected a list of strings, but received a list with a non-string element")
-        
-        if (i in FILTER_NAMES):
-            index = FILTER_NAMES.index(i)
-            booleans[index] = True
-        else:
-            raise ValueError("checklist_filters_to_booleans: At least one of the values of the checklist is not a valid filter")
-
-    return booleans
-
-
 def get_loaded_profile_name():
     """Returns the name of the loaded profile"""
 
@@ -228,20 +208,36 @@ def get_loaded_profile_name():
         return None
     else:
         return loaded_profile['name']
+    
 
-def apply_profile_filters(data):
+def apply_profile_driver_filters(data):
     """Applies the filters of the loaded profile to the data"""
 
     if (type(data) != list and type(data) != tuple):
         raise TypeError("apply_profile_filters: Expected a list or tuple, but received ", str(type(data)))
     elif (len(data) == 0):
-        raise ValueError("apply_profile_filters: data is empty")
+        return data
 
     if (get_loaded_profile_name() == None):
         # No filters to be applied
         return data
 
-    return loaded_profile.filter(data)
+    return profiles.filter(data, loaded_profile, True)
+
+
+def apply_profile_plot_filters(data):
+    """Applies the filters of the loaded profile to the data"""
+
+    if (type(data) != list and type(data) != tuple):
+        raise TypeError("apply_profile_filters: Expected a list or tuple, but received ", str(type(data)))
+    elif (len(data) == 0):
+        return data
+
+    if (get_loaded_profile_name() == None):
+        # No filters to be applied
+        return data
+
+    return profiles.filter(data, loaded_profile, False, True)
 
 
 def reset_upper_directories(dropdown_index):
@@ -282,10 +278,7 @@ def treat_fifth_level_dropdown(input_value):
             options.extend(fn.get_html_files())
 
         
-        #fn.change_directory(last_directories[4])
-        #path = fn.extend_dir(input_value)
-        #fn.change_directory(str(path))
-        #last_directories[5] = path
+        options = apply_profile_plot_filters(options)
 
         #print("     (callback) treat_fifth_level_dropdown: options = ", options)
         #print("")
@@ -322,17 +315,6 @@ def treat_sixth_lvl_dropdown(input_value):
             options = []
             #print("input value = " + input_value +" ; USBL_EXTENSIONS = ", USBL_EXTENSIONS)
             #print("input_value in USBL_EXTENSIONS = ", str(input_value in USBL_EXTENSIONS))
-            if (input_value in USBL_EXTENSIONS):
-                # USBL requires an extra directory jump to reach the html files
-                #print("     (callback) treat_sixth_lvl_dropdown: Picked a type of USBL. Extending accordingly")
-                path = fn.extend_dir("USBL")
-                fn.change_directory(str(path))
-                if (re.search("(send)", input_value) != None):
-                    path = fn.extend_dir("send")
-                elif (re.search("(sensors_usbl_fix)", input_value) != None):
-                    path = fn.extend_dir("sensors_usbl_fix")
-                elif (re.search("(recv)", input_value) != None):
-                    path = fn.extend_dir("recv")
             fn.change_directory(str(path))
             
             #print("     (callback) treat_sixth_lvl_dropdown: pwd = ", fn.get_pwd())
@@ -349,6 +331,7 @@ def treat_sixth_lvl_dropdown(input_value):
             # Prepare plot if it was an html file
                 #print("\t\tupdate_sixth_level_dir: Adding html file to the plot")
                 last_dir_options = fn.get_html_files()
+                last_dir_options = options = apply_profile_plot_filters(last_dir_options)
                 #print("last_dir_options = ", last_dir_options)
                 path = fn.extend_dir(str(input_value))
                 reset_upper_directories(6) # TODO maybe este não é preciso ???
@@ -555,61 +538,60 @@ app.layout = html.Div([
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.ModalTitle("Create Profile")),
-                dbc.ModalBody("Pick the name of the new profile and the filters you want to apply to it (the ones selected won't be displayed on the dropdowns). It isn't possible to create a profile if another one already exists with that name."),
-                html.Label('Enter the profile name:'),
-                dcc.Input(value='', type='text', id='profile name'),
-                dcc.Checklist(['gps', 'depthCell', 'altimeter', 'insidePressure', 'usbl', 'imu', 'batMonit', 'thrusters'],
-                    inputStyle={"margin-right": "5px", 'margin-left': '20px'},
-                    id='create profile checklist',
+                dbc.ModalBody([
+                    html.Label("Pick the name of the new profile and the filters you want to apply to it (the ones selected are displayed on the dropdowns). It isn't possible to create a profile if another one already exists with that name."),
+                    html.Label('Enter the profile name:'),
+                    html.Br(),
+                    dcc.Input(value='', type='text', id='profile name'),
+                    html.Br(),
+                    html.Label("Select the drivers you want to see"),
+                    dbc.RadioItems(
+                        id="driver radios",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "Select All Drivers", "value": 'Select All Drivers', "id": "Select All Drivers"},
+                            {"label": "Deselect All Drivers", "value": 'Deselect All Drivers', "id": "Deselect All Drivers"},
+                        ],
+                        value='Deselect All Drivers',
+                    ),
+                    dcc.Dropdown(
+                        id='create profile driver dropdown',
+                        placeholder = 'Select drivers',
+                        options=['gps', 'depthCell', 'altimeter', 'insidePressure', 'usbl', 'imu', 'batMonit', 'thruster0', 'thruster1', 'thruster1', 'thruster3', 'thruster4', 'thruster5'],
+                        multi=True,
+                        clearable=True,
+                        style={'color': '#49B0EA'},
+                    ),
+                    html.Label("Select the specific plots you want to see"),
+                    dbc.RadioItems(
+                        id="plots radios",
+                        className="btn-group",
+                        inputClassName="btn-check",
+                        labelClassName="btn btn-outline-primary",
+                        labelCheckedClassName="active",
+                        options=[
+                            {"label": "Select All Plots", "value": 'Select All Plots', "id": "Select All Plots"},
+                            {"label": "Deselect All Plots", "value": 'Deselect All Plots', "id": "Deselect All Plots"},
+                        ],
+                        value='Deselect All Plots',
+                    ),
+                    dcc.Dropdown(
+                        id='create profile plots dropdown',
+                        placeholder = 'Select specific plots',
+                        options=['Ax', 'Ay', 'Az', 'Cross_and_Along_errors', 'Current', 'ErrorInMissionOverview', 'Error_between_Filter_and_VirtualTarget', 'Errors', 'Filter_and_VirtualTarget_and_GT', 'Filter_vs_Virtual', 'Gx', 'Gy', 'Gz', 'Inertial_Current', 'MissionOverview', 'Mx', 'Mx_vs_My', 'My', 'Mz', 'Pitch', 'RMS', 'Ref_Surge', 'Ref_Yaw', 'Roll', 'Speed', 'Temperature', 'Tension_Pack1', 'Tension_Pack2', 'Yaw', 'actual_charge', 'altimeter', 'altitude', 'bearing_vs_bearing_raw', 'bitrate', 'charging', 'control_surge', 'course', 'crossTrackAlongTrack', 'current', 'data', 'destination_address', 'duration', 'elevation_vs_elevation_raw', 'equalize', 'filter_vs_virtual_target', 'imu_pp_mag_abs', 'imu_pp_mag_x', 'imu_pp_mag_y', 'imu_pp_mag_z', 'integrity', 'latitude', 'longitude', 'mag_abs', 'mag_x', 'mag_y', 'mag_z', 'max_cell', 'max_temp', 'measurement_usbl_fix_bearing', 'measurement_usbl_fix_bearing_raw', 'measurement_usbl_fix_elevation', 'measurement_usbl_fix_elevation_raw', 'measurement_usbl_fix_range', 'measurement_usbl_fix_sound_speed', 'measurement_usbl_fix_source_id', 'measurement_usbl_fix_type_id', 'min_cell', 'min_temp', 'mode', 'msg_id', 'number_of_packs', 'overview_filter_dr_usbl', 'overview_pf', 'pitch', 'pressure', 'propagation_time', 'range', 'range_vs_bering_vs_elevation', 'recv_bitrate', 'recv_destination_address', 'recv_duration', 'recv_integrity', 'recv_msg_id', 'recv_propagation_time', 'recv_relative_velocity', 'recv_rssi', 'recv_source_address', 'recv_type_id', 'relative_velocity', 'roll', 'rssi', 'satellites', 'send_bitrate', 'send_destination_address', 'send_duration', 'send_integrity', 'send_msg_id', 'send_propagation_time', 'send_relative_velocity', 'send_rssi', 'send_source_address', 'send_type_id', 'sensors_usbl_fix_bearing_vs_bearing_raw', 'sensors_usbl_fix_elevation_vs_elevation_raw', 'sensors_usbl_fix_range', 'sensors_usbl_fix_range_vs_bearing_vs_elevation', 'sensors_usbl_fix_source_id', 'source_address', 'source_id', 'speed_over_ground', 'temperature', 'type_id', 'utc_time', 'yaw'],
+                        multi=True,
+                        clearable=True,
+                        style={'color': '#49B0EA'},
                 ),
-                html.Br(),
-                html.Label("Select the drivers you want to see"),
-                dbc.RadioItems(
-                    id="driver radios",
-                    className="btn-group",
-                    inputClassName="btn-check",
-                    labelClassName="btn btn-outline-primary",
-                    labelCheckedClassName="active",
-                    options=[
-                        {"label": "Select All Drivers", "value": 'Select All Drivers', "id": "Select All Drivers"},
-                        {"label": "Deselect All Drivers", "value": 'Deselect All Drivers', "id": "Deselect All Drivers"},
-                    ],
-                    value='Deselect All Drivers',
-                ),
-                dcc.Dropdown(
-                    id='create profile driver dropdown',
-                    placeholder = 'Select drivers',
-                    options=['gps', 'depthCell', 'altimeter', 'insidePressure', 'usbl', 'imu', 'batMonit', 'thrusters'],
-                    multi=True,
-                    clearable=True,
-                    style={'color': '#49B0EA'},
-                ),
-                html.Label("Select the specific plots you want to see"),
-                dbc.RadioItems(
-                    id="plots radios",
-                    className="btn-group",
-                    inputClassName="btn-check",
-                    labelClassName="btn btn-outline-primary",
-                    labelCheckedClassName="active",
-                    options=[
-                        {"label": "Select All Plots", "value": 'Select All Plots', "id": "Select All Plots"},
-                        {"label": "Deselect All Plots", "value": 'Deselect All Plots', "id": "Deselect All Plots"},
-                    ],
-                    value='Deselect All Plots',
-                ),
-                dcc.Dropdown(
-                    id='create profile plots dropdown',
-                    placeholder = 'Select specific plots',
-                    options=['Ax', 'Ay', 'Az', 'Cross_and_Along_errors', 'Current', 'ErrorInMissionOverview', 'Error_between_Filter_and_VirtualTarget', 'Errors', 'Filter_and_VirtualTarget_and_GT', 'Filter_vs_Virtual', 'Gx', 'Gy', 'Gz', 'Inertial_Current', 'MissionOverview', 'Mx', 'Mx_vs_My', 'My', 'Mz', 'Pitch', 'RMS', 'Ref_Surge', 'Ref_Yaw', 'Roll', 'Speed', 'Temperature', 'Tension_Pack1', 'Tension_Pack2', 'Yaw', 'actual_charge', 'altimeter', 'altitude', 'bearing_vs_bearing_raw', 'bitrate', 'charging', 'control_surge', 'course', 'crossTrackAlongTrack', 'current', 'data', 'destination_address', 'duration', 'elevation_vs_elevation_raw', 'equalize', 'filter_vs_virtual_target', 'imu_pp_mag_abs', 'imu_pp_mag_x', 'imu_pp_mag_y', 'imu_pp_mag_z', 'integrity', 'latitude', 'longitude', 'mag_abs', 'mag_x', 'mag_y', 'mag_z', 'max_cell', 'max_temp', 'measurement_usbl_fix_bearing', 'measurement_usbl_fix_bearing_raw', 'measurement_usbl_fix_elevation', 'measurement_usbl_fix_elevation_raw', 'measurement_usbl_fix_range', 'measurement_usbl_fix_sound_speed', 'measurement_usbl_fix_source_id', 'measurement_usbl_fix_type_id', 'min_cell', 'min_temp', 'mode', 'msg_id', 'number_of_packs', 'overview_filter_dr_usbl', 'overview_pf', 'pitch', 'pressure', 'propagation_time', 'range', 'range_vs_bering_vs_elevation', 'recv_bitrate', 'recv_destination_address', 'recv_duration', 'recv_integrity', 'recv_msg_id', 'recv_propagation_time', 'recv_relative_velocity', 'recv_rssi', 'recv_source_address', 'recv_type_id', 'relative_velocity', 'roll', 'rssi', 'satellites', 'send_bitrate', 'send_destination_address', 'send_duration', 'send_integrity', 'send_msg_id', 'send_propagation_time', 'send_relative_velocity', 'send_rssi', 'send_source_address', 'send_type_id', 'sensors_usbl_fix_bearing_vs_bearing_raw', 'sensors_usbl_fix_elevation_vs_elevation_raw', 'sensors_usbl_fix_range', 'sensors_usbl_fix_range_vs_bearing_vs_elevation', 'sensors_usbl_fix_source_id', 'source_address', 'source_id', 'speed_over_ground', 'temperature', 'type_id', 'utc_time', 'yaw'],
-                    multi=True,
-                    clearable=True,
-                    style={'color': '#49B0EA'},
-                ),
+                ]),
                 dbc.ModalFooter(
                     dbc.ButtonGroup(
                         [
                             dbc.Button(
-                                "create",
+                                "Create",
                                 id="create modal create button",
                                 className="ms-auto",
                                 n_clicks=0),
@@ -822,8 +804,8 @@ def update_fifth_level_dir(input_value):
             label = '5. Mission details'
         else:
             options.extend(fn.get_html_files()) # TODO - is this extended necessary?
-            print("     (callback) update_fifth_level_dir: options = ", options)
-            options = apply_profile_filters(options)
+            #print("     (callback) update_fifth_level_dir: options = ", options)
+            options = apply_profile_driver_filters(options)
             label = '5. Drivers'
 
         #print("     (callback) update_fifth_level_dir: options = ", options)
@@ -896,18 +878,19 @@ app.callback(
     [State("create profile modal", "is_open"),
      State("create profile driver dropdown", "value"),
      State('profile name', 'value'),
-     State("radios", "value"),],
+     State("radios", "value"),
+     State("create profile plots dropdown", "value")],
 )
 def profile_callback(n_create_button, n_cancel_button, n_confirm_create,
                              dropdown_val, load_delete_radio_value, is_open, checklist_value, 
-                             profile_name, radio_value):
+                             profile_name, radio_value, plot_filters):
     callback_trigger = ctx.triggered_id
 
     if (callback_trigger == "create profile button"):
         return True, load_profiles(), build_current_profile_label_string(), "Pick if you want to Load or Delete a profile", get_loaded_profile_name()
     
     elif (callback_trigger == "create modal create button"):
-        create_profile(checklist_value, profile_name)
+        create_profile(checklist_value, profile_name, plot_filters)
 
     elif (callback_trigger == "radios" and radio_value == "Delete Profile"):
         return False, load_profiles(), build_current_profile_label_string(), load_delete_radio_value, None

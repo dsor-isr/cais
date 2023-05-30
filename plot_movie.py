@@ -24,74 +24,107 @@ Protect the manatees!
 import scipy
 import sys
 import os
-import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 from moviepy.editor import VideoClip
 from moviepy.video.io.bindings import mplfig_to_npimage
+import load_yaml as ly
 
-def help():
-    print("Command help: python plot_movie.py [TRIAL_NAME]")
-    print("The files should all be inside the working directory named \"files\"")
-    # print("The vehicle files must be named \"vehicle0\", \"vehicle1\", etc.")
+import mods.slap as slap
+import utils
 
-if len(sys.argv) != 2:
-    print("Invalid number of arguments: " + str(len(sys.argv) - 1))
-    help()
-    exit(1)
 
-plot_data = []
-color_dict = {"mred": "red", "mblack": "black", "mvector": "yellow", "delfim": "orange"}
-
+# Working directory configuration
+path = sys.argv[0].split('plot_movie.py')[0]
 if sys.argv[0].split('plot_movie.py')[0] == "":
-    path = "./files/"
+    path_files = "./files/"
+    path_saves = "./saves/"
+    path_configs = "./configs/"
 else:
-    path = sys.argv[0].split('plot_movie.py')[0] + "files/"
+    path_files = os.path.join(sys.argv[0].split('plot_movie.py')[0], "files/")
+    path_saves = os.path.join(sys.argv[0].split('plot_movie.py')[0], "saves/")
+    path_configs = os.path.join(sys.argv[0].split('plot_movie.py')[0], "configs/")
 
-if os.path.exists(path) and os.path.exists(path.split("files/")[0] + "save/"):
+# Check if directories exist and create them if not
+if os.path.exists(path_files):
     pass
 else:
-    print("Either \"files/\" or \"saves\" directory does not exist in specified path")
-    exit(1)
+    os.mkdir(path_files)
+if os.path.exists(path_saves):
+    pass
+else:
+    os.mkdir(path_saves)
+if os.path.exists(path_configs):
+    pass
+else:
+    os.mkdir(path_configs)
 
-for root, dirs, files in os.walk(path):
-    for f in files:
-        if ".mat" in f:
-            pd = {"mat_file": None, "data": None, "color": None, "variable_keyword": None}
-            pd["mat_file"] = os.path.join(root, f)
-            for c in color_dict.keys():
-                if c in f:
-                    pd["color"] = c
-            plot_data.append(pd)
+configs = ly.loadConfigurations(path_configs)
 
+plot_data = []
+
+# Treatment of data inside plot_data structure
+# non_data = ("__header__", "__version__", "__globals__")
 
 try:
-    for pd in plot_data:
+    for f in configs["plots"]["curves"]:
+        try:
+            pd = {"mat_file": os.path.join(path_files, f["file"]), "data": None, "color": f["color"], "variable_keyword": None}
+        except:
+            print("Something went wrong while reading the .yaml parameters. Please revise")
+            utils.help()
+            exit(1)
+        # Load .mat file
         pd["data"] = scipy.io.loadmat(pd["mat_file"])
+        keywords = list(pd["data"].keys())
+        # Change location of function V, can be more general than slap
+        pd["variable_keyword"] = utils.search_topic(f["topic"], keywords)
+        pd["data"] = pd["data"][pd["variable_keyword"]]
+        # Take away outer indexation from .mat format
+        while len(pd["data"]) == 1:
+            try:
+                pd["data"] = pd["data"][0]
+            except IndexError as e:
+                print(e)
+                utils.help()
+                exit(1)
+        if configs["plots"]["image"]["mirror"]:
+            aux_pd = pd["data"][1]
+            pd["data"][1] = pd["data"][2]
+            pd["data"][2] = aux_pd
+            if "nav" in pd["variable_keyword"]:
+                pd["data"][4][0] = pd["data"][4][0] + 2 * (45 - pd["data"][4][0])
+            else:
+                pd["data"][3][0] = pd["data"][3][0] + 2 * (45 - pd["data"][3][0])
+        # This code was only usable for scalar time series
+        # for i in range(len(pd["data"])):
+        #     while True:
+        #         try:
+        #             pd["data"][i][0][0]
+        #         except IndexError as e:
+        #             break
+        #         pd["data"][i] = pd["data"][i][0]
+        plot_data.append(pd)
 except FileNotFoundError as e:
     print(e)
+    utils.help()
     exit(1)
 
-non_data = ("__header__", "__version__", "__globals__")
-# variable_keyword = []
+# Image and Movie configurations
+length_list = []
 for pd in plot_data:
-    for keyword in non_data:
-        del pd["data"][keyword]
-    pd["variable_keyword"] = list(pd["data"].keys())[0]
+    length_list.append(len(pd["data"][0][0]))
+max_length = max(length_list)
+full_length = plot_data[0]["data"][0][0][-1] - plot_data[0]["data"][0][0][0]
+try:
+    duration = float(configs["plots"]["movie"]["duration"])
+    factor = 1/float(configs["plots"]["movie"]["factor"])
+    fps = max_length * factor / duration
+    speed = float(full_length / duration)
+except KeyError:
+    pass
 
-# variable_keyword = list(plot_data[0]["data"].keys())[0]
-
-for pd in plot_data:
-    pd["data"] = pd["data"][pd["variable_keyword"]][0][0]
-
-# Define the variables of interest
-#keys = ("Time", "North", "East", "Yaw")
-
-# if os.path.exists(path.split('files/')[0] + "saves/"):
-#     pass
-# else:
-#     print("\"saves/\" directory does not exist in specified path")
-#     exit(1)
-
+# Plot the image
 legend_size = 15
 
 fig, ax = plt.subplots(1,1)
@@ -102,51 +135,90 @@ manager = plt.get_current_fig_manager()
 manager.full_screen_toggle()
 
 for pd in plot_data:
-    # Check if file is valid
-    if len(pd["data"]) != 4:
-        print("Invalid number of variables in the .mat file: " + str(len(pd["data"])))
-        exit(1)
-    # for key in keys:
-    #     if key not in data.dtype:
-    #         print("The following variable does not exist in the .mat file: " + key)
-    #         exit(1)
-    #ax.plot(data[2], data[1], color='blue', linestyle='--')
-    if pd["color"] in color_dict.keys():
-        c = color_dict[pd["color"]]
-    else:
-        c = "blue"
-    ax.plot(pd["data"][2], pd["data"][1], color=c)
+    try:
+        if configs["plots"]["mod"] == "slap":
+            if "pdf" not in pd["variable_keyword"]:
+                ax.plot(pd["data"][1][0], pd["data"][2][0], color=pd["color"], label="_nolegend_")
+    except KeyError as e:
+        ax.plot(pd["data"][1][0], pd["data"][2][0], color=pd["color"])
+
+# Plot the samples in the image
+if int(configs["plots"]["image"]["samples"]) > 0:
+    samples = []
+    for pd in plot_data:
+        samples.append(np.linspace(pd["data"][0][0][0], pd["data"][0][0][-1], int(configs["plots"]["image"]["samples"]), True))
+    for num in range(int(configs["plots"]["image"]["samples"])):
+        for s, pd in enumerate(plot_data):
+            # Determine the right index for timestamp
+            err = 10000000000000000
+            err_index = 0
+            for time_stamp in pd["data"][0][0]:
+                if abs(time_stamp - samples[s][num]) < err:
+                    err = abs(time_stamp - samples[s][num])
+                    i = err_index
+                err_index += 1
+            try:
+                if configs["plots"]["mod"] == "slap":
+                    if "pdf" in pd["variable_keyword"].lower():
+                        covariance = [[pd["data"][1][i][0], pd["data"][1][i][1]], [pd["data"][2][i][0], pd["data"][2][i][1]]]
+                        slap.plot_ellipse(covariance, ax, position, pd["color"])
+                    else:
+                        raise KeyError
+                else:
+                    raise KeyError
+            except KeyError as e:
+                if "nav" in pd["variable_keyword"] and "mvector" in pd["variable_keyword"]:
+                    position = (pd["data"][1][0][i], pd["data"][2][0][i])
+                    yaw = 360 - pd["data"][4][0][i]
+                elif "nav" in pd["variable_keyword"]:
+                    yaw = 360 - pd["data"][4][0][i]
+                else:
+                    yaw = 360 - pd["data"][3][0][i]
+                ax.plot(pd["data"][1][0][i], pd["data"][2][0][i], color=pd["color"], marker=(3, 0, yaw), markersize=20)
 
 ax.ticklabel_format(useOffset=False, style='plain')
 
 # Title
-ax.set_title(sys.argv[1], size=legend_size)
+ax.set_title(configs["plots"]["title"], size=legend_size)
 
 # Labels and grid
-ax.set_xlabel('Northing [m]', size=legend_size*0.8)
-ax.set_ylabel('Easting [m]', size=legend_size*0.8)
-ax.grid()
+ax.set_xlabel(configs["plots"]["xlabel"], size=legend_size*0.8)
+ax.set_ylabel(configs["plots"]["ylabel"], size=legend_size*0.8)
 ax.axis('equal')
+
+try:
+    xlims = (0, 0)
+    xlims = (float(configs["plots"]["image"]["limits"]["xlim"][0]), float(configs["plots"]["image"]["limits"]["xlim"][1]))
+    ylims = (0, 0)
+    ylims = (float(configs["plots"]["image"]["limits"]["ylim"][0]), float(configs["plots"]["image"]["limits"]["ylim"][1]))
+except KeyError as e:
+    xlims, ylims = utils.calculate_limits(plot_data)
+ax.set(xlim=xlims, ylim=ylims)
+ax.grid()
 
 # Legend
 legends = []
+count = 0
 for pd in plot_data:
-    legends.append(pd["color"])
+    if "pdf" not in pd["variable_keyword"]:
+        legends.append(pd["variable_keyword"])
 ax.legend(legends, prop={'size': legend_size})
 
 fig.show()
-# file_name, ext = sys.argv[1].split('.')
-fig.savefig(fname=path.split('files/')[0] + "saves/" + sys.argv[1] + ".png", format='png')
 
-response = input("Static image created. Type \"[y]es\" to continue creating the video...\n")
+fig.savefig(fname=os.path.join(path_saves, configs["plots"]["title"] + ".png"), format='png')
 
-if "y" or "\n" or "Y" in response:
-    pass
-else:
+try:
+    configs["plots"]["movie"]
+except KeyError as e:
+    # response = input("No movie specified, do you wish to proceed to movie making? Type \"[y]es\" to continue creating the video...\n")
+    # if ("y" in response) or ("Y" in response) or (response == ""):
+    #     pass
+    # else:
     print("Ended program at image creation")
     exit(0)
 
-
+# Make the movie
 fig, ax = plt.subplots(1,1)
 
 fig.set_size_inches((14, 10))
@@ -154,48 +226,72 @@ fig.set_size_inches((14, 10))
 manager = plt.get_current_fig_manager()
 manager.full_screen_toggle()
 
-duration = 30
-full_length = plot_data[0]["data"][0][-1] - plot_data[0]["data"][0][0]
-factor = 1/8 # 64
-fps = len(plot_data[0]["data"][0]) * factor / duration
-speed = float(full_length / duration)
+
+
 
 print("The final video is x" + str(speed) + " faster and has a frame rate of " + str(fps)) # speed[0]
 
 def make_frame(t):
-    i = int(len(plot_data[0]["data"][0]) * t / duration)
-    if i >= len(plot_data[0]["data"][0]):
-        i = len(plot_data[0]["data"][0]) - 1
-
     ax.cla()
     for pd in plot_data:
-        if pd["color"] in color_dict.keys():
-            c = color_dict[pd["color"]]
-        else:
-            c = "blue"
-        ax.plot(pd["data"][2][:i], pd["data"][1][:i], color=c, label='_nolegend_')
-        ax.plot(pd["data"][2][i], pd["data"][1][i], color=c, marker=(3, 0, 360 - pd["data"][3][i]), markersize=20)
+        # Determine the right index for timestamp
+        err = 10000000000000000
+        err_index = 0
+        for time_stamp in pd["data"][0][0]:
+            if abs(time_stamp - pd["data"][0][0][0] - t / duration * full_length) < err:
+                err = abs(time_stamp - pd["data"][0][0][0] - t / duration * full_length)
+                i = err_index
+            err_index += 1
+        # Check if there is any modification active
+        try:
+            if configs["plots"]["mod"] == "slap":
+                if "pdf" in pd["variable_keyword"].lower():
+                    covariance = [[pd["data"][1][i][0], pd["data"][1][i][1]], [pd["data"][2][i][0], pd["data"][2][i][1]]]
+
+                    # for num, cov in enumerate(pd["data"]):
+                    #     if num != 0:
+                    #         covariance.append(cov[i])
+                    #     print(covariance)
+                    slap.plot_ellipse(covariance, ax, position, pd["color"])
+                else:
+                    raise KeyError
+            else:
+                raise KeyError
+        except KeyError as e:
+            # Plot normal navigation
+            if "nav" in pd["variable_keyword"] and "mvector" in pd["variable_keyword"]:
+                position = (pd["data"][1][0][i], pd["data"][2][0][i])
+                yaw = 360 - pd["data"][4][0][i]
+            elif "nav" in pd["variable_keyword"]:
+                yaw = 360 - pd["data"][4][0][i]
+            else:
+                yaw = 360 - pd["data"][3][0][i]
+            ax.plot(pd["data"][1][0][:i], pd["data"][2][0][:i], color=pd["color"], label='_nolegend_')
+            ax.plot(pd["data"][1][0][i], pd["data"][2][0][i], color=pd["color"], marker=(3, 0, yaw), markersize=20)
     
     ax.ticklabel_format(useOffset=False, style='plain')
 
     # Title
-    ax.set_title(sys.argv[1], size=legend_size)
+    ax.set_title(configs["plots"]["title"] + " - Video Speed: " + str(speed) + ", Frame Rate: " + str(fps), size=legend_size)
 
     # Labels and grid
-    ax.set_xlabel('Northing [m]', size=legend_size*0.8)
-    ax.set_ylabel('Easting [m]', size=legend_size*0.8)
-    ax.grid()
+    ax.set_xlabel(configs["plots"]["xlabel"], size=legend_size*0.8)
+    ax.set_ylabel(configs["plots"]["ylabel"], size=legend_size*0.8)
     ax.axis('equal')
+    ax.set(xlim=xlims, ylim=ylims)
+    # ax.set_xlim(left=xlim_min)
+    # ax.set_ylim([ylim_min, ylim_max])
+    ax.grid()
 
     # Legend
     legends = []
     for pd in plot_data:
-        legends.append(pd["color"])
+        legends.append(pd["variable_keyword"])
     ax.legend(legends, prop={'size': legend_size})
 
     return mplfig_to_npimage(fig)
 
 animation = VideoClip(make_frame, duration=duration)
-animation.write_videofile(path.split('files/')[0] + "saves/" + sys.argv[1] + ".mp4", fps=fps)
+animation.write_videofile(os.path.join(path_saves, configs["plots"]["title"] + ".mp4"), fps=fps)
 
 print("Output an image and a video. Enjoy!")

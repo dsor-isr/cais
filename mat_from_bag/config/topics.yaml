@@ -1,0 +1,179 @@
+flags:
+  # separates usbl measurements by each sender (0, 1, ...)
+  separate_usbl_meas_by_sender: False
+  
+  # loads all topics from the bag, var_name will be the name of the topic, substituting '/' for '_'
+  # NOT WORKING !!!!!!!!!!!!!!!!
+  load_all_topics_from_the_bag: False
+topics:
+  ###########
+  # MVECTOR #
+  ###########
+  mvector0_nav_filter_state:
+    topic_name: "/mvector0/nav/filter/state"
+    fields: [["position", "east"], ["position", "north"], ["position", "depth"], ["orientation", "z"]]
+    var_name: ["easting", "northing", "depth", "yaw"]
+  mvector0_state_dead_reckoning:
+    topic_name: "/mvector0/State_dr"
+    fields: [["X"], ["Y"], ["Yaw"]]
+    var_name: ["x", "y", "yaw"]
+  mvector0_state_usbl_meas:
+    topic_name: "/mvector0/State_usbl_est"
+    fields: [["X"], ["Y"], ["Yaw"]]
+    var_name: ["x", "y", "yaw"]
+  mvector0_sensors_usbl_fix:
+    topic_name: "/mvector0/sensors/usbl_fix"
+    fields: [["bearing"], ["elevation"], ["range"]]
+    var_name: ["bearing", "elevation", "range"]
+  mvector0_drivers_gps:
+    topic_name: "/mvector0/drivers/gps/data"
+    fields: [["utc_time"], ["latitude"], ["longitude"]]
+    var_name: ["utc_time", "latitude", "longitude"]
+  mvector0_drivers_dvl_raw:
+    topic_name: "/mvector0/drivers/dvl/raw"
+    fields: [["velo_instrument"]]
+    var_name: ["velocity"]
+  mvector0_drivers_imu:
+    topic_name: "/mvector0/drivers/imu/data"
+    fields: [["Roll"], ["Pitch"], ["Yaw"]]
+    var_name: ["roll", "pitch", "yaw"]
+  mvector0_drivers_navquest_dvl:
+    topic_name: "/mvector0/drivers/navquest_dvl/raw"
+    fields: [["velo_instrument"], ["good"]]
+    var_name: ["navquest_velocity", "good_valid"]
+  mvector0_drivers_nortek_dvl:
+    topic_name: "/mvector0/drivers/nortek_dvl/dvl_data"
+    fields: [["valid"], ["twist_stamped", "twist", "twist", "linear", "x"], ["twist_stamped", "twist", "twist", "linear", "y"], ["twist_stamped", "twist", "twist", "linear", "z"]]
+    var_name: ["nortek_valid", "nortek_velocity_x", "nortek_velocity_y", "nortek_velocity_z"]
+  mvector0_drivers_a50_dvl:
+    topic_name: "/mvector0/drivers/a50_dvl/data"
+    fields: [["velocity_valid"], ["velocity", "x"], ["velocity", "y"], ["velocity", "z"]]
+    var_name: ["a50_valid", "a50_velocity_x", "a50_velocity_y", "a50_velocity_z"]
+  
+  ########
+  # MRED #
+  ########
+  mred0_nav_filter_state:
+    topic_name: "/mred0/nav/filter/state"
+    fields: [["position", "east"], ["position", "north"], ["position", "depth"], ["orientation", "z"]]
+    var_name: ["easting", "northing", "depth", "yaw"]
+  mred0_drivers_gps:
+    topic_name: "/mred0/drivers/gps/data"
+    fields: [["utc_time"]]
+    var_name: ["utc_time"]
+  mred0_sensors_usbl_fix:
+    topic_name: "/mred0/sensors/usbl_fix"
+    fields: [["bearing"], ["elevation"], ["range"]]
+    var_name: ["bearing", "elevation", "range"]
+  mred0_slap_cpf_etc_info:
+    topic_name: "/mred0/slap/cpf/etc_info"
+    fields: [["broadcast_signal"], ["error"], ["threshold"]]
+    var_name: ["broadcast_signal", "error", "threshold"]
+  mred0_slap_dekf_etc_info:
+    topic_name: "/mred0/slap/dekf/etc_info"
+    fields: [["broadcast_signal"], ["error"], ["threshold"]]
+    var_name: ["broadcast_signal", "error", "threshold"]
+  mred0_slap_gamma_to_neighbor:
+    topic_name: "/mred0/slap/gamma_to_neighbor"
+    fields: [["ID"], ["gamma"], ["vd"]]
+    var_name: ["ID", "gamma", "vd"]
+  mred0_slap_internal_gamma:
+    topic_name: "/mred0/slap/internal/gamma"
+    fields: [["ID"], ["gamma"], ["vd"]]
+    var_name: ["ID", "gamma", "vd"]
+  mred0_slap_internal_gamma_dot:
+    topic_name: "/mred0/slap/internal/gamma_dot"
+    fields: [["data"]]
+    var_name: ["data"]
+  mred0_slap_internal_target_pdf:
+    topic_name: "/mred0/slap/internal/target/pdf"
+    fields: [["cov_row1"], ["cov_row2"], ["cov_row3"], ["cov_row4"], ["cov_row5"], ["cov_row6"]]
+    var_name: ["cov_row1", "cov_row2", "cov_row3", "cov_row4", "cov_row5", "cov_row6"]
+  mred0_slap_internal_target_pdf_to_neighbor:
+    topic_name: "/mred0/slap/internal/target/pdf_to_neighbor"
+    fields: [["cov_row1"], ["cov_row2"], ["cov_row3"], ["cov_row4"], ["cov_row5"], ["cov_row6"]]
+    var_name: ["cov_row1", "cov_row2", "cov_row3", "cov_row4", "cov_row5", "cov_row6"]
+  mred0_slap_internal_vc:
+    topic_name: "/mred0/slap/internal/vc"
+    fields: [["data"]]
+    var_name: ["data"]
+  mred0_slap_neighbor_gamma:
+    topic_name: "/mred0/slap/neighbor/gamma"
+    fields: [["ID"], ["gamma"], ["vd"]]
+    var_name: ["ID", "gamma", "vd"]
+  mred0_slap_neighbor_position:
+    topic_name: "/mred0/slap/neighbor/position"
+    fields: [["Veh_ID"], ["position"], ["velocity"]]
+    var_name: ["Veh_ID", "position", "velocity"]
+  mred0_slap_neighbor_target_pdf:
+    topic_name: "/mred0/slap/neighbor/target/pdf"
+    fields: [["cov_row1"], ["cov_row2"], ["cov_row3"], ["cov_row4"], ["cov_row5"], ["cov_row6"]]
+    var_name: ["cov_row1", "cov_row2", "cov_row3", "cov_row4", "cov_row5", "cov_row6"]
+  mred0_slap_st_curve:
+    topic_name: "/mred0/slap/st_curve"
+    fields: [["path_pos"], ["path_vel_gamma"], ["traj_pos"], ["traj_vel"], ["vd_bar"]]
+    var_name: ["path_pos", "path_vel_gamma", "traj_pos", "traj_vel", "vd_bar"]
+  
+  ##########
+  # MBLACK #
+  ##########
+  mblack0_nav_filter_state:
+    topic_name: "/mblack0/nav/filter/state"
+    fields: [["position", "east"], ["position", "north"], ["position", "depth"], ["orientation", "z"]]
+    var_name: ["easting", "northing", "depth", "yaw"]
+  mblack0_drivers_gps:
+    topic_name: "/mblack0/drivers/gps/data"
+    fields: [["utc_time"]]
+    var_name: ["utc_time"]
+  mblack0_sensors_usbl_fix:
+    topic_name: "/mblack0/sensors/usbl_fix"
+    fields: [["bearing"], ["elevation"], ["range"]]
+    var_name: ["bearing", "elevation", "range"]
+  mblack0_slap_cpf_etc_info:
+    topic_name: "/mblack0/slap/cpf/etc_info"
+    fields: [["broadcast_signal"], ["error"], ["threshold"]]
+    var_name: ["broadcast_signal", "error", "threshold"]
+  mblack0_slap_dekf_etc_info:
+    topic_name: "/mblack0/slap/dekf/etc_info"
+    fields: [["broadcast_signal"], ["error"], ["threshold"]]
+    var_name: ["broadcast_signal", "error", "threshold"]
+  mblack0_slap_gamma_to_neighbor:
+    topic_name: "/mblack0/slap/gamma_to_neighbor"
+    fields: [["ID"], ["gamma"], ["vd"]]
+    var_name: ["ID", "gamma", "vd"]
+  mblack0_slap_internal_gamma:
+    topic_name: "/mblack0/slap/internal/gamma"
+    fields: [["ID"], ["gamma"], ["vd"]]
+    var_name: ["ID", "gamma", "vd"]
+  mblack0_slap_internal_gamma_dot:
+    topic_name: "/mblack0/slap/internal/gamma_dot"
+    fields: [["data"]]
+    var_name: ["data"]
+  mblack0_slap_internal_target_pdf:
+    topic_name: "/mblack0/slap/internal/target/pdf"
+    fields: [["cov_row1"], ["cov_row2"], ["cov_row3"], ["cov_row4"], ["cov_row5"], ["cov_row6"]]
+    var_name: ["cov_row1", "cov_row2", "cov_row3", "cov_row4", "cov_row5", "cov_row6"]
+  mblack0_slap_internal_target_pdf_to_neighbor:
+    topic_name: "/mblack0/slap/internal/target/pdf_to_neighbor"
+    fields: [["cov_row1"], ["cov_row2"], ["cov_row3"], ["cov_row4"], ["cov_row5"], ["cov_row6"]]
+    var_name: ["cov_row1", "cov_row2", "cov_row3", "cov_row4", "cov_row5", "cov_row6"]
+  mblack0_slap_internal_vc:
+    topic_name: "/mblack0/slap/internal/vc"
+    fields: [["data"]]
+    var_name: ["data"]
+  mblack0_slap_neighbor_gamma:
+    topic_name: "/mblack0/slap/neighbor/gamma"
+    fields: [["ID"], ["gamma"], ["vd"]]
+    var_name: ["ID", "gamma", "vd"]
+  mblack0_slap_neighbor_position:
+    topic_name: "/mblack0/slap/neighbor/position"
+    fields: [["Veh_ID"], ["position"], ["velocity"]]
+    var_name: ["Veh_ID", "position", "velocity"]
+  mblack0_slap_neighbor_target_pdf:
+    topic_name: "/mblack0/slap/neighbor/target/pdf"
+    fields: [["cov_row1"], ["cov_row2"], ["cov_row3"], ["cov_row4"], ["cov_row5"], ["cov_row6"]]
+    var_name: ["cov_row1", "cov_row2", "cov_row3", "cov_row4", "cov_row5", "cov_row6"]
+  mblack0_slap_st_curve:
+    topic_name: "/mblack0/slap/st_curve"
+    fields: [["path_pos"], ["path_vel_gamma"], ["traj_pos"], ["traj_vel"], ["vd_bar"]]
+    var_name: ["path_pos", "path_vel_gamma", "traj_pos", "traj_vel", "vd_bar"]

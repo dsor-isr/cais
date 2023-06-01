@@ -953,4 +953,4 @@ if __name__ == '__main__':
     ####                                                                   ####
     ###########################################################################
 
-    app.run_server(debug=True, dev_tools_hot_reload=False, host='0.0.0.0')  # TODO set debug to False after app is fully functional
+    app.run_server(debug=True, dev_tools_hot_reload=False, host='0.0.0.0')  # TODO set debug to False after app is functional

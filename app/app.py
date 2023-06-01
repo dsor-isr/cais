@@ -84,17 +84,6 @@ def path_cat(path):
     return path[path.find('assets'):]
 
 
-def filter(files):
-    """Take a list or tuple of files and filter them based on the current
-    loaded profile."""
-    if type(files) != str or type(files) != tuple:
-        raise TypeError("filter: Expect a list or tuple of files but received ", str(type(files)))
-    if loaded_profile == None:
-        raise RuntimeError("filter: No profile has been loaded")
-    
-    return loaded_profile.filter(files)
-
-
 def merge_html_files(files):
 
     if not type(files) == list or len(files) == 0:
@@ -964,4 +953,4 @@ if __name__ == '__main__':
     ####                                                                   ####
     ###########################################################################
 
-    app.run_server(debug=True, dev_tools_hot_reload=False)  # TODO set debug to False after app is fully functional
+    app.run_server(debug=True, dev_tools_hot_reload=False, host='0.0.0.0')  # TODO set debug to False after app is fully functional

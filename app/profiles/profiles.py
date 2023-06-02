@@ -78,11 +78,15 @@ def serializeClass(profile):
         profile: dict
             The profile object to serialize"""
     if (type(profile) != dict):
-        raise TypeError("Profile must be a Profile object")
+        raise TypeError("Profile must be a dictionary object")
     elif (profile == None):
         raise ValueError("Profile can't be None/Null")
-    elif (profile['name'] == None or profile['name'] == ""):
-        raise ValueError("Profile name can't be None/Null or empty")
+    else:
+        try:
+            if (profile['name'] == None or profile['name'] == ""):
+                raise ValueError("Profile name can't be None/Null or empty")
+        except KeyError as keyError:
+            raise KeyError("Profile must have a name")
 
     deserializedProfiles = []
     try:
@@ -155,16 +159,34 @@ def validate_profile(profile):
             The profile to validate"""
     if (type(profile) != dict):
         raise TypeError("Profile must be a dictionary")
+    elif (len(profile) == 0):
+        raise ValueError("Profile can't be an empty dictionary")
     if (not 'name' in profile or not 'driverFilters' in profile or not 'plotFilters' in profile):
         raise ValueError("Profile must contain name, driverFilters and plotFilters")
     if (type(profile['name']) != str):
         raise TypeError("Profile name must be a string")
-    if (['name'] == ""):
+    if (profile['name'] == ""):
         raise ValueError("Profile name can't be empty")
     if (type(profile['driverFilters']) != list):
         raise TypeError("Profile driverFilters must be a list")
+    elif (len(profile['driverFilters']) == 0):
+        raise ValueError("Profile driverFilters can't be empty")
     if (type(profile['plotFilters']) != list):
         raise TypeError("Profile plotFilters must be a list")
+    elif (len(profile['plotFilters']) == 0):
+        raise ValueError("Profile plotFilters can't be empty")
+    
+    for driverFilter in profile['driverFilters']:
+        if (type(driverFilter) != str):
+            raise TypeError("Profile driverFilters must be a list of strings")
+        elif (driverFilter == ""):
+            raise ValueError("Profile driverFilters can't contain empty strings")
+        
+    for plotFilter in profile['plotFilters']:
+        if (type(plotFilter) != str):
+            raise TypeError("Profile plotFilters must be a list of strings")
+        elif (plotFilter == ""):
+            raise ValueError("Profile plotFilters can't contain empty strings")
     
 
 def filter(files, profile, filterDrivers=False, filterPlots=False):
@@ -210,11 +232,17 @@ def __filter_drivers(files, driverFilters):
         driverFilters: list
             list of driver filters
     """
+    if (type(files) not in (list, tuple)):
+        raise TypeError("Files must be a list or tuple")
     if (type(driverFilters) not in (list, tuple)):
         raise TypeError("Driver filters must be a list or tuple")
 
     output_files = [file for file in files]
     for file in files:
+        if (type(file) != str):
+            raise TypeError("Files must be a list or tuple of strings")
+        elif (file == ""):
+            raise ValueError("Files can't contain empty strings")
         lowerCaseFile = file
         if (not lowerCaseFile in driverFilters):
             output_files.remove(file)
@@ -234,6 +262,8 @@ def __filter_plots(files, plotFilters):
     """
     if (type(plotFilters) not in (list, tuple)):
         raise TypeError("Plot filters must be a list or tuple")
+    if (type(files) not in (list, tuple)):
+        raise TypeError("Files must be a list or tuple")
     
     output_files = [file for file in files]
     for file in files:

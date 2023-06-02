@@ -48,4 +48,24 @@ def test_read_json_permission_error():
         profiles.readJSONfile("read_json_test.json")
 
     clean_files()
-    
+
+
+def test_read_json_invalid_json():
+    clean_files()
+    with open("read_json_test.json", "w") as f:
+        f.write("")
+
+    with pytest.raises(Exception) as e:
+        profiles.readJSONfile("read_json_test.json")
+
+    clean_files()
+
+
+def test_read_json_valid_json():
+    clean_files()
+    with open("read_json_test.json", "w") as f:
+        f.write("[]")
+
+    assert profiles.readJSONfile("read_json_test.json") == []
+
+    clean_files()

@@ -1,4 +1,15 @@
 all.html
 profiles.json
-__pycache__
+
+# Only relevant to update the plots in app.py
 plot_names.txt
+
+# Irrelevant python data
+__pycache__
+.pytest_cache
+
+# The ROS bags are too big to be uploaded to GitHub
+*.bag
+
+# Ignore the .DS_Store files created by Dash
+.DS_Store

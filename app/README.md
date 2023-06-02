@@ -10,7 +10,7 @@ There are two ways to use it. Either with a docker image or by running it direct
 **Run with docker**
 
 To build the docker image, run: `docker build -t <image_name> .`
-< image_name > should be replaced with the desired the name for the containerized app.
+< image_name > should be replaced with the desired name for the containerized app.
 
 To run the created image, run: `docker run -v $(pwd)/app:$(pwd)/app -w $(pwd)/app -p 8050:8050 <image_name>`
 The flags used to build and run the docker image are explained in depth in the [documentation](https://docs.docker.com/engine/reference/commandline/run/). Either way, most of the times all of the above flags will be required to run CAIS. 

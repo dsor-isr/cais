@@ -7,6 +7,7 @@ import portalocker
 class Profile:
     
     class ProfileEncoder(json.JSONEncoder):
+        """Class used to serialize profiles into a JSON string"""
         def default(self, o):
             return o.__dict__
 
@@ -41,11 +42,16 @@ def readJSONfile(file):
 
 
 def loadProfile(profileName):
-    """Loads a profile from the profiles.json file"""
+    """Loads a profile from the profiles.json file
+    
+    Parameters
+    ----------
+        profileName: str
+            The name of the profile to load"""
     if (type(profileName) != str):
         raise TypeError("Profile name must be a string")
     elif (profileName == ""):
-        raise ValueError("Profile name can't be None/Null or empty")
+        raise ValueError("Profile name can't be empty")
 
     deserializedProfiles = []
     try:
@@ -65,7 +71,12 @@ def loadProfile(profileName):
 
 
 def serializeClass(profile):
-    """Serializes a Profile object into a JSON string"""
+    """Serializes a Profile object into a JSON string
+    
+    Parameters
+    ----------
+        profile: dict
+            The profile object to serialize"""
     if (type(profile) != dict):
         raise TypeError("Profile must be a Profile object")
     elif (profile == None):
@@ -98,11 +109,16 @@ def serializeClass(profile):
 
 
 def deleteProfileByName(profileName):
-    """Deletes a profile from the profiles.json file"""
+    """Deletes a profile from the profiles.json file
+    
+    Parameters
+    ----------
+        profileName: str
+            The name of the profile to delete"""
     if (type(profileName) != str):
         raise TypeError("Profile name must be a string")
-    elif (profileName == None or profileName == ""):
-        raise ValueError("Profile name can't be None/Null or empty")
+    elif (profileName == ""):
+        raise ValueError("Profile name can't be empty")
 
     profiles = []
     try:
@@ -131,6 +147,12 @@ def deleteProfileByName(profileName):
 
 
 def validate_profile(profile):
+    """Validates a profile
+    
+    Parameters
+    ----------
+        profile: dict
+            The profile to validate"""
     if (type(profile) != dict):
         raise TypeError("Profile must be a dictionary")
     if (not 'name' in profile or not 'driverFilters' in profile or not 'plotFilters' in profile):
@@ -179,6 +201,18 @@ def filter(files, profile, filterDrivers=False, filterPlots=False):
             
 
 def __filter_drivers(files, driverFilters):
+    """Filters the files based on the driver filters
+    
+    Parameters
+    ----------
+        files: list
+            list of files to filter
+        driverFilters: list
+            list of driver filters
+    """
+    if (type(driverFilters) not in (list, tuple)):
+        raise TypeError("Driver filters must be a list or tuple")
+
     output_files = [file for file in files]
     for file in files:
         lowerCaseFile = file
@@ -189,6 +223,18 @@ def __filter_drivers(files, driverFilters):
 
 
 def __filter_plots(files, plotFilters):
+    """Filters the files based on the plot filters
+
+    Parameters
+    ----------
+        files: list
+            list of files to filter
+        plotFilters: list
+            list of plot filters
+    """
+    if (type(plotFilters) not in (list, tuple)):
+        raise TypeError("Plot filters must be a list or tuple")
+    
     output_files = [file for file in files]
     for file in files:
         processedFile = file
@@ -199,10 +245,6 @@ def __filter_plots(files, plotFilters):
     return output_files
 
 
-############################################
-######       Test the class           ######
-############################################
 
 if __name__ == '__main__':
-
    pass

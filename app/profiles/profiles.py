@@ -4,6 +4,14 @@ import re
 import portalocker
 
 
+class Profile:
+    
+    class ProfileEncoder(json.JSONEncoder):
+        def default(self, o):
+            return o.__dict__
+
+
+
 def readJSONfile(file):
     """Reads a JSON file and returns the data
     
@@ -23,6 +31,7 @@ def readJSONfile(file):
     try:
         with open(file) as jsonFile:
             portalocker.lock(jsonFile, portalocker.LockFlags.SHARED) # Lock file
+            print(file)
             data = json.load(jsonFile)
             return data
     except FileNotFoundError as fileNotFoundError:
@@ -67,7 +76,6 @@ def serializeClass(profile):
     deserializedProfiles = []
     try:
         deserializedProfiles = readJSONfile("profiles.json")
-        print("deserializedProfiles = " + str(deserializedProfiles))
     except FileNotFoundError as fileNotFoundError: # TODO - remove "as" keyword?
         json.dump(profile, open("profiles.json", "w"), indent=4, cls=Profile.ProfileEncoder)
     except PermissionError as permissionError:

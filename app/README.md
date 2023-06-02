@@ -28,8 +28,6 @@ The last option `-v $(pwd)/app:$(pwd)/app` is very particular to the way the app
 
 **Run with python**
 
---- 
-
 The CAIS web app assumes it is being run from it's directory, so the first step is getting there.
 `cd /path/to/cais/app`
 Then simply invoke it with python

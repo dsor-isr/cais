@@ -46,7 +46,7 @@ server = app.server
 app.run_server(debug=False, dev_tools_hot_reload=False, host='0.0.0.0') 
 ```
 
-By default, Dash apps run on port 8050. The first relevant part is `host='0.0.0.0'` This is used if you want it to be run using your IP address, which means you would access it your browser of choice by going to [https://https//XXX.XXX.XXX.XXX:8050](https://https//XXX.XXX.XXX.XXX:8050) where XXX.XXX.XXX.XXX is your IP address. If you omit the host argument, the app is run on the localhost [http://127.0.0.1:8050/](http://127.0.0.1:8050/).
+By default, Dash apps run on port 8050. The first relevant part is `host='0.0.0.0'` This is used if you want it to be run using your IP address, which means you would access it in your browser of choice by going to [https://https//XXX.XXX.XXX.XXX:8050](https://https//XXX.XXX.XXX.XXX:8050) where XXX.XXX.XXX.XXX is your IP address. If you omit the host argument, the app is run on the localhost [http://127.0.0.1:8050/](http://127.0.0.1:8050/).
 
 To figure out your IP address run `ip r` on a linux system terminal or `ipconfig /all` on Windows's command prompt.
 

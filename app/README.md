@@ -83,4 +83,4 @@ dcc.Dropdown(
 ```
 Since there may be lots of plots, instead of finding them and inserting them one by one, simply run extract_plot_names.py
 `python3 extract_plot_names.py`
-It will generate a called *plot_names.txt* with all plots already formated nicely to be added directly to the dropdown.
+It will generate a file called *plot_names.txt* with all plots already formated nicely to be added directly to the dropdown.

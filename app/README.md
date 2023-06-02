@@ -7,9 +7,8 @@ The Cluster of Analysis for Intelligent Systems (CAIS) web application is built 
 There are two ways to use it. Either with a docker image or by running it directly. 
 
 
-Run with docker:
+**Run with docker**
 
---- 
 To build the docker image, run: `docker build -t <image_name> .`
 < image_name > should be replaced with the desired the name for the containerized app.
 
@@ -27,7 +26,7 @@ The last option `-v $(pwd)/app:$(pwd)/app` is very particular to the way the app
 2. Using your own file system. Simply run with `-v $(pwd)/app:$(pwd)/app`
 
 
-Run with python:
+**Run with python**
 
 --- 
 
@@ -39,7 +38,7 @@ Then simply invoke it with python
 
 ## How to open it with a browser
 
-It first helps to know how Dash apps are run code-wise. In a very simple way, Dash apps are run like this
+It first helps to know how Dash apps are run code-wise. In a very simple way, Dash apps are run like this:
 ```
 app = Dash(__name__)
 server = app.server
@@ -53,14 +52,15 @@ By default, Dash apps run on port 8050. The first relevant part is `host='0.0.0.
 
 To figure out your IP address run `ip r` on a linux system terminal or `ipconfig /all` on Windows's command prompt.
 
-Suppose you run `ip r`. It will return something like this
+Suppose you run `ip r`. It will return something like this:
 ```
-default via XXX.XXX.XXX.1 dev eth0 proto kernel                                                                          XXX.XXX.XXX.XXX/K dev docker0 proto kernel scope link src XXX.XXX.XXX.1 linkdown
+default via XXX.XXX.XXX.1 dev eth0 proto kernel
+XXX.XXX.XXX.XXX/K dev docker0 proto kernel scope link src XXX.XXX.XXX.1 linkdown
 XXX.XXX.XXX.XXX/K' dev eth0 proto kernel scope link src YYY.YYY.YYY.YYY
 ```
-Your IP will be YYY.YYY.YYY.YYY
+Your IP will be *YYY.YYY.YYY.YYY*
 
-In windows, the output will be quite larger, but the relevant bit is the IPv4 Address
+In windows, the output will be quite larger, but the relevant bit is the IPv4 Address.
 
 ## dev_tools_hot_reload
 
@@ -72,7 +72,7 @@ CAIS already has tests to check some of it's backend's behaviour. The tests are 
 
 ## extract_plot_names.py
 
-Whenever a profile is created, a modal pops up with two dropdowns to select which drivers and plots that profile should be able to see. Within the app itself, that list should be defined something like this
+Whenever a profile is created, a modal pops up with two dropdowns to select which drivers and plots that profile should be able to see. Within the app itself, that list should be defined something like this:
 ```
 dcc.Dropdown(
     id='create profile plots dropdown',

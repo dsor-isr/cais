@@ -13,22 +13,23 @@ TEXT_FILES = ["test.txt", ".test.txt", "a.txt"]
 INVALID_TEXT_FILES = ["test.jpg", "test.png", "test.html", ".test.txt.", "txt"]
 
 DIRECTORIES = ["dir1", "dir2", "dir3"]
+TEST_DIR = "test_dir"
 
 
 def clean_up_test_dir():
-    if (os.path.isdir("test_dir")):
-        shutil.rmtree("test_dir")
+    if (os.path.isdir(TEST_DIR)):
+        shutil.rmtree(TEST_DIR)
 
 def setup_test_dir():
-    if (not os.path.isdir("test_dir")):
-        os.mkdir("test_dir")
+    if (not os.path.isdir(TEST_DIR)):
+        os.mkdir(TEST_DIR)
 
 
 def create_hidden_files():
     setup_test_dir()
 
     for file in HIDDEN_FILES:
-        f = open("test_dir/" + file, "w+")
+        f = open(TEST_DIR + "/" + file, "w+")
         f.close()
 
 
@@ -36,7 +37,7 @@ def create_invalid_hidden_files():
     setup_test_dir()
 
     for file in INVALID_HIDDEN_FILES:
-        f = open("test_dir/" + file, "w+")
+        f = open(TEST_DIR + "/" + file, "w+")
         f.close()
 
 
@@ -44,7 +45,7 @@ def create_image_files():
     setup_test_dir()
 
     for file in IMAGE_FILES:
-        f = open("test_dir/" + file, "w+")
+        f = open(TEST_DIR + "/" + file, "w+")
         f.close()
 
 
@@ -52,7 +53,7 @@ def create_invalid_image_files():
     setup_test_dir()
 
     for file in INVALID_IMAGE_FILES:
-        f = open("test_dir/" + file, "w+")
+        f = open(TEST_DIR + "/" + file, "w+")
         f.close()
 
 
@@ -60,7 +61,7 @@ def create_html_files():
     setup_test_dir()
 
     for file in HTML_FILES:
-        f = open("test_dir/" + file, "w+")
+        f = open(TEST_DIR + "/" + file, "w+")
         f.close()
 
 
@@ -68,7 +69,7 @@ def create_invalid_html_files():
     setup_test_dir()
 
     for file in INVALID_HTML_FILES:
-        f = open("test_dir/" + file, "w+")
+        f = open(TEST_DIR + "/" + file, "w+")
         f.close()
 
 
@@ -76,7 +77,7 @@ def create_text_files():
     setup_test_dir()
 
     for file in TEXT_FILES:
-        f = open("test_dir/" + file, "w+")
+        f = open(TEST_DIR + "/" + file, "w+")
         f.close()
 
 
@@ -84,7 +85,7 @@ def create_invalid_text_files():
     setup_test_dir()
 
     for file in INVALID_TEXT_FILES:
-        f = open("test_dir/" + file, "w+")
+        f = open(TEST_DIR + "/" + file, "w+")
         f.close()
 
 
@@ -92,7 +93,7 @@ def create_directories():
     setup_test_dir()
 
     for directory in DIRECTORIES:
-        os.mkdir("test_dir/" + directory)
+        os.mkdir(TEST_DIR + "/" + directory)
 
 
 def test_filter_hidden_files():
@@ -176,7 +177,7 @@ def test_filter_files_without_directories():
 
 
     gcwd = os.getcwd()
-    os.chdir("test_dir")
+    os.chdir(TEST_DIR)
 
     assert (fn.filter_out_files(HTML_FILES + IMAGE_FILES + TEXT_FILES + HIDDEN_FILES) 
             == [])
@@ -187,7 +188,7 @@ def test_filter_files_without_directories():
     create_invalid_image_files()
     create_invalid_html_files()
     create_invalid_text_files()
-    os.chdir("test_dir")
+    os.chdir(TEST_DIR)
 
     assert (fn.filter_out_files(INVALID_HTML_FILES + INVALID_IMAGE_FILES + INVALID_TEXT_FILES + INVALID_HIDDEN_FILES) 
             == [])
@@ -228,7 +229,7 @@ def test_filter_files_with_directories():
     create_directories()
 
     gcwd = os.getcwd()
-    os.chdir("test_dir")
+    os.chdir(TEST_DIR)
 
     assert (fn.filter_out_files(HTML_FILES + IMAGE_FILES + TEXT_FILES + HIDDEN_FILES + DIRECTORIES) 
             == DIRECTORIES)
@@ -240,7 +241,7 @@ def test_filter_files_with_directories():
     create_invalid_html_files()
     create_invalid_text_files()
     create_directories()
-    os.chdir("test_dir")
+    os.chdir(TEST_DIR)
 
     assert (fn.filter_out_files(INVALID_HTML_FILES + INVALID_IMAGE_FILES + INVALID_TEXT_FILES + INVALID_HIDDEN_FILES + DIRECTORIES) 
             == DIRECTORIES)

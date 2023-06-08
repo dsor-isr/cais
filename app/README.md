@@ -67,29 +67,29 @@ In a very high level description, CAIS goes through the file system in a Depth-F
 For this reason, if you are running CAIS outside the docker or using your own local file system, it is essential that the overall structure look something like this:
 ```
 | cais
-    | app
-        | app.py
-        | (...)
-        | <other_files>
-        | (...)
-        | assets
-            | logos
-                | DSOR_logo_v05a.jpg
-                | isr_logo_red_background.png
-                | isr_logo_white_background.png
-            | days
-                | <some_date>
-                    | Vehicles
-                        | <vehicle_1>
-                        | (...)
-                        | <vehicle_N>
-                            | plots
-                                | Missions
-                                    | <number_mission>
-                                        | <plot.html>
-                                | Overall
-                                    | <drivers>
-                                        | <plot.html>
+|    | app
+|    |    | app.py
+|    |    | (...)
+|    |    | <other_files>
+|    |    | (...)
+|    |    | assets
+|    |    |    | logos
+|    |    |    |    | DSOR_logo_v05a.jpg
+|    |    |    |    | isr_logo_red_background.png
+|    |    |    |    | isr_logo_white_background.png
+|    |    |    | days
+|    |    |    |    | <some_date>
+|    |    |    |    |    | Vehicles
+|    |    |    |    |    |    | <vehicle_1>
+|    |    |    |    |    |    | (...)
+|    |    |    |    |    |    | <vehicle_N>
+|    |    |    |    |    |    |    | plots
+|    |    |    |    |    |    |    |    | Missions
+|    |    |    |    |    |    |    |    |    | <number_mission>
+|    |    |    |    |    |    |    |    |    |    | <plot.html>
+|    |    |    |    |    |    |    |    | Overall
+|    |    |    |    |    |    |    |    |    | <drivers>
+|    |    |    |    |    |    |    |    |    |    | <plot.html>
 ```
         
 

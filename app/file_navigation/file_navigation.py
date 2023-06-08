@@ -38,6 +38,9 @@ def is_valid_file(file):
 
     if not (type(file) == str):
         raise TypeError("Input should be of type str, but an object of type {} was received.".format(type(file)))
+    
+    if (file == ''):
+        raise ValueError("Input should not be an empty string")
 
     return os.path.isfile(file)
 
@@ -173,6 +176,9 @@ def filter_out_files(files):
 
     filtered = []
     for file in files:
+        if (type(file) == str and file == ""):
+            raise ValueError("Input should not contain empty strings")
+        
         file_path = extend_dir(file)
 
         if not (is_valid_file(file_path)):

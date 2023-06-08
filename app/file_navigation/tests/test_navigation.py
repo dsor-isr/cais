@@ -66,6 +66,11 @@ def test_is_valid_file_invalid_input():
 
     assert "Input should be of type str, but an object of type {} was received.".format(type(1)) in str(e.value)
 
+    with pytest.raises(ValueError) as e:
+        fn.filter_out_files([""])
+
+    assert "Input should not contain empty strings" in str(e.value)
+
 
 def test_is_valid_file_valid_input():
     path = os.getcwd() + "/test.txt"

@@ -243,7 +243,7 @@ def __filter_drivers(files, driverFilters):
             raise TypeError("Files must be a list or tuple of strings")
         elif (file == ""):
             raise ValueError("Files can't contain empty strings")
-        lowerCaseFile = file
+        lowerCaseFile = file.lower()
         if (not lowerCaseFile in driverFilters):
             output_files.remove(file)
 
@@ -267,7 +267,7 @@ def __filter_plots(files, plotFilters):
     
     output_files = [file for file in files]
     for file in files:
-        processedFile = file
+        processedFile = file.lower()
         processedFile = processedFile.replace('.html', '')
         if (not processedFile in plotFilters):
             output_files.remove(file)

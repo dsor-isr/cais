@@ -381,3 +381,65 @@ def test_get_files_with_provided_path():
     assert output == result
 
     clean_up_test_dir()
+
+
+def test_get_images():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_images()
+    output.sort()
+    result = IMAGE_FILES
+    result.sort()
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_txt_files():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_txt_files()
+    output.sort()
+    result = TEXT_FILES + ["..test.txt"]
+    result.sort()
+    print("output: ", output)
+    print("result: ", result)
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_html_files():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_html_files()
+    output.sort()
+    result = HTML_FILES
+    result.sort()
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()

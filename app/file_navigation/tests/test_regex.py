@@ -78,3 +78,12 @@ def test_is_image():
         fn.is_image(1)
 
     assert "Input should be of type str, but an object of type {} was received.".format(type(1)) in str(e.value)
+
+
+def test_is_part_of_path():
+    assert fn.is_part_of_path("test/test", "test") == True
+    assert fn.is_part_of_path("tet/te.st/test.", "test") == True
+    assert fn.is_part_of_path("test/test", "test/test") == True
+
+    assert fn.is_part_of_path("test/test", "a") == False
+    assert fn.is_part_of_path("a", "test") == False

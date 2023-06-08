@@ -7,10 +7,13 @@ HIDDEN_FILES = [".test", ".test.txt", ".test.jpg", ".test.png", ".test.html", ".
 INVALID_HIDDEN_FILES = ["test", "test.txt", "test.jpg", "test.png", "test.html"]
 IMAGE_FILES = ["test.jpg", "test.png", ".test.jpg", ".test.png", "a.txt.jpg", "a.txt.png"]
 INVALID_IMAGE_FILES = ["test.txt", "test.html", "test.txt", ".test.txt", ".test.html", ".test.txt", "image.jpg.txt"]
+NON_HIDDEN_IMAGE_FILES = ["test.jpg", "test.png", "a.txt.jpg", "a.txt.png"]
 HTML_FILES = ["test.html", ".test.html", "a.txt.html"]
 INVALID_HTML_FILES = ["test.txt", "test.jpg", "test.png", "test.txt", ".test.txt", ".test.jpg", ".test.png", ".test.txt", "html.jpg", ".html.jpg"]
+NON_HIDDEN_HTML_FILES = ["test.html", "a.txt.html"]
 TEXT_FILES = ["test.txt", ".test.txt", "a.txt"]
 INVALID_TEXT_FILES = ["test.jpg", "test.png", "test.html", ".test.txt.", "txt"]
+NON_HIDDEN_TEXT_FILES = ["test.txt", "a.txt"]
 
 DIRECTORIES = ["dir1", "dir2", "dir3"]
 TEST_DIR = "test_dir"
@@ -314,5 +317,67 @@ def test_get_directories_with_provided_path():
     output = fn.get_directories(path=TEST_DIR)
     output.sort()
     assert output == DIRECTORIES
+
+    clean_up_test_dir()
+
+
+def test_get_files_ignore_hidden_files():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_files()
+    output.sort()
+    result = NON_HIDDEN_TEXT_FILES + NON_HIDDEN_HTML_FILES + NON_HIDDEN_IMAGE_FILES
+    result.sort()
+    assert output == result
+
+    output = fn.get_files(ignore_hidden_files=True)
+    output.sort()
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_files_with_hidden_files():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_files(ignore_hidden_files=False)
+    output.sort()
+    output = {file for file in output} # remove duplicates
+    result = HIDDEN_FILES + IMAGE_FILES + HTML_FILES + TEXT_FILES
+    result.sort()
+    result = {file for file in result} # remove duplicates
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_files_with_provided_path():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+
+    output = fn.get_files(path=TEST_DIR)
+    output.sort()
+    result = NON_HIDDEN_TEXT_FILES + NON_HIDDEN_HTML_FILES + NON_HIDDEN_IMAGE_FILES
+    result.sort()
+    assert output == result
 
     clean_up_test_dir()

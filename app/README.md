@@ -60,6 +60,39 @@ Your IP will be *YYY.YYY.YYY.YYY*
 
 In windows, the output will be quite larger, but the relevant bit is the IPv4 Address.
 
+## CAIS file tree
+
+In a very high level description, CAIS goes through the file system in a Depth-First-Search like way, albeit interactive, where at each level the user makes a decision on which directory/file to pick next. There are some additional directories that never show up, but nevertheless are there for organizational reasons. Naturally, since these directories aren't shown to the user (they're "skipped"), the underlying algorithm assumes their existence, which means that if they are removed, CAIS will stop working properly.
+
+For this reason, if you are running CAIS outside the docker or using your own local file system, it is essential that the overall structure look something like this:
+```
+| cais
+    | app
+        | app.py
+        | (...)
+        | <other_files>
+        | (...)
+        | assets
+            | logos
+                | DSOR_logo_v05a.jpg
+                | isr_logo_red_background.png
+                | isr_logo_white_background.png
+            | days
+                | <some_date>
+                    | Vehicles
+                        | <vehicle_1>
+                        | (...)
+                        | <vehicle_N>
+                            | plots
+                                | Missions
+                                    | <number_mission>
+                                        | <plot.html>
+                                | Overall
+                                    | <drivers>
+                                        | <plot.html>
+```
+        
+
 ## dev_tools_hot_reload
 
 Dash has something called [Code Reloading and Hot Reload](https://dash.plotly.com/devtools). This makes Dash refresh your browser whenever a change is made to the code (Code Reloading) or a file is saved (Hot Reload). Since CAIS frequently writes to the file system and Hot Reload doesn't save the app's current state, Hot Reload is incredibly detrimental to CAIS's functionalities, so it should be generally run with `app.run_server(dev_tools_hot_reload=False)`

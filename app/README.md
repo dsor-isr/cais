@@ -19,7 +19,7 @@ The flags used to build and run the docker image are explained in depth in the [
 
 `-w $(pwd)/app` This specifies the working directory inside the container's own file system.
 
-The last option `-v $(pwd)/app:$(pwd)/app` is very particular to the way the app works. Since CAIS will be reading and writing to the file system there are two ways to go around it:
+The last option `-v $(pwd)/app:$(pwd)/app` is very particular to the way the app works. Since CAIS will be reading and writing to the file system there are two ways to go about it:
 
 1. Use the container's own file system. In this case, `-v $(pwd)/app:$(pwd)/app` isn't needed at all. What that flag does is mount the local machine's app directory (supposing that the present working directory is cais's directory) to a directory with the same name on the container's file system. However, if this flag is not passed, the plots will be needed to be built onto the container itself. See bellow on how to modify the dockerfile to accomodate that.
 

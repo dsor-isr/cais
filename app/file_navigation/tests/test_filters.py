@@ -248,3 +248,71 @@ def test_filter_files_with_directories():
     
     os.chdir(gcwd)
     clean_up_test_dir()
+
+
+def test_get_directories():
+    clean_up_test_dir()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_directories()
+    output.sort()
+    assert output == DIRECTORIES
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_directories_filter_hidden_files():
+    clean_up_test_dir()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+    os.mkdir(".hidden")
+
+    output = fn.get_directories()
+    output.sort()
+    assert output == DIRECTORIES
+
+    output = fn.get_directories(ignore_hidden_files=True)
+    output.sort()
+    assert output == DIRECTORIES
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_directories_with_hidden_files():
+    clean_up_test_dir()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+    os.mkdir(".hidden")
+
+    output = fn.get_directories()
+    output.sort()
+    assert output == DIRECTORIES
+
+    output = fn.get_directories(ignore_hidden_files=False)
+    output.sort()
+    result = DIRECTORIES + [".hidden"]
+    result.sort()
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_directories_with_provided_path():
+    clean_up_test_dir()
+    create_directories()
+
+    output = fn.get_directories(path=TEST_DIR)
+    output.sort()
+    assert output == DIRECTORIES
+
+    clean_up_test_dir()

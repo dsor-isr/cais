@@ -288,7 +288,7 @@ def get_directory_content(ignore_hidden_files=True, ignore_text_files=False,
         files = filter_out_hidden_files(files)
     if (ignore_text_files == True):
         # Remove .txt files from output
-        files = filter_out_text_files
+        files = filter_out_text_files(files)
     if (ignore_directories == True):
         # Remove sub-directories from output
         files = filter_out_directories(files)

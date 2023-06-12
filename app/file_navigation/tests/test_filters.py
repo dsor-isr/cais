@@ -443,3 +443,134 @@ def test_get_html_files():
 
     os.chdir(gcwd)
     clean_up_test_dir()
+
+
+def test_get_directory_content_without_hidden_files():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_directory_content()
+    output.sort()
+    print("output: ", output)
+    result = DIRECTORIES + NON_HIDDEN_HTML_FILES + NON_HIDDEN_IMAGE_FILES + NON_HIDDEN_TEXT_FILES
+    result.sort()
+    print("result: ", result)
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_directory_content_with_hidden_files():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_directory_content(ignore_hidden_files=False)
+    output.sort()
+    result = DIRECTORIES + HIDDEN_FILES + IMAGE_FILES + HTML_FILES + TEXT_FILES
+    result = set(result) # remove duplicates
+    result = list(result) # convert back to list
+    result.sort()
+
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_directory_content_without_images():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_directory_content(ignore_images=True)
+    output.sort()
+    result = DIRECTORIES + NON_HIDDEN_HTML_FILES + NON_HIDDEN_TEXT_FILES
+    result.sort()
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_directory_content_without_html_files():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_directory_content(ignore_html=True)
+    output.sort()
+    result = DIRECTORIES + NON_HIDDEN_IMAGE_FILES + NON_HIDDEN_TEXT_FILES
+    result.sort()
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_directory_content_without_text_files():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_directory_content(ignore_text_files=True)
+    output.sort()
+    result = DIRECTORIES + NON_HIDDEN_HTML_FILES + NON_HIDDEN_IMAGE_FILES
+    result.sort()
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()
+
+
+def test_get_directory_content_without_directories():
+    clean_up_test_dir()
+    create_hidden_files()
+    create_image_files()
+    create_html_files()
+    create_text_files()
+    create_directories()
+
+    gcwd = os.getcwd()
+    os.chdir(TEST_DIR)
+
+    output = fn.get_directory_content(ignore_directories=True)
+    output.sort()
+    result = NON_HIDDEN_HTML_FILES + NON_HIDDEN_IMAGE_FILES + NON_HIDDEN_TEXT_FILES
+    result.sort()
+    assert output == result
+
+    os.chdir(gcwd)
+    clean_up_test_dir()

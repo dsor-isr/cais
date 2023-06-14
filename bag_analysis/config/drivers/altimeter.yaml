@@ -1,0 +1,19 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+plots:
+  altimeter:
+    name: "Altimeter"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Altimeter [m]"
+        topics:
+          - "drivers/altimeter/data"
+        fields:
+          - "data"
+    plot_markers:
+      - "lines"

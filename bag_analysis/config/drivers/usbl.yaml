@@ -1,0 +1,447 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+plots:
+  measurement_usbl_fix_bearing:
+    name: "Bearing"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "bearing"
+        topics:
+          - "acomms/modem/measurement/usbl_fix"
+        fields:
+          - "bearing"
+    plot_markers:
+      - "markers"
+  measurement_usbl_fix_bearing_raw:
+    name: "Bearing raw"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "bearing_raw"
+        topics:
+          - "acomms/modem/measurement/usbl_fix"
+        fields:
+          - "bearing_raw"
+    plot_markers:
+      - "markers"
+  measurement_usbl_fix_elevation:
+    name: "Elevation"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "elevation"
+        topics:
+          - "acomms/modem/measurement/usbl_fix"
+        fields:
+          - "elevation"
+    plot_markers:
+      - "markers"
+  measurement_usbl_fix_elevation_raw:
+    name: "Elevation raw"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "elevation_raw"
+        topics:
+          - "acomms/modem/measurement/usbl_fix"
+        fields:
+          - "elevation_raw"
+    plot_markers:
+      - "markers"
+  measurement_usbl_fix_range:
+    name: "Range"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "range"
+        topics:
+          - "acomms/modem/measurement/usbl_fix"
+        fields:
+          - "range"
+    plot_markers:
+      - "markers"
+  measurement_usbl_fix_sound_speed:
+    name: "Sound speed"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "sound_speed"
+        topics:
+          - "acomms/modem/measurement/usbl_fix"
+        fields:
+          - "sound_speed"
+    plot_markers:
+      - "markers"
+  measurement_usbl_fix_source_id:
+    name: "Source id"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "source_id"
+        topics:
+          - "acomms/modem/measurement/usbl_fix"
+        fields:
+          - "source_id"
+    plot_markers:
+      - "markers"
+  measurement_usbl_fix_type_id:
+    name: "Type id"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "type_id"
+        topics:
+          - "acomms/modem/measurement/usbl_fix"
+        fields:
+          - "type"
+    plot_markers:
+      - "markers"
+  sensors_usbl_fix_bearing_vs_bearing_raw:
+    name: "Bearing vs Bearing raw"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Bearing"
+        topics:
+          - "sensors/usbl_fix"
+          - "sensors/usbl_fix"
+        fields:
+          - "bearing"
+          - "bearing_raw"
+    plot_markers:
+      - "markers"
+      - "markers"
+  sensors_usbl_fix_elevation_vs_elevation_raw:
+    name: "Elevation vs Elevation raw"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Elevation"
+        topics:
+          - "sensors/usbl_fix"
+          - "sensors/usbl_fix"
+        fields:
+          - "elevation"
+          - "elevation_raw"
+    plot_markers:
+      - "markers"
+      - "markers"
+  sensors_usbl_fix_range:
+    name: "Range"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Range"
+        topics:
+          - "sensors/usbl_fix"
+        fields:
+          - "range"
+    plot_markers:
+      - "markers"
+  sensors_usbl_fix_range_vs_bearing_vs_elevation:
+    name: "Range vs Bearing vs Elevation"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: ""
+        topics:
+          - "sensors/usbl_fix"
+          - "sensors/usbl_fix"
+          - "sensors/usbl_fix"
+        fields:
+          - "range"
+          - "bearing"
+          - "elevation"
+    plot_markers:
+      - "markers"
+      - "markers"
+      - "markers"
+  sensors_usbl_fix_source_id:
+    name: "Source id"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Source id"
+        topics:
+          - "sensors/usbl_fix"
+        fields:
+          - "source_id"
+    plot_markers:
+      - "markers"
+  recv_bitrate:
+    name: "Bitrate"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: ""
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "bitrate"
+    plot_markers:
+      - "lines"
+  recv_destination_address:
+    name: "Destination address"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "destination_address"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "destination_address"
+    plot_markers:
+      - "lines"
+  recv_duration:
+    name: "Duration"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "duration"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "duration"
+    plot_markers:
+      - "lines"
+  recv_integrity:
+    name: "Integrity"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "integrity"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "integrity"
+    plot_markers:
+      - "lines"
+  recv_msg_id:
+    name: "Msg id"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "msg_id"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "msg_id"
+    plot_markers:
+      - "lines"
+  recv_propagation_time:
+    name: "Propagation time"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "propagation_time"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "propagation_time"
+    plot_markers:
+      - "lines"
+  recv_relative_velocity:
+    name: "Relative velocity"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "relative_velocity"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "relative_velocity"
+    plot_markers:
+      - "lines"
+  recv_rssi:
+    name: "rssi"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "rssi"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "rssi"
+    plot_markers:
+      - "lines"
+  recv_source_address:
+    name: "Source address"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "source_address"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "source_address"
+    plot_markers:
+      - "lines"
+  recv_type_id:
+    name: "Type id"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "type_id"
+        topics:
+          - "acomms/modem/recv"
+        fields:
+          - "type"
+    plot_markers:
+      - "lines"
+  send_bitrate:
+    name: "Bitrate"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: ""
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "bitrate"
+    plot_markers:
+      - "lines"
+  send_destination_address:
+    name: "Destination address"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "destination_address"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "destination_address"
+    plot_markers:
+      - "lines"
+  send_duration:
+    name: "Duration"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "duration"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "duration"
+    plot_markers:
+      - "lines"
+  send_integrity:
+    name: "Integrity"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "integrity"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "integrity"
+    plot_markers:
+      - "lines"
+  send_msg_id:
+    name: "Msg id"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "msg_id"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "msg_id"
+    plot_markers:
+      - "lines"
+  send_propagation_time:
+    name: "Propagation time"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "propagation_time"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "propagation_time"
+    plot_markers:
+      - "lines"
+  send_relative_velocity:
+    name: "Relative velocity"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "relative_velocity"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "relative_velocity"
+    plot_markers:
+      - "lines"
+  send_rssi:
+    name: "rssi"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "rssi"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "rssi"
+    plot_markers:
+      - "lines"
+  send_source_address:
+    name: "Source address"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "source_address"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "source_address"
+    plot_markers:
+      - "lines"
+  send_type_id:
+    name: "Type id"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "type_id"
+        topics:
+          - "acomms/modem/send"
+        fields:
+          - "type"
+    plot_markers:
+      - "lines"

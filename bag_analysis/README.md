@@ -275,14 +275,3 @@ plots:
       - "lines"
       - "lines"
 ```
-
-#
-
-## README NOTES:
-
-Talk about:
-- ~~XY plots vs. plots with time as the x axis~~
-- ~~why topics must be defined as they are (allow for multiple vehicles and be specific enough)~~
-- ~~fields can be a list, if the attribute is nested behind parent attributes~~
-- ~~possible to plot more than one line (how to define various lines)~~
-- ~~indexes for attributes~~

@@ -1,0 +1,123 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+plots:
+  actual_charge:
+    name: "Actual Charge"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: ""
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "actual_charge"
+    plot_markers:
+      - "lines"
+  charging:
+    name: "Charging"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Charging"
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "charging"
+    plot_markers:
+      - "lines"
+  current:
+    name: "Current"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Current [A]"
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "current"
+    plot_markers:
+      - "lines"
+  equalize:
+    name: "Equalize"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: ""
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "equalize"
+    plot_markers:
+      - "lines"
+  max_cell:
+    name: "Max Cell"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: ""
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "max_cell"
+    plot_markers:
+      - "lines"
+  max_temp:
+    name: "Max Temperature"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Temperature [ºC]"
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "max_temp"
+    plot_markers:
+      - "lines"
+  min_cell:
+    name: "Min Cell"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: ""
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "min_cell"
+    plot_markers:
+      - "lines"
+  min_temp:
+    name: "Min Temperature"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Temperature [ºC]"
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "min_temp"
+    plot_markers:
+      - "lines"
+  number_of_packs:
+    name: "Number of Packs"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Number of packs"
+        topics:
+          - "drivers/bat_monit/data"
+        fields:
+          - "number_of_packs"
+    plot_markers:
+      - "lines"

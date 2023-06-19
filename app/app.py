@@ -309,7 +309,7 @@ def treat_sixth_lvl_dropdown(input_value):
 
 def merge_button_click():
     files = fn.get_html_files()
-    # files = apply_profile_plot_filters(files)
+    files = apply_profile_plot_filters(files)
     if (len(files) != 0):
         # html files found on present working directory
         merge_html_files(files)

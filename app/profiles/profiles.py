@@ -32,7 +32,6 @@ def readJSONfile(file):
     try:
         with open(file) as jsonFile:
             portalocker.lock(jsonFile, portalocker.LockFlags.SHARED) # Lock file
-            print(file)
             data = json.load(jsonFile)
             return data
     except FileNotFoundError as fileNotFoundError:

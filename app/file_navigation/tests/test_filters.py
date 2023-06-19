@@ -417,8 +417,6 @@ def test_get_txt_files():
     output.sort()
     result = TEXT_FILES + ["..test.txt"]
     result.sort()
-    print("output: ", output)
-    print("result: ", result)
     assert output == result
 
     os.chdir(gcwd)
@@ -458,10 +456,8 @@ def test_get_directory_content_without_hidden_files():
 
     output = fn.get_directory_content()
     output.sort()
-    print("output: ", output)
     result = DIRECTORIES + NON_HIDDEN_HTML_FILES + NON_HIDDEN_IMAGE_FILES + NON_HIDDEN_TEXT_FILES
     result.sort()
-    print("result: ", result)
     assert output == result
 
     os.chdir(gcwd)

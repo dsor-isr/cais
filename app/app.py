@@ -10,6 +10,7 @@ import base64
 from bs4 import BeautifulSoup
 import copy
 import re
+import extract_plot_names as epn
 
 
 ##############################
@@ -118,6 +119,10 @@ def merge_html_files(files):
 
 def create_profile(driver_filters, profile_name, plot_filters):
     """Creates a new profile with the given checklist values"""
+    if (type(driver_filters) == list and len(driver_filters) == 0):
+        driver_filters = epn.get_drivers()
+    if (type(plot_filters) == list and len(plot_filters) == 0):
+        plot_filters = epn.get_plots()
     
     profile = {'name': profile_name, 'driverFilters': driver_filters, 'plotFilters': plot_filters}
     if (type(profile_name) != str):
@@ -304,6 +309,7 @@ def treat_sixth_lvl_dropdown(input_value):
 
 def merge_button_click():
     files = fn.get_html_files()
+    # files = apply_profile_plot_filters(files)
     if (len(files) != 0):
         # html files found on present working directory
         merge_html_files(files)
@@ -492,6 +498,19 @@ app.layout = html.Div([
             [
                 dbc.ModalHeader(dbc.ModalTitle("Create Profile")),
                 dbc.ModalBody([
+                    dbc.ButtonGroup(
+                        [
+                            dbc.Button(
+                                "Update list of possible plots",
+                                id="update list of plots",
+                                className="ms-auto",
+                                n_clicks=0),
+                            dbc.Button("Update list of possible drivers",
+                                id="update list of drivers",
+                                className="ms-auto",
+                                n_clicks=0),
+                        ]
+                    ),
                     html.Label("Pick the name of the new profile and the filters you want to apply to it (the ones selected are displayed on the dropdowns). It isn't possible to create a profile if another one already exists with that name."),
                     html.Label('Enter the profile name:'),
                     html.Br(),
@@ -513,7 +532,7 @@ app.layout = html.Div([
                     dcc.Dropdown(
                         id='create profile driver dropdown',
                         placeholder = 'Select drivers',
-                        options=['gps', 'depthCell', 'altimeter', 'insidePressure', 'usbl', 'imu', 'batMonit', 'thruster0', 'thruster1', 'thruster1', 'thruster3', 'thruster4', 'thruster5'],
+                        options=[],
                         multi=True,
                         clearable=True,
                         style={'color': '#49B0EA'},
@@ -534,7 +553,7 @@ app.layout = html.Div([
                     dcc.Dropdown(
                         id='create profile plots dropdown',
                         placeholder = 'Select specific plots',
-                        options=['Ax', 'Ay', 'Az', 'Cross_and_Along_errors', 'Current', 'ErrorInMissionOverview', 'Error_between_Filter_and_VirtualTarget', 'Errors', 'Filter_and_VirtualTarget_and_GT', 'Filter_vs_Virtual', 'Gx', 'Gy', 'Gz', 'Inertial_Current', 'MissionOverview', 'Mx', 'Mx_vs_My', 'My', 'Mz', 'Pitch', 'RMS', 'Ref_Surge', 'Ref_Yaw', 'Roll', 'Speed', 'Temperature', 'Tension_Pack1', 'Tension_Pack2', 'Yaw', 'actual_charge', 'altimeter', 'altitude', 'bearing_vs_bearing_raw', 'bitrate', 'charging', 'control_surge', 'course', 'crossTrackAlongTrack', 'current', 'data', 'destination_address', 'duration', 'elevation_vs_elevation_raw', 'equalize', 'filter_vs_virtual_target', 'imu_pp_mag_abs', 'imu_pp_mag_x', 'imu_pp_mag_y', 'imu_pp_mag_z', 'integrity', 'latitude', 'longitude', 'mag_abs', 'mag_x', 'mag_y', 'mag_z', 'max_cell', 'max_temp', 'measurement_usbl_fix_bearing', 'measurement_usbl_fix_bearing_raw', 'measurement_usbl_fix_elevation', 'measurement_usbl_fix_elevation_raw', 'measurement_usbl_fix_range', 'measurement_usbl_fix_sound_speed', 'measurement_usbl_fix_source_id', 'measurement_usbl_fix_type_id', 'min_cell', 'min_temp', 'mode', 'msg_id', 'number_of_packs', 'overview_filter_dr_usbl', 'overview_pf', 'pitch', 'pressure', 'propagation_time', 'range', 'range_vs_bering_vs_elevation', 'recv_bitrate', 'recv_destination_address', 'recv_duration', 'recv_integrity', 'recv_msg_id', 'recv_propagation_time', 'recv_relative_velocity', 'recv_rssi', 'recv_source_address', 'recv_type_id', 'relative_velocity', 'roll', 'rssi', 'satellites', 'send_bitrate', 'send_destination_address', 'send_duration', 'send_integrity', 'send_msg_id', 'send_propagation_time', 'send_relative_velocity', 'send_rssi', 'send_source_address', 'send_type_id', 'sensors_usbl_fix_bearing_vs_bearing_raw', 'sensors_usbl_fix_elevation_vs_elevation_raw', 'sensors_usbl_fix_range', 'sensors_usbl_fix_range_vs_bearing_vs_elevation', 'sensors_usbl_fix_source_id', 'source_address', 'source_id', 'speed_over_ground', 'temperature', 'type_id', 'utc_time', 'yaw'],
+                        options=[],
                         multi=True,
                         clearable=True,
                         style={'color': '#49B0EA'},
@@ -720,9 +739,9 @@ def update_fifth_level_dir(input_value):
 
     # Roll back to parent directory
     fn.change_directory(last_directories[3])
-
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories())):
         # If the path actually changed
+        
         fn.change_directory(last_directories[3])
         path = fn.extend_dir(input_value)
         fn.change_directory(str(path))
@@ -838,7 +857,7 @@ def profile_callback(n_create_button, n_cancel_button, n_confirm_create,
     Input("driver radios", "value"),
     [State("create profile driver dropdown", "options"),],
 )
-def profile_drivers_dropdown(input_value, drivers):
+def profile_drivers_dropdown_value(input_value, drivers):
     if (input_value == "Select All Drivers"):
         return [driver for driver in drivers]
     elif (input_value == "Deselect All Drivers"):
@@ -850,15 +869,33 @@ def profile_drivers_dropdown(input_value, drivers):
 @app.callback(
     Output("create profile plots dropdown", "value"),
     Input("plots radios", "value"),
+    Input("create profile driver dropdown", "value"),
     [State("create profile plots dropdown", "options"),],
 )
-def profile_drivers_dropdown(input_value, plots):
+def profile_drivers_dropdown_value(input_value, drivers, plots):
     if (input_value == "Select All Plots"):
+        # return [plot for plot in plots if not filteredByDrivers(plot, drivers)
         return [plot for plot in plots]
     elif (input_value == "Deselect All Plots"):
         return []
     else:
         return []
+    
+
+@app.callback(
+    Output("create profile driver dropdown", "options"),
+    Input("update list of drivers", "n_clicks"),
+)
+def profile_drivers_dropdown_value(n_clicks):
+    return epn.get_drivers()
+
+
+@app.callback(
+    Output("create profile plots dropdown", "options"),
+    Input("update list of plots", "n_clicks"),
+)
+def profile_drivers_dropdown_value(n_clicks):
+    return epn.get_plots()
 
 ##############################
 ###      Main Function     ###
@@ -886,4 +923,6 @@ if __name__ == '__main__':
     ####                                                                   ####
     ###########################################################################
 
-    app.run_server(debug=True, dev_tools_hot_reload=False, host='0.0.0.0')  # TODO set debug to False after app is functional
+    # app.run_server(debug=True, dev_tools_hot_reload=False, host='0.0.0.0')  # TODO set debug to False after app is functional
+
+    app.run_server(debug=True, dev_tools_hot_reload=False)  # TODO set debug to False after app is functional

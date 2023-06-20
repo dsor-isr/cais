@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 import copy
 import re
 import extract_plot_names as epn
+import webbrowser
+import sys
 
 
 ##############################
@@ -85,36 +87,21 @@ def path_cat(path):
     return path[path.find('assets'):]
 
 
-def merge_html_files(files):
+def merge_html_files(files, merged_html=fn.get_pwd() + ALL_HTML):
 
     if not type(files) == list or len(files) == 0:
         raise TypeError("merge_html_files: Expected a file of type list with size > 0, but received something else.")
 
-    soup_objects = []
+    with open(merged_html, 'w') as merged_file:
+        for file in files:
+            if (file != ALL_HTML2 or not file.endswith(ALL_HTML2)):
+                with open(file, 'r') as f:
+                    # Read html files as BeautifulSoup objects and store them
+                    contents = f.read()
 
-    # Iterate over the files
-    for file in files:
-        if (file != ALL_HTML2):
-            # This if prevents from concatenating old all.html files
-            with open(file, 'r') as f:
-                # Read html files as BeautifulSoup objects and store them
-                contents = f.read()
+                    soup = BeautifulSoup(contents, 'lxml')
 
-                soup = BeautifulSoup(contents, 'lxml')
-                soup_objects.append(soup)
-
-    output_file = soup_objects[0]
-
-    # Append the contents of each html to a baseline html file
-    for soup in soup_objects[1::]:
-        for element in soup.body:
-            output_file.body.append(copy.copy(element))
-
-
-    # Save the new merged html file in the file system
-    merged_html = fn.get_pwd() + ALL_HTML
-    with open(merged_html, "w", encoding='utf-8') as file:
-        file.write(str(output_file))
+                merged_file.write(str(soup))
 
 
 def create_profile(driver_filters, profile_name, plot_filters):
@@ -231,6 +218,28 @@ def apply_profile_plot_filters(data):
     return profiles.filter(data, loaded_profile, False, True)
 
 
+def apply_profile_plot_filters_to_paths(paths):
+    """Applies the filters of the loaded profile to the given paths"""
+
+    if (type(paths) != list and type(paths) != tuple):
+        raise TypeError("apply_profile_filters: Expected a list or tuple, but received ", str(type(paths)))
+    elif (len(paths) == 0):
+        return paths
+
+    if (get_loaded_profile_name() == None):
+        # No filters to be applied
+        return paths
+    
+    output = paths
+    for path in paths:
+        file = path.split("/")[-1] # Get the file name
+        res = apply_profile_plot_filters([file])
+        if (res != [file]):
+            output.remove(path)
+
+    return output
+
+
 def reset_upper_directories(dropdown_index):
     """Resets the directories of the upper dropdowns, so that they don't point irrelevant directories"""
 
@@ -312,7 +321,7 @@ def merge_button_click():
     files = apply_profile_plot_filters(files)
     if (len(files) != 0):
         # html files found on present working directory
-        merge_html_files(files)
+        merge_html_files(files, fn.get_pwd() + ALL_HTML)
         path = fn.extend_dir(ALL_HTML2)
 
         sixth_dir_options = fn.get_html_files()
@@ -450,11 +459,25 @@ app.layout = html.Div([
         ##############################
 
         html.Br(),
+        html.H4("Current Plot:"),
         dcc.Link('',
         href='',
         target='_blank',
         refresh=True,
         id='plot',),
+
+        ##############################
+        ####    path to Profile    ###
+        ####         plot          ###
+        ##############################
+
+        html.Br(),
+        html.H4("Current Profile Plot:"),
+        dcc.Link('',
+        href='',
+        target='_blank',
+        refresh=True,
+        id='plot profile',),
 
 
         html.P(id='placeholder') # TODO remove later
@@ -490,6 +513,12 @@ app.layout = html.Div([
 
         dbc.Button('Create Profile',
             id='create profile button',
+            n_clicks=0,
+            style={'margin-left': '25px'}
+        ),
+
+        dbc.Button('Plot Profile',
+            id='plot profile button',
             n_clicks=0,
             style={'margin-left': '25px'}
         ),
@@ -595,7 +624,8 @@ app.layout = html.Div([
         ),
         html.Label(
             children="Current Profile: {}".format(str(get_loaded_profile_name())),
-            id='current profile name',),
+            id='current profile name',
+        ),
 
         html.P(id='center dropdowns', # This is here so the dropdowns won't show up at the top of the page
         style={'height': '8%'}),
@@ -618,6 +648,31 @@ app.layout = html.Div([
         id='Sixth level dir label'),
         dcc.Dropdown((),
         id='Sixth level dir',
+        ),
+
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Plot Profile (ERROR)")),
+                dbc.ModalBody([
+                    html.Label("An error occured while trying to generate an html file with all plots for the selected profile. One of the likely causes for the error is:\n - No profile was selected\n - No Day was selected on the first dropdown\n - No Vehicle was selected on the second dropdown\n - No Overview was selected on the third dropdown\n\nAll four of these conditions have to be met."),
+                ]),
+                dbc.ModalFooter(
+                    dbc.ButtonGroup(
+                        [
+                            dbc.Button(
+                                "Close",
+                                id="plot profile error modal close button",
+                                className="ms-auto",
+                                n_clicks=0),
+                        ],
+                    ),
+                ),
+            ],
+            id="plot profile error modal",
+            scrollable=True,
+            is_open=False,
+            style={'white-space':'pre-line'},
+            size="xl",
         ),
     
     ], style={'padding': 10, 'flex': 1}),
@@ -716,7 +771,7 @@ def update_fourth_level_dir(input_value):
 
         options = []
         options.extend(fn.get_directories())
-        options.extend(fn.get_html_files())
+        # options.extend(fn.get_html_files())
 
         label = ""
         if (input_value.lower() == "overall"):
@@ -896,6 +951,47 @@ def profile_drivers_dropdown_value(n_clicks):
 )
 def profile_drivers_dropdown_value(n_clicks):
     return epn.get_plots()
+
+
+@app.callback(
+    Output("plot profile", "children"),
+    Output("plot profile", "href"),
+    Output("plot profile error modal", "is_open"),
+    Input("plot profile button", "n_clicks"),
+    Input("plot profile error modal close button", "n_clicks"),
+    [
+        State("Home directory", "value"),
+        State("Second level dir", "value"),
+        State("Third level dir", "value"),
+    ]
+)
+def plot_profile(n_clicks, close, home_dir, second_dir, third_dir):
+    callback_trigger = ctx.triggered_id
+
+    if (n_clicks == 0 and home_dir == None and second_dir == None 
+        and third_dir == None and close == 0):
+        # Do Nothing
+        return '', '', False
+    if (callback_trigger == "plot profile button"):
+        if (home_dir == None or second_dir == None or third_dir == None or 
+         get_loaded_profile_name() == None):
+            return '', '', True
+        else:
+            root_dir = home + "/" + home_dir + "/" + "vehicles" + "/" + second_dir + "/" + "plots" + "/"
+            root_dir = root_dir + fn.get_directories(path=root_dir)[0] + "/" + third_dir
+            files = epn.get_plot_paths(root_dir)
+            files = apply_profile_plot_filters_to_paths(files)
+            if (len(files) != 0):
+                # html files found on present working directory
+                path = root_dir + "/" + get_loaded_profile_name() + ".html"
+                merge_html_files(files, path)
+
+            return path, path_cat(path), False
+    elif (callback_trigger == "plot profile error modal close button"):
+        return '', '', False
+    
+    return '', '', False
+
 
 ##############################
 ###      Main Function     ###

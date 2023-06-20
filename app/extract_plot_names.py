@@ -40,7 +40,6 @@ def dfs(vehicle_path=os.getcwd(), findPlots=True, findDrivers=False):
     if (findPlots and findDrivers):
         raise ValueError("The flags findPlots and findDrivers can't both be true.")
 
-    last_dir = vehicle_path
     path_stack
     push_stack(path_stack, vehicle_path)
     output = set()
@@ -83,7 +82,52 @@ def dfs(vehicle_path=os.getcwd(), findPlots=True, findDrivers=False):
                 # Only add directories as nodes with children to the stack
                 push_stack(path_stack, file_path)
 
-        last_dir = path
+    # print("\tFinished main loop")
+    # print("\tOutput: " + str(output))
+    # print("dfs: Finished function")
+    return output
+
+
+def dfs_output_full_path(vehicle_path=os.getcwd()):
+    if not os.path.isdir(vehicle_path):
+        raise ValueError("The path provided is not a directory")
+
+    path_stack
+    push_stack(path_stack, vehicle_path)
+    output = set()
+
+    # print("dfs: Starting function")
+    # print("\tSearching for drivers in " + vehicle_path)
+    # print("\tStarting main loop")
+    # Depth First Search main loop
+    while True:
+        # print("\tStarting iteration")
+        # print("\t\tLast directory: " + last_dir)
+        # print("\t\tCurrent stack: " + str(path_stack))
+        # print("\t\t\tPopping stack")
+        path = pop_stack(path_stack)
+        # print("\t\t\tPopped: " + str(path))
+        if path is None:
+            break
+
+        # process plots and directories
+        dir_content = os.listdir(path)
+        # print("\t\tDirectory content: " + str(dir_content))
+
+        html_files = [path + "/" + file_name for file_name in dir_content if is_html_file(file_name) 
+                    and file_name != "all.html"]
+        # add plots to output
+        output = output.union(set(html_files))
+
+        directories = [file_name for file_name in dir_content if is_dir(path + "/" + file_name)]
+        # print("\t\tDirectories to be added to the stack: " + str(directories))
+
+        # Add directories to stack to continue the search
+        for dir in directories:
+            file_path = path + "/" + dir
+            if os.path.isdir(file_path):
+                # Only add directories as nodes with children to the stack
+                push_stack(path_stack, file_path)
 
     # print("\tFinished main loop")
     # print("\tOutput: " + str(output))
@@ -116,6 +160,12 @@ def print_plots(plots):
 
 def get_plots(path=os.getcwd()):
     output = sorted(dfs(vehicle_path=path))
+    output = [plot for plot in output if not plot.endswith("copy")]
+    return output
+
+
+def get_plot_paths(path=os.getcwd()):
+    output = sorted(dfs_output_full_path(vehicle_path=path))
     output = [plot for plot in output if not plot.endswith("copy")]
     return output
 

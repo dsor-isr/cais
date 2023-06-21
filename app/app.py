@@ -1082,36 +1082,39 @@ def plot_profile(n_clicks, close, home_dir, second_dir, third_dir):
 @app.callback(
     Output("change directory modal", "is_open"),
     Output("change directory error modal", "is_open"),
+    Output("Home directory", "options"),
     Input("change directory button", "n_clicks"),
     Input("change-dir-close-body-scroll", "n_clicks"),
     Input("change-dir-modal-button", "n_clicks"),
     Input("change-dir-error-close-body-scroll", "n_clicks"),
     State("change directory input", "value"),
+    State("Home directory", "options"),
 )
 def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
-                        n_clicks_error, directory):
+                        n_clicks_error, directory, home_dir_options):
     callback_trigger = ctx.triggered_id
 
     if (n_clicks_open == 0):
-        return False, False
+        return False, False, home_dir_options
     
     if (callback_trigger == "change directory button"):
-        return True, False
+        return True, False, home_dir_options
     elif (callback_trigger == "change-dir-close-body-scroll"):
-        return False, False
+        return False, False, home_dir_options
     elif (callback_trigger == "change-dir-modal-button"):
         if (type(directory) != str or fn.is_valid_directory(directory) == False):
-            return True, True
+            return True, True, home_dir_options
         else:
             global home
             home = directory
             reset_upper_directories(0)
             fn.change_directory(directory)
-            return False, False
+            home_dir_options = fn.get_directories()
+            return False, False, home_dir_options
     elif (callback_trigger == "change-dir-error-close-body-scroll"):
-        return True, False
+        return True, False, home_dir_options
         
-    return False, False
+    return False, False, home_dir_options
 
 
 ##############################

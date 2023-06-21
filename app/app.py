@@ -216,6 +216,9 @@ def apply_profile_plot_filters(data):
         # No filters to be applied
         return data
 
+    # print("Applying plot filters")
+    # print("Loaded profile: ", loaded_profile)
+    # print("Data: ", data)
     return profiles.filter(data, loaded_profile, False, True)
 
 
@@ -231,12 +234,7 @@ def apply_profile_plot_filters_to_paths(paths):
         # No filters to be applied
         return paths
     
-    output = paths
-    for path in paths:
-        file = path.split("/")[-1] # Get the file name
-        res = apply_profile_plot_filters([file])
-        if (res != [file]):
-            output.remove(path)
+    output = apply_profile_plot_filters(paths)
 
     return output
 
@@ -987,11 +985,22 @@ def profile_drivers_dropdown_value(input_value, drivers):
 @app.callback(
     Output("create profile plots dropdown", "value"),
     Input("plots radios", "value"),
-    [State("create profile plots dropdown", "options"),],
+    [State("create profile plots dropdown", "options"),
+     State("create profile driver dropdown", "value"),],
 )
-def profile_drivers_dropdown_value(input_value, plots):
+def profile_drivers_dropdown_value(input_value, plots, drivers):
     if (input_value == "Select All Plots"):
-        return [plot for plot in plots]
+        if (drivers == None or len(drivers) == 0):
+            return [plot for plot in plots]
+        
+        pwd = fn.get_pwd()
+        fn.change_directory(PATH_TO_PROFILES)
+        valid_plots = set()
+        for driver in drivers:
+            # Get plots and remove duplicates
+            valid_plots = valid_plots.union(set(profiles.getPlotsByDriver(driver)))
+        fn.change_directory(pwd)
+        return [plot for plot in valid_plots]
     elif (input_value == "Deselect All Plots"):
         return []
     else:
@@ -1055,6 +1064,7 @@ def plot_profile(n_clicks, close, home_dir, second_dir, third_dir):
         else:
             root_dir = home + "/" + home_dir + "/" + "vehicles" + "/" + second_dir + "/" + "plots" + "/"
             root_dir = root_dir + fn.get_directories(path=root_dir)[0] + "/" + third_dir
+            # print("root_dir: " + root_dir)
             files = epn.get_plot_paths(root_dir)
             files = apply_profile_plot_filters_to_paths(files)
             if (len(files) != 0):

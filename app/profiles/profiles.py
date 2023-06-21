@@ -265,10 +265,15 @@ def __filter_plots(files, plotFilters):
         raise TypeError("Files must be a list or tuple")
     
     output_files = [file for file in files]
+    plotFilters = [plotFilter.lower() for plotFilter in plotFilters]
     for file in files:
+        keep = False
         processedFile = file.lower()
-        processedFile = processedFile.replace('.html', '')
-        if (not processedFile in plotFilters):
+        for plotFilter in plotFilters:
+            if (processedFile.endswith(plotFilter)):
+                keep = True
+                break
+        if (not keep):
             output_files.remove(file)
 
     return output_files

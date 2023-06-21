@@ -51,6 +51,7 @@ HELP9 = """c) Run app.py again"""
 HELP10 = """\nYou can create a new profile to restrict the kind of plots you see. The filters you pick on the profile creation menu are the ones you will see displayed. You can't create a profile if another one with that name already exists"""
 HELP11 = """\nThe load and delete options are radio buttons (selecting one deselects the other). After picking the action you want, just pick the profile on the dropdown bellow the radio buttons."""
 HELP += '\n' + HELP2 + '\n' + HELP3 + '\n' + HELP4 + '\n' + HELP5 + '\n' + HELP6 + '\n' + HELP7 + '\n' + HELP8 + '\n' + HELP9 + '\n' + HELP10 + '\n' + HELP11
+CHANGE_DIR_MESSAGE = "Instead of placing the plots within the CAIS app, you can store them someplace else.\n\nInsert the path to the directory you want to go to. The directory must have the expected structure (see README.md). In particular, the \"root\" directory should be \"days\"."
 
 PATH_TO_PROFILES = fn.extend_dir('profiles')
 
@@ -245,7 +246,6 @@ def reset_upper_directories(dropdown_index):
 
     #global last_directories
     #print("reset_upper_directories: home = ", home)
-
     for i in range(dropdown_index, len(last_directories)):
         last_directories[i] = home
 
@@ -401,17 +401,26 @@ app.layout = html.Div([
         ####        Buttons        ###
         ##############################
 
-        dbc.Button('Plot Directory',
-        id='plot button',
-        n_clicks=0,
-        style={'display':'inline'},
-        ),
-
-        dbc.Button(
-            "Help", 
-            id="open-help-body-scroll", 
+        dbc.ButtonGroup([
+            dbc.Button('Plot Directory',
+            id='plot button',
             n_clicks=0,
             style={'display':'inline'},
+            ),
+
+            dbc.Button(
+                "Change search directory", 
+                id="change directory button", 
+                n_clicks=0,
+                style={'display':'inline'},
+            ),
+
+            dbc.Button(
+                "Help", 
+                id="open-help-body-scroll", 
+                n_clicks=0,
+                style={'display':'inline'},
+            )]
         ),
 
         dbc.Modal(
@@ -432,7 +441,42 @@ app.layout = html.Div([
             is_open=False,
             style={'white-space':'pre-line'}
         ),
-        
+
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Change search directory")),
+                dbc.ModalBody([CHANGE_DIR_MESSAGE,
+                               html.Br(),
+                               dbc.Input(
+                                    id="change directory input",
+                                    placeholder="Enter directory",
+                                    type="text",
+                                    value="",
+                               ),
+                               ]),
+                dbc.ModalFooter(
+                    dbc.ButtonGroup([
+                        dbc.Button(
+                            "Change directory",
+                            id="change-dir-modal-button",
+                            className="ms-auto",
+                            n_clicks=0,
+                        ),
+
+                        dbc.Button(
+                            "Close",
+                            id="change-dir-close-body-scroll",
+                            className="ms-auto",
+                            n_clicks=0,
+                        ),
+                    ]),
+                ),
+            ],
+            id="change directory modal",
+            scrollable=True,
+            is_open=False,
+            style={'white-space':'pre-line'}
+        ),
         
         ##############################
         ####   Left   Dropdowns    ###
@@ -465,20 +509,6 @@ app.layout = html.Div([
         target='_blank',
         refresh=True,
         id='plot',),
-
-        ##############################
-        ####    path to Profile    ###
-        ####         plot          ###
-        ##############################
-
-        html.Br(),
-        html.H4("Current Profile Plot:"),
-        dcc.Link('',
-        href='',
-        target='_blank',
-        refresh=True,
-        id='plot profile',),
-
 
         html.P(id='placeholder') # TODO remove later
 
@@ -628,7 +658,7 @@ app.layout = html.Div([
         ),
 
         html.P(id='center dropdowns', # This is here so the dropdowns won't show up at the top of the page
-        style={'height': '8%'}),
+        style={'height': '8.5%'}),
 
         html.Br(),
         html.Label(children='4. ',
@@ -674,6 +704,19 @@ app.layout = html.Div([
             style={'white-space':'pre-line'},
             size="xl",
         ),
+
+        ##############################
+        ####    path to Profile    ###
+        ####         plot          ###
+        ##############################
+
+        html.Br(),
+        html.H4("Current Profile Plot:"),
+        dcc.Link('',
+        href='',
+        target='_blank',
+        refresh=True,
+        id='plot profile',),
     
     ], style={'padding': 10, 'flex': 1}),
     
@@ -1004,6 +1047,37 @@ def plot_profile(n_clicks, close, home_dir, second_dir, third_dir):
         return '', '', False
     
     return '', '', False
+
+
+@app.callback(
+    Output("change directory modal", "is_open"),
+    Input("change directory button", "n_clicks"),
+    Input("change-dir-close-body-scroll", "n_clicks"),
+    Input("change-dir-modal-button", "n_clicks"),
+    State("change directory input", "value"),
+)
+def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save, directory):
+    callback_trigger = ctx.triggered_id
+
+    if (n_clicks_open == 0):
+        return False
+    
+    if (callback_trigger == "change directory button"):
+        return True
+    elif (callback_trigger == "change-dir-close-body-scroll"):
+        return False
+    elif (callback_trigger == "change-dir-modal-button"):
+        if (directory == None or fn.is_valid_directory(directory) == False):
+            return True
+        else:
+            global home
+            home = directory
+            reset_upper_directories(0)
+            fn.change_directory(directory)
+            print("Changed directory to: " + directory)
+            return False
+        
+    return False
 
 
 ##############################

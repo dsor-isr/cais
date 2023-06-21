@@ -477,6 +477,26 @@ app.layout = html.Div([
             is_open=False,
             style={'white-space':'pre-line'}
         ),
+
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Error")),
+                dbc.ModalBody("The specified directory is either empty or doesn't exist.",
+                    id='change-dir-error-message'),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close",
+                        id="change-dir-error-close-body-scroll",
+                        className="ms-auto",
+                        n_clicks=0,
+                    ),
+                ),
+            ],
+            id="change directory error modal",
+            scrollable=True,
+            is_open=False,
+            style={'white-space':'pre-line'}
+        ),
         
         ##############################
         ####   Left   Dropdowns    ###
@@ -1051,33 +1071,37 @@ def plot_profile(n_clicks, close, home_dir, second_dir, third_dir):
 
 @app.callback(
     Output("change directory modal", "is_open"),
+    Output("change directory error modal", "is_open"),
     Input("change directory button", "n_clicks"),
     Input("change-dir-close-body-scroll", "n_clicks"),
     Input("change-dir-modal-button", "n_clicks"),
+    Input("change-dir-error-close-body-scroll", "n_clicks"),
     State("change directory input", "value"),
 )
-def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save, directory):
+def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
+                        n_clicks_error, directory):
     callback_trigger = ctx.triggered_id
 
     if (n_clicks_open == 0):
-        return False
+        return False, False
     
     if (callback_trigger == "change directory button"):
-        return True
+        return True, False
     elif (callback_trigger == "change-dir-close-body-scroll"):
-        return False
+        return False, False
     elif (callback_trigger == "change-dir-modal-button"):
-        if (directory == None or fn.is_valid_directory(directory) == False):
-            return True
+        if (type(directory) != str or fn.is_valid_directory(directory) == False):
+            return True, True
         else:
             global home
             home = directory
             reset_upper_directories(0)
             fn.change_directory(directory)
-            print("Changed directory to: " + directory)
-            return False
+            return False, False
+    elif (callback_trigger == "change-dir-error-close-body-scroll"):
+        return True, False
         
-    return False
+    return False, False
 
 
 ##############################

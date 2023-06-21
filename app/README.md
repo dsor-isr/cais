@@ -117,3 +117,8 @@ dcc.Dropdown(
 Since there may be lots of plots, instead of finding them and inserting them one by one, simply run extract_plot_names.py
 `python3 extract_plot_names.py`
 It will generate a file called *plot_names.txt* with all plots already formated nicely to be added directly to the dropdown.
+
+
+## What plots are filtered by what drivers?
+
+Inside the profiles directory, there is a file called `drivers.json`. Whenever you want to specify that a plot *X* is filtered by a certain driver *Y*, simply add that plot to the corresponding list on the json file.

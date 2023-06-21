@@ -274,6 +274,38 @@ def __filter_plots(files, plotFilters):
     return output_files
 
 
+def getPlotsByDriver(driver):
+    """Returns a list of plots that are associated with the driver
+    
+    Parameters
+    ----------
+        driver: str
+            The driver to get plots for
+    Returns
+    -------
+        list
+            list of plots associated with the driver"""
+    if (type(driver) != str):
+        raise TypeError("Driver must be a string")
+    elif (driver == ""):
+        raise ValueError("Driver can't be empty")
+
+    plots = []
+    try:
+        drivers = readJSONfile("drivers.json")[0]
+        for driverName in drivers:
+            if (driverName.lower() == driver.lower()):
+                return drivers[driverName]
+    except FileNotFoundError as fileNotFoundError:
+        raise fileNotFoundError
+    except PermissionError as permissionError:
+        raise permissionError
+    except Exception as exception:
+        raise exception
+
+    return plots
+
+
 
 if __name__ == '__main__':
    pass

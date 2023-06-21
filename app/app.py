@@ -924,12 +924,10 @@ def profile_drivers_dropdown_value(input_value, drivers):
 @app.callback(
     Output("create profile plots dropdown", "value"),
     Input("plots radios", "value"),
-    Input("create profile driver dropdown", "value"),
     [State("create profile plots dropdown", "options"),],
 )
-def profile_drivers_dropdown_value(input_value, drivers, plots):
+def profile_drivers_dropdown_value(input_value, plots):
     if (input_value == "Select All Plots"):
-        # return [plot for plot in plots if not filteredByDrivers(plot, drivers)
         return [plot for plot in plots]
     elif (input_value == "Deselect All Plots"):
         return []
@@ -948,8 +946,23 @@ def profile_drivers_dropdown_value(n_clicks):
 @app.callback(
     Output("create profile plots dropdown", "options"),
     Input("update list of plots", "n_clicks"),
+    Input("create profile driver dropdown", "value"),
 )
-def profile_drivers_dropdown_value(n_clicks):
+def profile_drivers_dropdown_value(n_clicks, drivers):
+    callback_trigger = ctx.triggered_id
+    if (callback_trigger == "create profile driver dropdown"):
+        if (drivers == None or len(drivers) == 0):
+            return epn.get_plots()
+
+        pwd = fn.get_pwd()
+        fn.change_directory(PATH_TO_PROFILES)
+        valid_plots = set()
+        for driver in drivers:
+            # Get plots and remove duplicates
+            valid_plots = valid_plots.union(set(profiles.getPlotsByDriver(driver)))
+        fn.change_directory(pwd)
+        return [{'label': plot, 'value': plot} for plot in valid_plots]
+    
     return epn.get_plots()
 
 

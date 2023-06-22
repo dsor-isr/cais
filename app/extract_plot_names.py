@@ -1,4 +1,5 @@
 import os
+from profiles import profiles
 
 path_stack = []
 
@@ -44,23 +45,14 @@ def dfs(vehicle_path=os.getcwd(), findPlots=True, findDrivers=False):
     push_stack(path_stack, vehicle_path)
     output = set()
 
-    # print("dfs: Starting function")
-    # print("\tSearching for drivers in " + vehicle_path)
-    # print("\tStarting main loop")
     # Depth First Search main loop
     while True:
-        # print("\tStarting iteration")
-        # print("\t\tLast directory: " + last_dir)
-        # print("\t\tCurrent stack: " + str(path_stack))
-        # print("\t\t\tPopping stack")
         path = pop_stack(path_stack)
-        # print("\t\t\tPopped: " + str(path))
         if path is None:
             break
 
         # process plots and directories
         dir_content = os.listdir(path)
-        # print("\t\tDirectory content: " + str(dir_content))
 
         if (findPlots):
             html_files = [file_name for file_name in dir_content if is_html_file(file_name) 
@@ -68,12 +60,10 @@ def dfs(vehicle_path=os.getcwd(), findPlots=True, findDrivers=False):
             # add plots to output
             output = output.union(set(remove_html_extension_from_files(html_files)))
         elif (findDrivers and path.endswith("drivers")):
-            # print("\t\t\tAdding drivers to output")
             # add drivers to output
             output = output.union(set(dir_content))
 
         directories = [file_name for file_name in dir_content if is_dir(path + "/" + file_name)]
-        # print("\t\tDirectories to be added to the stack: " + str(directories))
 
         # Add directories to stack to continue the search
         for dir in directories:
@@ -82,9 +72,6 @@ def dfs(vehicle_path=os.getcwd(), findPlots=True, findDrivers=False):
                 # Only add directories as nodes with children to the stack
                 push_stack(path_stack, file_path)
 
-    # print("\tFinished main loop")
-    # print("\tOutput: " + str(output))
-    # print("dfs: Finished function")
     return output
 
 
@@ -95,24 +82,13 @@ def dfs_output_full_path(vehicle_path=os.getcwd()):
     path_stack
     push_stack(path_stack, vehicle_path)
     output = set()
-
-    # print("dfs: Starting function")
-    # print("\tSearching for drivers in " + vehicle_path)
-    # print("\tStarting main loop")
-    # Depth First Search main loop
     while True:
-        # print("\tStarting iteration")
-        # print("\t\tLast directory: " + last_dir)
-        # print("\t\tCurrent stack: " + str(path_stack))
-        # print("\t\t\tPopping stack")
         path = pop_stack(path_stack)
-        # print("\t\t\tPopped: " + str(path))
         if path is None:
             break
 
         # process plots and directories
         dir_content = os.listdir(path)
-        # print("\t\tDirectory content: " + str(dir_content))
 
         html_files = [path + "/" + file_name for file_name in dir_content if is_html_file(file_name) 
                     and file_name != "all.html"]
@@ -120,7 +96,6 @@ def dfs_output_full_path(vehicle_path=os.getcwd()):
         output = output.union(set(html_files))
 
         directories = [file_name for file_name in dir_content if is_dir(path + "/" + file_name)]
-        # print("\t\tDirectories to be added to the stack: " + str(directories))
 
         # Add directories to stack to continue the search
         for dir in directories:
@@ -129,10 +104,62 @@ def dfs_output_full_path(vehicle_path=os.getcwd()):
                 # Only add directories as nodes with children to the stack
                 push_stack(path_stack, file_path)
 
-    # print("\tFinished main loop")
-    # print("\tOutput: " + str(output))
-    # print("dfs: Finished function")
     return output
+
+
+def build_dictionary(plots):
+    if (type(plots) not in (list, tuple)):
+        raise TypeError("The plots argument must be of type list or tuple")
+    if (len(plots) == 0):
+        raise ValueError("The plots argument must contain at least one plot")
+    
+    output = dict()
+    for plot in plots:
+        lowerCasePlot = plot.lower()
+        split = plot.split("/")
+        driver = None
+        if (not split[-1].endswith(".html")):
+            raise ValueError("Something went wrong. Plot doesn't end with .html: " + plot)
+
+        if ("overall" in lowerCasePlot and "drivers" in lowerCasePlot):
+            split = plot.split("/")
+            if (len(split) < 3):
+                raise ValueError("Something went wrong. Path too small for plot: " + plot)
+            
+            driver = split[-2]
+        elif ("missions" in lowerCasePlot or "_mission" in lowerCasePlot):
+            driver = "mission specific"
+
+        if (driver != None):
+            if (driver in output and split[-1] not in output[driver]):
+                output[driver].append(split[-1])
+            else:
+                output[driver] = [split[-1]]
+
+    return output
+
+
+def create_drivers_json(path=os.getcwd()):
+    if (not os.path.isdir(path)):
+        raise ValueError("The path provided is not a directory")
+    if (path.split("/")[-1].lower() != "days"):
+        raise ValueError("The path provided isn't a valid CAIS subdirectory")
+    
+    days = os.listdir(path)
+    print("days: " + str(days))
+
+    for day in days:
+        print("day: " + day)
+        if (os.path.isdir(path + "/" + day)):
+            print("Processing " + day)
+            plots = sorted(dfs_output_full_path(path + "/" + day))
+            plots = [plot for plot in plots if not plot.endswith("copy")]
+            dictionary = build_dictionary(plots)
+            print("Finished processing " + day)
+            print("dictionary: " + str(dictionary))
+            print("type(dictionary): " + str(type(dictionary)))
+            print("Creating drivers.json")
+            profiles.JSONDump(dictionary, path + "/" + day + "/drivers.json")
 
 
 def write_to_file(file_name, output):
@@ -177,39 +204,39 @@ def get_drivers(path=os.getcwd()):
 
 
 if __name__ == "__main__":
+    create_drivers_json("/home/goncalo/cais/app/assets/days")
+    # print("This script will extract all plot names in the provided directory and all subdirectories")
+    # print("")
+    # print("If you don't provide a starting directory, the current working directory will be used")
+    # print("Current working directory: " + os.getcwd())
+    # print("")
 
-    print("This script will extract all plot names in the provided directory and all subdirectories")
-    print("")
-    print("If you don't provide a starting directory, the current working directory will be used")
-    print("Current working directory: " + os.getcwd())
-    print("")
+    # answer = ""
+    # vehicle_path = ""
+    # while answer != "y" and answer != "n":
+    #     answer = input("Do you want to use the current working directory? (y/n) ")
 
-    answer = ""
-    vehicle_path = ""
-    while answer != "y" and answer != "n":
-        answer = input("Do you want to use the current working directory? (y/n) ")
+    #     if answer == "n":
+    #         print("")
+    #         vehicle_path = process_dir(input("Please provide a starting directory: "))
+    #         print("")
+    #         print("Using directory: " + vehicle_path)
+    #         while not is_dir(vehicle_path):
+    #             vehicle_path = process_dir(input("The path provided is not a directory, please try again: "))
 
-        if answer == "n":
-            print("")
-            vehicle_path = process_dir(input("Please provide a starting directory: "))
-            print("")
-            print("Using directory: " + vehicle_path)
-            while not is_dir(vehicle_path):
-                vehicle_path = process_dir(input("The path provided is not a directory, please try again: "))
+    #         break
+    #     elif answer == "y":
+    #         print("")
+    #         print("Using current working directory")
+    #         vehicle_path = os.getcwd()
+    #         break
+    #     else:
+    #         print("Invalid input, please try again")
 
-            break
-        elif answer == "y":
-            print("")
-            print("Using current working directory")
-            vehicle_path = os.getcwd()
-            break
-        else:
-            print("Invalid input, please try again")
-
-        print("")
+    #     print("")
 
 
-    plots = sorted(dfs(vehicle_path))
-    plots = [plot for plot in plots if not plot.endswith("copy")]
-    print_plots(plots)
-    write_to_file("plot_names.txt", plots)
+    # plots = sorted(dfs(vehicle_path))
+    # plots = [plot for plot in plots if not plot.endswith("copy")]
+    # print_plots(plots)
+    # write_to_file("plot_names.txt", plots)

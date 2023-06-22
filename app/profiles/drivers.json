@@ -34,6 +34,9 @@
         "sensors_usbl_fix_bearing_vs_bearing_raw.html", "sensors_usbl_fix_elevation_vs_elevation_raw.html", 
         "sensors_usbl_fix_range_vs_bearing_vs_elevation.html", "sensors_usbl_fix_range.html", 
         "sensors_usbl_fix_source_id.html"
+        ],
+        "mission specific": ["control_surge.html", "overview_filter_dr_usbl.html",
+        "filter_vs_virtual_target.html", "overview_pf.html", "crossTrackAlongTrack.html"
         ]
     }
 ]

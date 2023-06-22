@@ -110,6 +110,19 @@ def serializeClass(profile):
     file.close()
 
 
+def JSONDump(data, file):
+    if (type(data) != dict):
+        raise TypeError("Data must be a dictionary")
+    if (type(file) != str):
+        raise TypeError("File must be a string")
+    if (len(file) == 0):
+        raise ValueError("File can't be empty")
+    
+    file = open(file, "w")
+    portalocker.lock(file, portalocker.LockFlags.EXCLUSIVE) # Lock file
+    json.dump(data, file, indent=4, cls=Profile.ProfileEncoder)
+    file.close()
+
 
 def deleteProfileByName(profileName):
     """Deletes a profile from the profiles.json file

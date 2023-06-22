@@ -16,16 +16,6 @@ import sys
 
 
 ##############################
-###    Suggested Debug     ###
-###         Format         ###
-##############################
-
-"""print("(callback) <function_name>: Input = " + str(input_value) + " ; path = ", fn.get_pwd())
-print("		(callback) <function_name>: other useful things")
-print("")
-"""
-
-##############################
 ###        Constants       ###
 ##############################
 
@@ -73,6 +63,21 @@ isr_logo = 'assets/logos/isr_logo_red_background.png'
 ##############################
 ###   Auxilary Functions   ###
 ##############################
+
+def merge_dictionaries(dict1, dict2):
+    if (type(dict1) != dict or type(dict2) != dict):
+        raise TypeError("Arguments should be dictionaries")
+    
+    output = {key: value[:] for key, value in dict1.items()}
+    for key in dict2:
+        if not key in output:
+            output[key] = dict2[key]
+        else:
+            res = set(output[key]).union(set(dict2[key]))
+            output[key] = list(res)
+
+    return output
+
 
 # Using base64 encoding and decoding
 def b64_image(image_filename):
@@ -216,9 +221,6 @@ def apply_profile_plot_filters(data):
         # No filters to be applied
         return data
 
-    # print("Applying plot filters")
-    # print("Loaded profile: ", loaded_profile)
-    # print("Data: ", data)
     return profiles.filter(data, loaded_profile, False, True)
 
 
@@ -243,7 +245,6 @@ def reset_upper_directories(dropdown_index):
     """Resets the directories of the upper dropdowns, so that they don't point irrelevant directories"""
 
     #global last_directories
-    #print("reset_upper_directories: home = ", home)
     for i in range(dropdown_index, len(last_directories)):
         last_directories[i] = home
 
@@ -570,42 +571,50 @@ app.layout = html.Div([
             n_clicks=0,
             style={'margin-left': '25px'}
         ),
-
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.ModalTitle("Create Profile")),
                 dbc.ModalBody([
                     dbc.ButtonGroup(
                         [
-                            dbc.Button(
-                                "Update list of possible plots",
-                                id="update list of plots",
-                                className="ms-auto",
-                                n_clicks=0),
-                            dbc.Button("Update list of possible drivers",
-                                id="update list of drivers",
+                            dbc.Button("Update dropdowns",
+                                id="update dropdowns",
                                 className="ms-auto",
                                 n_clicks=0),
                         ]
                     ),
+                    html.Br(),
                     html.Label("Pick the name of the new profile and the filters you want to apply to it (the ones selected are displayed on the dropdowns). It isn't possible to create a profile if another one already exists with that name."),
+                    html.Br(),
                     html.Label('Enter the profile name:'),
                     html.Br(),
                     dcc.Input(value='', type='text', id='profile name'),
                     html.Br(),
                     html.Label("Select the drivers you want to see"),
-                    dbc.RadioItems(
-                        id="driver radios",
-                        className="btn-group",
-                        inputClassName="btn-check",
-                        labelClassName="btn btn-outline-primary",
-                        labelCheckedClassName="active",
-                        options=[
-                            {"label": "Select All Drivers", "value": 'Select All Drivers', "id": "Select All Drivers"},
-                            {"label": "Deselect All Drivers", "value": 'Deselect All Drivers', "id": "Deselect All Drivers"},
-                        ],
-                        value='Deselect All Drivers',
+                    html.Br(),
+                    dbc.ButtonGroup([
+                        dbc.Button("Select All",
+                            id="select all drivers",
+                            className="ms-auto",
+                            n_clicks=0),
+                        dbc.Button("Deselect All",
+                            id="deselect all drivers",
+                            className="ms-auto",
+                            n_clicks=0),
+                    ]
                     ),
+                    # dbc.RadioItems(
+                    #     id="driver radios",
+                    #     className="btn-group",
+                    #     inputClassName="btn-check",
+                    #     labelClassName="btn btn-outline-primary",
+                    #     labelCheckedClassName="active",
+                    #     options=[
+                    #         {"label": "Select All Drivers", "value": 'Select All Drivers', "id": "Select All Drivers"},
+                    #         {"label": "Deselect All Drivers", "value": 'Deselect All Drivers', "id": "Deselect All Drivers"},
+                    #     ],
+                    #     value='Deselect All Drivers',
+                    # ),
                     dcc.Dropdown(
                         id='create profile driver dropdown',
                         placeholder = 'Select drivers',
@@ -614,18 +623,19 @@ app.layout = html.Div([
                         clearable=True,
                         style={'color': '#49B0EA'},
                     ),
+                    html.Br(),
                     html.Label("Select the specific plots you want to see"),
-                    dbc.RadioItems(
-                        id="plots radios",
-                        className="btn-group",
-                        inputClassName="btn-check",
-                        labelClassName="btn btn-outline-primary",
-                        labelCheckedClassName="active",
-                        options=[
-                            {"label": "Select All Plots", "value": 'Select All Plots', "id": "Select All Plots"},
-                            {"label": "Deselect All Plots", "value": 'Deselect All Plots', "id": "Deselect All Plots"},
-                        ],
-                        value='Deselect All Plots',
+                    html.Br(),
+                    dbc.ButtonGroup([
+                        dbc.Button("Select All",
+                            id="select all plots",
+                            className="ms-auto",
+                            n_clicks=0),
+                        dbc.Button("Deselect All",
+                            id="deselect all plots",
+                            className="ms-auto",
+                            n_clicks=0),
+                    ]
                     ),
                     dcc.Dropdown(
                         id='create profile plots dropdown',
@@ -832,7 +842,6 @@ def update_fourth_level_dir(input_value):
 
         options = []
         options.extend(fn.get_directories())
-        # options.extend(fn.get_html_files())
 
         label = ""
         if (input_value.lower() == "overall"):
@@ -843,7 +852,6 @@ def update_fourth_level_dir(input_value):
 
         return [{'label': i, 'value': i} for i in options], label
     
-    #print("")
     return (), "4. "
 
 @app.callback(
@@ -970,38 +978,36 @@ def profile_callback(n_create_button, n_cancel_button, n_confirm_create,
 
 @app.callback(
     Output("create profile driver dropdown", "value"),
-    Input("driver radios", "value"),
-    [State("create profile driver dropdown", "options"),],
+    Input("select all drivers", "n_clicks"),
+    Input("deselect all drivers", "n_clicks"),
+    [State("create profile driver dropdown", "options"),
+     State("create profile driver dropdown", "value")],
 )
-def profile_drivers_dropdown_value(input_value, drivers):
-    if (input_value == "Select All Drivers"):
-        return [driver for driver in drivers]
-    elif (input_value == "Deselect All Drivers"):
-        return []
+def profile_drivers_dropdown_value(select_all, deselect_all, drivers, selected_drivers):
+    callback_trigger = ctx.triggered_id
+    if (callback_trigger in ("select all drivers", "deselect all drivers")):
+        if (callback_trigger == "select all drivers"):
+            return [driver for driver in drivers]
+        else:
+            return []
     else:
+        if (type(selected_drivers) == list):
+            return [driver for driver in selected_drivers]
         return []
     
 
 @app.callback(
     Output("create profile plots dropdown", "value"),
-    Input("plots radios", "value"),
+    Input("select all plots", "n_clicks"),
+    Input("deselect all plots", "n_clicks"),
     [State("create profile plots dropdown", "options"),
      State("create profile driver dropdown", "value"),],
 )
-def profile_drivers_dropdown_value(input_value, plots, drivers):
-    if (input_value == "Select All Plots"):
-        if (drivers == None or len(drivers) == 0):
-            return [plot for plot in plots]
-        
-        pwd = fn.get_pwd()
-        fn.change_directory(PATH_TO_PROFILES)
-        valid_plots = set()
-        for driver in drivers:
-            # Get plots and remove duplicates
-            valid_plots = valid_plots.union(set(profiles.getPlotsByDriver(driver)))
-        fn.change_directory(pwd)
-        return [plot for plot in valid_plots]
-    elif (input_value == "Deselect All Plots"):
+def profile_drivers_dropdown_value(select_all, deselect_all, plots, drivers):
+    callback_trigger = ctx.triggered_id
+    if (callback_trigger == "select all plots"):
+        return [plot for plot in plots]
+    elif (callback_trigger == "deselect All Plots"):
         return []
     else:
         return []
@@ -1009,33 +1015,46 @@ def profile_drivers_dropdown_value(input_value, plots, drivers):
 
 @app.callback(
     Output("create profile driver dropdown", "options"),
-    Input("update list of drivers", "n_clicks"),
-)
-def profile_drivers_dropdown_value(n_clicks):
-    return epn.get_drivers()
-
-
-@app.callback(
     Output("create profile plots dropdown", "options"),
-    Input("update list of plots", "n_clicks"),
+    Input("update dropdowns", "n_clicks"),
     Input("create profile driver dropdown", "value"),
 )
-def profile_drivers_dropdown_value(n_clicks, drivers):
-    callback_trigger = ctx.triggered_id
-    if (callback_trigger == "create profile driver dropdown"):
-        if (drivers == None or len(drivers) == 0):
-            return epn.get_plots()
+def profile_drivers_dropdown_value(n_clicks, selected_drivers):
+    global home
 
-        pwd = fn.get_pwd()
-        fn.change_directory(PATH_TO_PROFILES)
-        valid_plots = set()
-        for driver in drivers:
-            # Get plots and remove duplicates
-            valid_plots = valid_plots.union(set(profiles.getPlotsByDriver(driver)))
-        fn.change_directory(pwd)
-        return [{'label': plot, 'value': plot} for plot in valid_plots]
-    
-    return epn.get_plots()
+    # Update drivers.json for each day
+    epn.create_drivers_json(home)
+
+    # Get list of days
+    days = fn.get_directories(path=home)
+
+    drivers = []
+    plots = []
+    dictionaries = []
+    for day in days:
+        file = home + "/" + day + "/drivers.json"
+        data = profiles.readJSONfile(file)
+        dictionaries.append(data)
+        for driver in data:
+            if (not driver in drivers):
+                drivers.append(driver)
+            for plot in data[driver]:
+                if (plot not in plots):
+                    plots.append(plot)
+
+    if (n_clicks == 0 and selected_drivers in (None, [])):
+        return drivers, plots
+
+    if (len(dictionaries) > 1 and (selected_drivers != None and len(selected_drivers) > 0)):
+        # Merge all drivers.json into one dictionary
+        merged_dict = dictionaries[-1]
+        dictionaries.pop()
+        for dictionary in dictionaries:
+            merged_dict = merge_dictionaries(merged_dict, dictionary)
+
+        plots = profiles.getPlotsByDrivers(selected_drivers, merged_dict)
+
+    return drivers, plots
 
 
 @app.callback(
@@ -1064,7 +1083,6 @@ def plot_profile(n_clicks, close, home_dir, second_dir, third_dir):
         else:
             root_dir = home + "/" + home_dir + "/" + "vehicles" + "/" + second_dir + "/" + "plots" + "/"
             root_dir = root_dir + fn.get_directories(path=root_dir)[0] + "/" + third_dir
-            # print("root_dir: " + root_dir)
             files = epn.get_plot_paths(root_dir)
             files = apply_profile_plot_filters_to_paths(files)
             if (len(files) != 0):

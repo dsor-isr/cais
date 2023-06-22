@@ -146,19 +146,12 @@ def create_drivers_json(path=os.getcwd()):
         raise ValueError("The path provided isn't a valid CAIS subdirectory")
     
     days = os.listdir(path)
-    print("days: " + str(days))
 
     for day in days:
-        print("day: " + day)
         if (os.path.isdir(path + "/" + day)):
-            print("Processing " + day)
             plots = sorted(dfs_output_full_path(path + "/" + day))
             plots = [plot for plot in plots if not plot.endswith("copy")]
             dictionary = build_dictionary(plots)
-            print("Finished processing " + day)
-            print("dictionary: " + str(dictionary))
-            print("type(dictionary): " + str(type(dictionary)))
-            print("Creating drivers.json")
             profiles.JSONDump(dictionary, path + "/" + day + "/drivers.json")
 
 

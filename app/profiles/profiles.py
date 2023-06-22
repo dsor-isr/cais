@@ -292,7 +292,7 @@ def __filter_plots(files, plotFilters):
     return output_files
 
 
-def getPlotsByDriver(driver):
+def getPlotsByDrivers(drivers, dictionary):
     """Returns a list of plots that are associated with the driver
     
     Parameters
@@ -303,26 +303,21 @@ def getPlotsByDriver(driver):
     -------
         list
             list of plots associated with the driver"""
-    if (type(driver) != str):
-        raise TypeError("Driver must be a string")
-    elif (driver == ""):
-        raise ValueError("Driver can't be empty")
-
+    if (type(drivers) != list and type(drivers) != tuple):
+        raise TypeError("")
+    if (type(dictionary) != dict):
+        raise TypeError("")
+    if (len(drivers) == 0):
+        return list(dictionary.values())
+    
     plots = []
-    try:
-        drivers = readJSONfile("drivers.json")[0]
-        for driverName in drivers:
-            if (driverName.lower() == driver.lower()):
-                return drivers[driverName]
-    except FileNotFoundError as fileNotFoundError:
-        raise fileNotFoundError
-    except PermissionError as permissionError:
-        raise permissionError
-    except Exception as exception:
-        raise exception
+    for driver in drivers:
+        if (not driver in dictionary):
+            raise ValueError("driver not in dictionary")
+        
+        [plots.append(x) for x in dictionary[driver] if x not in plots]
 
     return plots
-
 
 
 if __name__ == '__main__':

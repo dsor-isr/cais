@@ -101,24 +101,9 @@ Dash has something called [Code Reloading and Hot Reload](https://dash.plotly.co
 
 CAIS already has tests to check some of it's backend's behaviour. The tests are written in Python using [Pytest](https://docs.pytest.org/en/7.3.x/). To run them all, simply run test.sh `/path/to/cais/app/test.sh`
 
-## extract_plot_names.py
-
-Whenever a profile is created, a modal pops up with two dropdowns to select which drivers and plots that profile should be able to see. Within the app itself, that list should be defined something like this:
-```
-dcc.Dropdown(
-    id='create profile plots dropdown',
-    placeholder = 'Select specific plots',
-    options=['Ax', 'Ay', 'Az', 'Cross_and_Along_errors', 'Current'],
-    multi=True,
-    clearable=True,
-    style={'color': '#49B0EA'},
-),
-```
-Since there may be lots of plots, instead of finding them and inserting them one by one, simply run extract_plot_names.py
-`python3 extract_plot_names.py`
-It will generate a file called *plot_names.txt* with all plots already formated nicely to be added directly to the dropdown.
-
 
 ## What plots are filtered by what drivers?
 
-Inside the profiles directory, there is a file called `drivers.json`. Whenever you want to specify that a plot *X* is filtered by a certain driver *Y*, simply add that plot to the corresponding list on the json file.
+Inside the directory of each day, there is a file called `drivers.json`. This file maps each different plot to the corresponding type of driver. Plots not necessarily associated with one driver or another fall into the "mission specific" category.
+
+These *json* files are created either when the *Update Dropdowns* button, on the profile creation menu, is clicked or every 7 days after the webapp starts running (assuming the process isn't finished or dies in the meantime). The creation of these files is implemented in `extract_plot_names.py`, where most of the domain logic, regarding finding and computing lists of all the plots and drivers, is found.

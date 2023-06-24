@@ -745,6 +745,16 @@ app.layout = html.Div([
         target='_blank',
         refresh=True,
         id='plot profile',),
+
+
+        ##############################
+        ####         Timer         ###
+        ##############################
+        dcc.Interval(
+            id='driver json update timer',
+            interval=1 * (6048 * 10**10), # one week in milliseconds
+            n_intervals=0
+        ),
     
     ], style={'padding': 10, 'flex': 1}),
     
@@ -1018,8 +1028,9 @@ def profile_drivers_dropdown_value(select_all, deselect_all, plots, drivers):
     Output("create profile plots dropdown", "options"),
     Input("update dropdowns", "n_clicks"),
     Input("create profile driver dropdown", "value"),
+    Input("driver json update timer", "n_intervals"),
 )
-def profile_drivers_dropdown_value(n_clicks, selected_drivers):
+def profile_drivers_dropdown_value(n_clicks, selected_drivers, n_intervals):
     global home
 
     # Update drivers.json for each day

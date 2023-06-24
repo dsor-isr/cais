@@ -1,5 +1,9 @@
-all.html
+# To avoid cluttering the repository with garbage
 profiles.json
+drivers.json
+
+# Can get quite large, no point uploading them
+*.html
 
 # Only relevant to update the plots in app.py
 plot_names.txt
@@ -13,3 +17,6 @@ __pycache__
 
 # Ignore the .DS_Store files created by Dash
 .DS_Store
+
+# Ignore personal vscode configuration settings
+.vscode

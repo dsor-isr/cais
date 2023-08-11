@@ -22,10 +22,12 @@ For example, a bag recorded on the mvector vehicle, on 20th January 2023, should
 
 ## 3. How to run:
 
-Create a virtual environment, install the requirements and source it:
+Create a virtual environment, source it and install the requirements (you will have to source the virtual environment every time a new terminal is opened):
 
 ```shell
+python -m venv venv/.
 source venv/bin/activate
+pip install -r requirements.txt
 ```
 
 Run the BagAnalysis python script, specifying the path where the trials data is:

@@ -5,6 +5,7 @@ from Bag import Bag
 from Mission import Mission
 from handyTools import *
 from PlotData import PlotData
+from HardcodedPlots import getHardcodedPlotsData
 import plotly.graph_objs as go
 import plotly.offline as py
 from datetime import datetime
@@ -159,6 +160,17 @@ class Plotter(object):
       # ignores yaml files with no info
       pass
 
+  def __makeHarcodedPlots(self, bag, path_to_plots, overall_folder):
+    # get bag filename without ".bag"
+    bag_filename = bag.filename[:bag.filename.rfind('.')]
+
+    # get plot data list
+    plot_data_list = getHardcodedPlotsData(bag)
+
+    # plot data from the list
+    for plot_data, config_type in plot_data_list:
+      self.__makePlotFromPlotData(plot_data, path_to_plots, config_type, bag_filename, overall_folder)
+
   def __makeMissionPlotsFromConfig(self, bag, original_bag_filename, mission_name, config_type, path_to_plots):
     # get bag filename without ".bag"
     bag_filename = original_bag_filename[:original_bag_filename.rfind('.')]
@@ -282,6 +294,9 @@ class Plotter(object):
         # if config file corresponds to plots for Overall folder
         if any(config_folder in config_type for config_folder in overall_configs_list):
           self.__makeOverallPlotsFromConfig(bag, config_type, path_to_plots)
+      
+      # plot hardcoded plots, i.e., plots not defined in the .yaml config files
+      self.__makeHarcodedPlots(bag, path_to_plots, "Overall")
 
     print("\nCreating Mission plots...")
 

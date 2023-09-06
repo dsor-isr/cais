@@ -69,7 +69,7 @@ def main():
 				path_to_bag = os.path.join(root, name)
 				# add new bag to bag list if it is inside ROSData folder
 				if "ROSData/" in path_to_bag:
-				# if "ROSData/" in path_to_bag and "2023-01-20/" in path_to_bag:
+				# if "ROSData/" in path_to_bag and "2023-07-26/" in path_to_bag and "mvector" in path_to_bag:
 					bag_list.append(Bag(path_to_bag))
 					print("\t" + name)
 

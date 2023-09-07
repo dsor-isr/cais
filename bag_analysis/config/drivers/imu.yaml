@@ -121,6 +121,25 @@ plots:
           - "Mz"
     plot_markers:
       - "lines"
+  Mx_vs_My:
+    name: "Magnetometer x vs. Magnetometer y"
+    axes:
+      x:
+        vehicles: # for all vehicles
+        label: "Mx"
+        topics:
+          - "drivers/imu/data"
+        fields:
+          - "Mx"
+      y:
+        vehicles: # for all vehicles
+        label: "My"
+        topics:
+          - "drivers/imu/data"
+        fields:
+          - "My"
+    plot_markers:
+      - "lines"
   pitch:
     name: "Pitch"
     axes:

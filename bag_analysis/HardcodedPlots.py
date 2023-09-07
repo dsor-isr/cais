@@ -7,7 +7,7 @@ from PlotData import PlotData
 import pandas as pd
 
 def tensionPack(bag, tension_pack_nr):
-  plot_data = PlotData(bag, "tension_pack" + tension_pack_nr)
+  plot_data = PlotData(bag, "", "tension_pack" + tension_pack_nr, "", [], to_load = False)
 
   plot_data.title = "Tension per cell in Pack " + tension_pack_nr
   plot_data.axes_labels["x"] = "Time"

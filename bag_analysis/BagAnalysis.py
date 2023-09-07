@@ -57,11 +57,19 @@ def main():
 	# list of bags
 	bag_list = []
 
+	# number of bags per batch
+	batch_size = 5
+	bag_counter = 0
+
   # get path where trials data is
 	path_trials_data = getPathToTrialsData()
 
-	# search across all files in the specified path
-	print("Loading bags...")
+	# load configurations inside config/ folder
+	print("\nLoading configurations...")
+	configs = loadConfigurations()
+
+	# search across all files in the specified path to find bags to load in batches
+	print("\nLoading bags...")
 	for root, dirs, files in os.walk(path_trials_data, topdown=False):
 		for name in files:
 			# check if the file is a .bag file but not a _mission.bag file
@@ -69,17 +77,28 @@ def main():
 				path_to_bag = os.path.join(root, name)
 				# add new bag to bag list if it is inside ROSData folder
 				if "ROSData/" in path_to_bag:
-				# if "ROSData/" in path_to_bag and "2023-07-26/" in path_to_bag and "mvector" in path_to_bag:
+				# if "ROSData/" in path_to_bag and "2023-07-26/" in path_to_bag and "mblack" in path_to_bag:
 					bag_list.append(Bag(path_to_bag))
+					bag_counter += 1
 					print("\t" + name)
+				
+				# check if it has found a new batch of bags
+				if bag_counter == batch_size:
+					print("\nPlotting new batch of bags...")
+					
+					# create plots according to configs using loaded bags in the current batch
+					plt = Plotter(bag_list, configs)
+					plt.createPlots()
 
-	# load configurations inside config/ folder
-	print("\nLoading configurations...")
-	configs = loadConfigurations()
+					# clear bag list and reset bag counter
+					bag_list = []
+					bag_counter = 0
 
-	# create plots according to configs using loaded bags
-	plt = Plotter(bag_list, configs)
-	plt.createPlots()
+	# if some bags are left to plot
+	if len(bag_list) > 0:
+		print("\nPlotting new batch of bags...")
+		plt = Plotter(bag_list, configs)
+		plt.createPlots()
 
 if __name__ == '__main__':
   main()

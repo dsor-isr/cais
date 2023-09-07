@@ -8,7 +8,7 @@ import pandas as pd
 class PlotData(object):
 
   # Constructor for plot data defined by config file
-  def __init__(self, bag, config_type, plot_key, plot_value, topics_read_list):
+  def __init__(self, bag, config_type, plot_key, plot_value, topics_read_list, to_load = True):
     self.id = plot_key
     self.title = None
     self.curves = []
@@ -16,15 +16,9 @@ class PlotData(object):
     self.topics_read_list = topics_read_list
     self.flag_all_topics_read = False
 
-    # get all data into the appropriate structure
-    self.__loadPlotData(bag, config_type, plot_value)
-  
-  # Constructor for hardcoded plot data
-  def __init__(self, bag, plot_key):
-    self.id = plot_key
-    self.title = None
-    self.curves = []
-    self.axes_labels = dict()
+    if to_load:
+      # get all data into the appropriate structure
+      self.__loadPlotData(bag, config_type, plot_value)
 
   # Private Methods
 

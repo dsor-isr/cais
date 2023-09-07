@@ -752,7 +752,7 @@ app.layout = html.Div([
         ##############################
         dcc.Interval(
             id='driver json update timer',
-            interval=1 * (6048 * 10**10), # one week in milliseconds
+            interval=1000 * 60 * 60 * 24, # one week in milliseconds
             n_intervals=0
         ),
     

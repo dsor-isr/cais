@@ -7,7 +7,8 @@ KEYS = ["name", "driverFilters", "plotFilters"]
 VALUES = ["test", ["test"], ["test"]]
 PLOTS = ["gps.html", "speed.html", "Ax.html", "Ay.html", "Az.html", "Gx.html", "Gy.html", 
          "Gz.html", "Mx.html", "My.html", "Mz.html", "temp.html", "pressure.html"]
-PLOT_FILTERS = ["ax", "ay", "az"]
+PLOT_FILTERS = ["ax.html", "ay.html", "az.html"]
+FILTERED_PLOTS = ["ax", "ay", "az"]
 DRIVERS = ["gps", "Altimeter", "THRUSter0", "BATMONIT", "Depthcell", "imu", "insidePressure"]
 DRIVER_FILTERS = ["gps", "altimeter", "thruster0", "batmonit", "insidepressure"]
 
@@ -92,7 +93,7 @@ def test_filter_plots():
     filtered_files = profiles.__filter_plots(PLOTS, PLOT_FILTERS)
     filtered_files = [file.lower().replace(".html", "") for file in filtered_files]
 
-    assert filtered_files == PLOT_FILTERS
+    assert filtered_files == FILTERED_PLOTS
 
 
 def test_filter():
@@ -103,7 +104,7 @@ def test_filter():
     filtered_files = profiles.filter(files, profile, filterPlots=True)
     filtered_files = format_plots(filtered_files)
 
-    assert filtered_files == PLOT_FILTERS
+    assert filtered_files == FILTERED_PLOTS
 
     files = DRIVERS
 

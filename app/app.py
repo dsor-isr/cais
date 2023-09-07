@@ -13,6 +13,7 @@ import re
 import extract_plot_names as epn
 import webbrowser
 import sys
+from os.path import expanduser
 
 
 ##############################
@@ -752,7 +753,7 @@ app.layout = html.Div([
         ##############################
         dcc.Interval(
             id='driver json update timer',
-            interval=1000 * 60 * 60 * 24, # one week in milliseconds
+            interval=1000 * 60 * 60 * 24, # one day in milliseconds
             n_intervals=0
         ),
     
@@ -1131,11 +1132,18 @@ def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
     elif (callback_trigger == "change-dir-close-body-scroll"):
         return False, False, home_dir_options
     elif (callback_trigger == "change-dir-modal-button"):
+        if (directory.startswith("~")):
+            # Replace ~ with home directory
+            directory = directory.replace("~", expanduser("~"), 1)
+        elif (directory.startswith(".")):
+            # Replace . with present working directory
+            directory = directory.replace(".", fn.get_pwd(), 1)
         if (type(directory) != str or fn.is_valid_directory(directory) == False):
             return True, True, home_dir_options
         else:
             global home
             home = directory
+            
             reset_upper_directories(0)
             fn.change_directory(directory)
             home_dir_options = fn.get_directories()

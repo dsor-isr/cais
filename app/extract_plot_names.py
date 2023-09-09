@@ -142,8 +142,6 @@ def build_dictionary(plots):
 def create_drivers_json(path=os.getcwd()):
     if (not os.path.isdir(path)):
         raise ValueError("The path provided is not a directory")
-    if (path.split("/")[-1].lower() != "days"):
-        raise ValueError("The path provided isn't a valid CAIS subdirectory")
     
     days = os.listdir(path)
 

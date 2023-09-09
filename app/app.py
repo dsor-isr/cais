@@ -1014,7 +1014,7 @@ def profile_drivers_dropdown_value(select_all, deselect_all, drivers, selected_d
     [State("create profile plots dropdown", "options"),
      State("create profile driver dropdown", "value"),],
 )
-def profile_drivers_dropdown_value(select_all, deselect_all, plots, drivers):
+def profile_plots_dropdown_value(select_all, deselect_all, plots, drivers):
     callback_trigger = ctx.triggered_id
     if (callback_trigger == "select all plots"):
         return [plot for plot in plots]
@@ -1031,7 +1031,7 @@ def profile_drivers_dropdown_value(select_all, deselect_all, plots, drivers):
     Input("create profile driver dropdown", "value"),
     Input("driver json update timer", "n_intervals"),
 )
-def profile_drivers_dropdown_value(n_clicks, selected_drivers, n_intervals):
+def profile_drivers_dropdown_options(n_clicks, selected_drivers, n_intervals):
     global home
 
     # Update drivers.json for each day
@@ -1055,15 +1055,17 @@ def profile_drivers_dropdown_value(n_clicks, selected_drivers, n_intervals):
                     plots.append(plot)
 
     if (n_clicks == 0 and selected_drivers in (None, [])):
+        # If no drivers were selected, return all drivers, plots
         return drivers, plots
 
-    if (len(dictionaries) > 1 and (selected_drivers != None and len(selected_drivers) > 0)):
+    if (len(dictionaries) >= 1 and (selected_drivers != None and len(selected_drivers) > 0)):
         # Merge all drivers.json into one dictionary
         merged_dict = dictionaries[-1]
         dictionaries.pop()
         for dictionary in dictionaries:
             merged_dict = merge_dictionaries(merged_dict, dictionary)
 
+        # Get plots by drivers
         plots = profiles.getPlotsByDrivers(selected_drivers, merged_dict)
 
     return drivers, plots

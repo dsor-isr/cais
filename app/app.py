@@ -530,7 +530,20 @@ app.layout = html.Div([
         refresh=True,
         id='plot',),
 
-        html.P(id='placeholder') # TODO remove later
+        ##############################
+        ####      Open HTML        ###
+        ####        Button         ###
+        ##############################
+
+        html.Br(),
+        dbc.Button(
+            "Open",
+            id="open plot button",
+            className="ms-auto",
+            n_clicks=0,
+        ),
+
+        html.P(id='placeholder')
 
     ], style={'padding': 10, 'flex': 1}),
 
@@ -1154,6 +1167,19 @@ def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
         return True, False, home_dir_options
         
     return False, False, home_dir_options
+
+
+@app.callback(
+    Output("placeholder", "children"), # Callbacks need an Output
+    Input("open plot button", "n_clicks"),
+    State("plot", "children"),
+)
+def open_plot(n_clicks, plot):
+    if plot != '':
+        protocol = 'file://'
+        webbrowser.open_new_tab(protocol + plot)
+
+    return ''
 
 
 ##############################

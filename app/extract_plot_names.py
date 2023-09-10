@@ -153,6 +153,7 @@ def create_drivers_json(path=os.getcwd()):
             profiles.JSONDump(dictionary, path + "/" + day + "/drivers.json")
 
 
+
 def write_to_file(file_name, output):
     with open(file_name, 'w') as f:
         size = len(output)

@@ -543,7 +543,7 @@ app.layout = html.Div([
             n_clicks=0,
         ),
 
-        html.P(id='placeholder')
+        html.P(id='placeholder1')
 
     ], style={'padding': 10, 'flex': 1}),
 
@@ -759,6 +759,21 @@ app.layout = html.Div([
         target='_blank',
         refresh=True,
         id='plot profile',),
+
+        ##############################
+        ####      Open HTML        ###
+        ####        Button         ###
+        ##############################
+
+        html.Br(),
+        dbc.Button(
+            "Open",
+            id="open profile plot button",
+            className="ms-auto",
+            n_clicks=0,
+        ),
+
+        html.P(id='placeholder2'),
 
 
         ##############################
@@ -1170,7 +1185,7 @@ def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
 
 
 @app.callback(
-    Output("placeholder", "children"), # Callbacks need an Output
+    Output("placeholder1", "children"), # Callbacks need an Output
     Input("open plot button", "n_clicks"),
     State("plot", "children"),
 )
@@ -1181,6 +1196,18 @@ def open_plot(n_clicks, plot):
 
     return ''
 
+
+@app.callback(
+    Output("placeholder2", "children"), # Callbacks need an Output
+    Input("open profile plot button", "n_clicks"),
+    State("plot profile", "children"),
+)
+def open_plot(n_clicks, plot):
+    if plot != '':
+        protocol = 'file://'
+        webbrowser.open_new_tab(protocol + plot)
+
+    return ''
 
 ##############################
 ###      Main Function     ###

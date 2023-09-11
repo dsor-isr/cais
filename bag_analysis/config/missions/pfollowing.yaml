@@ -114,3 +114,83 @@ plots:
     plot_markers:
       - "lines"
       - "lines"
+  control_yaw:
+    name: "Yaw Control and Reference"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Yaw [deg]"
+        topics:
+          - "/ref/yaw"
+          - "/nav/filter/state"
+        fields:
+          - "data"
+          - ["orientation", "z"]
+    plot_markers:
+      - "lines"
+      - "lines"
+  control_depth:
+    name: "Depth Control and Reference"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Depth [m]"
+        topics:
+          - "/ref/depth"
+          - "/nav/filter/state"
+        fields:
+          - "data"
+          - ["position", "depth"]
+    plot_markers:
+      - "lines"
+      - "lines"
+  inertial_current:
+    name: "Inertial Velocity Current"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Velocity [m/s]"
+        topics:
+          - "/nav/filter/currents"
+          - "/nav/filter/currents"
+        fields:
+          - "x_current"
+          - "y_current"
+    plot_markers:
+      - "lines"
+      - "lines"
+  vx_state_VS_vx_DR:
+    name: "Vx in State vs. in DR"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Velocity [m/s]"
+        topics:
+          - "/nav/filter/state"
+          - "/nav/filter/state_dr"
+        fields:
+          - ["body_velocity", "x"]
+          - ["seafloor_velocity", "x"]
+    plot_markers:
+      - "lines"
+      - "lines"
+  vy_state_VS_vy_DR:
+    name: "Vy in State vs. in DR"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Velocity [m/s]"
+        topics:
+          - "/nav/filter/state"
+          - "/nav/filter/state_dr"
+        fields:
+          - ["body_velocity", "y"]
+          - ["seafloor_velocity", "y"]
+    plot_markers:
+      - "lines"
+      - "lines"

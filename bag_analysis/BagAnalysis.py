@@ -57,9 +57,9 @@ def main():
 	# list of bags
 	bag_list = []
 
-	# number of bags per batch
-	batch_size = 5
-	bag_counter = 0
+	# size of bags per batch
+	batch_size = 1*1024*1024*1024 # bytes, 1 GB
+	batch_size_counter = 0
 
   # get path where trials data is
 	path_trials_data = getPathToTrialsData()
@@ -77,14 +77,14 @@ def main():
 				path_to_bag = os.path.join(root, name)
 				# add new bag to bag list if it is inside ROSData folder
 				if "ROSData/" in path_to_bag:
-				# if "ROSData/" in path_to_bag and "2023-07-26/" in path_to_bag and "mvector__2023-07-26-18-13-46" in path_to_bag:
+				# if "ROSData/" in path_to_bag and "test_day/" in path_to_bag:
 					bag_list.append(Bag(path_to_bag))
-					bag_counter += 1
-					print("\t" + name)
+					batch_size_counter += os.path.getsize(path_to_bag)
+					print("\t" + name + " ({:.2f} MB)".format(os.path.getsize(path_to_bag)/1024/1024))
 				
 				# check if it has found a new batch of bags
-				if bag_counter == batch_size:
-					print("\nPlotting new batch of bags...")
+				if batch_size_counter >= batch_size:
+					print("\nPlotting new batch of bags ({:.2f} GB)...".format(batch_size_counter/(1024*1024*1024)))
 					
 					# create plots according to configs using loaded bags in the current batch
 					plt = Plotter(bag_list, configs)
@@ -92,11 +92,11 @@ def main():
 
 					# clear bag list and reset bag counter
 					bag_list = []
-					bag_counter = 0
+					batch_size_counter = 0
 
 	# if some bags are left to plot
 	if len(bag_list) > 0:
-		print("\nPlotting new batch of bags...")
+		print("\nPlotting new batch of bags ({:.2f} GB)...".format(batch_size_counter/(1024*1024*1024)))
 		plt = Plotter(bag_list, configs)
 		plt.createPlots()
 

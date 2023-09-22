@@ -253,25 +253,28 @@ def reset_upper_directories(dropdown_index):
 def treat_fifth_level_dropdown(input_value):
 
     # Roll back to parent directory
-    fn.change_directory(last_directories[4])
+    fn.change_directory(last_directories[5])
 
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories()) or input_value == 'mission specific graphics'):
         # If the path actually changed
-        fn.change_directory(last_directories[4])
+        fn.change_directory(last_directories[5])
         options = []
         if (re.search("mission specific graphics", input_value) == None):
             path = fn.extend_dir(input_value)
             fn.change_directory(str(path))
-            last_directories[5] = path
-            reset_upper_directories(6)
+            last_directories[6] = path
+            reset_upper_directories(7)
 
             options.extend(fn.get_html_files())
         else:
-            reset_upper_directories(5)
+            reset_upper_directories(6)
             options.extend(fn.get_html_files())
 
         
         options = apply_profile_plot_filters(options)
+
+        if isinstance(options, list):
+            options.sort()
 
         return [{'label': i, 'value': i} for i in options], (), ""
     
@@ -293,15 +296,18 @@ def treat_sixth_lvl_dropdown(input_value):
                 # If previously chose missions, instead of overall
                 last_dir_options += USBL_EXTENSIONS
                 last_dir_options.remove("USBL")
-            fn.change_directory(last_directories[5])
+            fn.change_directory(last_directories[6])
             path = fn.extend_dir(input_value)
             options = []
             fn.change_directory(str(path))
             
             options.extend(fn.get_directories())
             options.extend(fn.get_html_files())
+
+            if isinstance(options, list):
+                options.sort()
             
-            last_directories[6] = path
+            last_directories[7] = path
 
             return last_dir_options, [{'label': i, 'value': i} for i in options], ""
         elif (input_value in fn.get_html_files()):
@@ -309,7 +315,10 @@ def treat_sixth_lvl_dropdown(input_value):
                 last_dir_options = fn.get_html_files()
                 last_dir_options = options = apply_profile_plot_filters(last_dir_options)
                 path = fn.extend_dir(str(input_value))
-                reset_upper_directories(6) # TODO maybe este não é preciso ???
+                reset_upper_directories(7) # TODO maybe este não é preciso ???
+
+                if isinstance(last_dir_options, list):
+                    last_dir_options.sort()
 
                 return last_dir_options, path, path_cat(path)
     
@@ -513,7 +522,12 @@ app.layout = html.Div([
         id='Second level dir'),
 
         html.Br(),
-        html.Label('3. Overview'),
+        html.Label('3. Bag'),
+        dcc.Dropdown((),
+        id='Test level dir'),
+
+        html.Br(),
+        html.Label('4. Overview'),
         dcc.Dropdown((),
         id='Third level dir'),
 
@@ -703,20 +717,20 @@ app.layout = html.Div([
         style={'height': '8.5%'}),
 
         html.Br(),
-        html.Label(children='4. ',
+        html.Label(children='5. ',
         id='Fourth level dir label'),
         dcc.Dropdown((),
         id='Fourth level dir'),
 
         html.Br(),
-        html.Label(children='5. ',
+        html.Label(children='6. ',
         id='Fifth level dir label'),
         dcc.Dropdown((),
         id='Fifth level dir',
         ),
 
         html.Br(),
-        html.Label(children='6. Plots',
+        html.Label(children='7. Plots',
         id='Sixth level dir label'),
         dcc.Dropdown((),
         id='Sixth level dir',
@@ -815,6 +829,8 @@ def update_second_level_dir(input_value):
         options.extend(fn.get_directories())
         options.extend(fn.get_html_files())
 
+        if isinstance(options, list):
+            options.sort()
         
         return [{'label': i, 'value': i} for i in options if i not in ('logos')]
     
@@ -822,11 +838,10 @@ def update_second_level_dir(input_value):
 
 
 @app.callback(
-    Output('Third level dir', 'options'),
+    Output('Test level dir', 'options'),
     Input('Second level dir', 'value'),
 )
-def update_third_level_dir(input_value):
-
+def update_test_level_dir(input_value):
     # Roll back to parent directory
     fn.change_directory(last_directories[1])
 
@@ -841,15 +856,44 @@ def update_third_level_dir(input_value):
             # Check if plots subdirectory exists
             path = fn.build_dir(PLOTS, path)
             valid_dir = fn.is_valid_directory(path)
-        if (valid_dir and len(fn.get_directories(True, path)) > 0):
-            # Check if any plots were actually produced
-            path = fn.build_dir(fn.get_directories(True, path)[0], path)
         else:
             return ()
         
         fn.change_directory(str(path))
         last_directories[2] = path
         reset_upper_directories(3)
+
+        options = []
+        options.extend(fn.get_directories())
+        options.extend(fn.get_html_files())
+        
+        # order bags in order to make it easier for the user to search
+        if isinstance(options, list):
+            options.sort()
+
+        return [{'label': i, 'value': i} for i in options]
+    
+    return ()
+
+
+@app.callback(
+    Output('Third level dir', 'options'),
+    Input('Test level dir', 'value'),
+)
+def update_third_level_dir(input_value):
+    # Roll back to parent directory
+    fn.change_directory(last_directories[2])
+
+    if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories())):
+        # If the path actually changed
+        fn.change_directory(last_directories[2])
+
+        # Skip irrelevant directories
+        path = fn.extend_dir(input_value)
+        
+        fn.change_directory(str(path))
+        last_directories[3] = path
+        reset_upper_directories(4)
 
         options = []
         options.extend(fn.get_directories())
@@ -869,29 +913,32 @@ def update_third_level_dir(input_value):
 def update_fourth_level_dir(input_value):
 
     # Roll back to parent directory
-    fn.change_directory(last_directories[2])
+    fn.change_directory(last_directories[3])
 
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories())):
         # If the path actually changed
-        fn.change_directory(last_directories[2])
+        fn.change_directory(last_directories[3])
         path = fn.extend_dir(input_value)
         fn.change_directory(str(path))
-        last_directories[3] = path
-        reset_upper_directories(4)
+        last_directories[4] = path
+        reset_upper_directories(5)
 
         options = []
         options.extend(fn.get_directories())
 
+        if isinstance(options, list):
+            options.sort()
+
         label = ""
         if (input_value.lower() == "overall"):
-            label = "4. Specificity"
+            label = "5. Specificity"
         elif (input_value.lower() == "missions"):
-            label = "4. Missions"
+            label = "5. Missions"
 
 
         return [{'label': i, 'value': i} for i in options], label
     
-    return (), "4. "
+    return (), "5. "
 
 @app.callback(
     Output('Fifth level dir', 'options'),
@@ -901,31 +948,33 @@ def update_fourth_level_dir(input_value):
 def update_fifth_level_dir(input_value):
 
     # Roll back to parent directory
-    fn.change_directory(last_directories[3])
+    fn.change_directory(last_directories[4])
     if (type(input_value) == str) and (not (fn.is_part_of_path(fn.get_pwd(),input_value)) and (input_value in fn.get_directories())):
         # If the path actually changed
         
-        fn.change_directory(last_directories[3])
+        fn.change_directory(last_directories[4])
         path = fn.extend_dir(input_value)
         fn.change_directory(str(path))
-        last_directories[4] = path
-        reset_upper_directories(5)
+        last_directories[5] = path
+        reset_upper_directories(6)
 
         options = []
         options.extend(fn.get_directories())
-        label = "5. "
+        label = "6. "
         if (re.search("mission", input_value) != None):
             options.extend(["mission specific graphics"])
-            label = '5. Mission details'
+            label = '6. Mission details'
         else:
             options.extend(fn.get_html_files()) # TODO - is this extended necessary?
             options = apply_profile_driver_filters(options)
-            label = '5. Drivers'
+            label = '6. Drivers'
 
+        if isinstance(options, list):
+            options.sort()
 
         return [{'label': i, 'value': i} for i in options], label
     
-    return (), '5. '
+    return (), '6. '
 
 
 @app.callback(
@@ -1108,10 +1157,11 @@ def profile_drivers_dropdown_options(n_clicks, selected_drivers, n_intervals):
     [
         State("Home directory", "value"),
         State("Second level dir", "value"),
+        State("Test level dir", "value"),
         State("Third level dir", "value"),
     ]
 )
-def plot_profile(n_clicks, close, home_dir, second_dir, third_dir):
+def plot_profile(n_clicks, close, home_dir, second_dir, test_dir, third_dir):
     callback_trigger = ctx.triggered_id
 
     if (n_clicks == 0 and home_dir == None and second_dir == None 
@@ -1124,13 +1174,16 @@ def plot_profile(n_clicks, close, home_dir, second_dir, third_dir):
             return '', '', True
         else:
             root_dir = home + "/" + home_dir + "/" + "vehicles" + "/" + second_dir + "/" + "plots" + "/"
-            root_dir = root_dir + fn.get_directories(path=root_dir)[0] + "/" + third_dir
+            root_dir = root_dir + test_dir + "/" + third_dir
+            print(root_dir)
             files = epn.get_plot_paths(root_dir)
             files = apply_profile_plot_filters_to_paths(files)
             if (len(files) != 0):
                 # html files found on present working directory
                 path = root_dir + "/" + get_loaded_profile_name() + ".html"
                 merge_html_files(files, path)
+            else:
+                path = ''
 
             return path, path_cat(path), False
     elif (callback_trigger == "plot profile error modal close button"):

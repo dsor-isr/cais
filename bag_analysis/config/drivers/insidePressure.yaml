@@ -10,24 +10,24 @@ plots:
       x: # time
       y:
         vehicles: # for all vehicles
-        label: "Pressure []"
+        label: "Pressure [mbar]"
         topics:
-          - "drivers/inside_pressure_filter/data_dot"
+          - "drivers/inside_pressure/data"
         fields:
-          - "data"
+          - "pressure"
     plot_markers:
       - "lines"
-  # temperature:
-  #   name: "Temperature"
-  #   axes:
-  #     x: # time
-  #     y:
-  #       vehicles: # for all vehicles
-  #       label: "Temperature [ºC]"
-  #       topics:
-  #         - "drivers/inside_pressure_filter/data_dot"
-  #       fields:
-  #         - "temperature"
-  #   plot_markers:
-  #     - "lines"
+  temperature:
+    name: "Temperature"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Temperature [ºC]"
+        topics:
+          - "drivers/inside_pressure/data"
+        fields:
+          - "temperature"
+    plot_markers:
+      - "lines"
     

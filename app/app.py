@@ -429,6 +429,13 @@ app.layout = html.Div([
             ),
 
             dbc.Button(
+                "Update search data", 
+                id="update-search-data", 
+                n_clicks=0,
+                style={'display':'inline'},
+            ),
+
+            dbc.Button(
                 "Help", 
                 id="open-help-body-scroll", 
                 n_clicks=0,
@@ -1216,12 +1223,19 @@ def plot_profile(n_clicks, close, home_dir, second_dir, test_dir, third_dir):
     Input("change-dir-close-body-scroll", "n_clicks"),
     Input("change-dir-modal-button", "n_clicks"),
     Input("change-dir-error-close-body-scroll", "n_clicks"),
+    Input("update-search-data", "n_clicks"),
     State("change directory input", "value"),
     State("Home directory", "options"),
 )
 def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
-                        n_clicks_error, directory, home_dir_options):
+                        n_clicks_error, n_clicks_update, directory, home_dir_options):
     callback_trigger = ctx.triggered_id
+
+    global home
+
+    if (callback_trigger == "update-search-data"):
+        options = sorted([{'label': i, 'value': i} for i in fn.get_directories(path=home) if (i not in {'logos'})], key=lambda d: d['label'], reverse=True)
+        return False, False, options
 
     if (n_clicks_open == 0):
         return False, False, home_dir_options
@@ -1240,7 +1254,7 @@ def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
         if (type(directory) != str or fn.is_valid_directory(directory) == False):
             return True, True, home_dir_options
         else:
-            global home
+            # global home
             home = directory
             
             reset_upper_directories(0)

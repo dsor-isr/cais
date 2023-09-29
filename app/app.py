@@ -14,6 +14,8 @@ import extract_plot_names as epn
 import webbrowser
 import sys
 from os.path import expanduser
+import tkinter
+from tkinter import filedialog as fd
 
 
 ##############################
@@ -456,13 +458,25 @@ app.layout = html.Div([
                 dbc.ModalHeader(dbc.ModalTitle("Change search directory")),
                 dbc.ModalBody([CHANGE_DIR_MESSAGE,
                                html.Br(),
-                               dbc.Input(
-                                    id="change directory input",
-                                    placeholder="Enter directory",
-                                    type="text",
-                                    value="",
-                               ),
-                               ]),
+                               dbc.ModalBody([
+                                    dbc.Input(
+                                            id="change directory input",
+                                            placeholder="Enter directory",
+                                            type="text",
+                                            value="",
+                                            style={'margin-right': 20}
+                                    ),
+                                    dbc.Button(
+                                            "TEST",
+                                            id="change directory input via gui",
+                                            className="ms-auto",
+                                            n_clicks=0,
+                                            style={'margin-left': 20}
+                                    )
+                               ],
+                               style={'display': 'flex'}),
+                              ],
+                              style={'display': 'flex', 'flex-wrap': 'wrap', 'flex-direction': 'column'}),
                 dbc.ModalFooter(
                     dbc.ButtonGroup([
                         dbc.Button(
@@ -1235,6 +1249,29 @@ def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
         return True, False, home_dir_options
         
     return False, False, home_dir_options
+
+@app.callback(
+    Output('change directory input', 'value'),
+    Input('change directory input via gui', 'n_clicks'),
+    # prevent_initial_call=True
+)
+def open_excel_function(open_excel): 
+    # ctx = dash.callback_context
+    trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if trigger == 'change directory input via gui':
+        root = tkinter.Tk()
+        root.withdraw()
+       # root.iconbitmap(default='Extras/transparent.ico')
+        
+        file_dir = '~/'
+        file_directory = tkinter.filedialog.askdirectory(initialdir=file_dir)
+
+        root.destroy()
+    else:
+        file_directory = ''
+    
+    return file_directory
 
 
 @app.callback(

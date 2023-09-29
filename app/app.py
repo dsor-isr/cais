@@ -13,7 +13,7 @@ import re
 import extract_plot_names as epn
 import webbrowser
 import sys
-from os.path import expanduser
+from os.path import expanduser, join
 import tkinter
 from tkinter import filedialog as fd
 
@@ -377,6 +377,8 @@ nav = dbc.Nav(
 load_figure_template('CERULEAN')
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
+app.title = 'CAIS'
+app._favicon = join('logos', 'DSOR_logo_v05a.jpg')
 
 server = app.server
 
@@ -467,7 +469,7 @@ app.layout = html.Div([
                                             style={'margin-right': 20}
                                     ),
                                     dbc.Button(
-                                            "TEST",
+                                            "Search",
                                             id="change directory input via gui",
                                             className="ms-auto",
                                             n_clicks=0,
@@ -527,7 +529,7 @@ app.layout = html.Div([
         
         html.Br(),
         html.Label('1. Day'),
-        dcc.Dropdown([{'label': i, 'value': i} for i in fn.get_directories(path=home) if (i not in {'logos'})],
+        dcc.Dropdown(sorted([{'label': i, 'value': i} for i in fn.get_directories(path=home) if (i not in {'logos'})], key=lambda d: d['label'], reverse=True),
         id='Home directory'),
 
         html.Br(),
@@ -1244,6 +1246,11 @@ def change_directory_modal(n_clicks_open, n_clicks_close, n_clicks_save,
             reset_upper_directories(0)
             fn.change_directory(directory)
             home_dir_options = fn.get_directories()
+
+            if isinstance(home_dir_options, list):
+                home_dir_options.sort()
+                home_dir_options.reverse()
+
             return False, False, home_dir_options
     elif (callback_trigger == "change-dir-error-close-body-scroll"):
         return True, False, home_dir_options
@@ -1325,6 +1332,6 @@ if __name__ == '__main__':
     ####                                                                   ####
     ###########################################################################
 
-    # app.run_server(debug=True, dev_tools_hot_reload=False, host='0.0.0.0')  # TODO set debug to False after app is functional
+    app.run_server(debug=True, dev_tools_hot_reload=False, host='0.0.0.0')  # TODO set debug to False after app is functional
 
-    app.run_server(debug=True, dev_tools_hot_reload=False)  # TODO set debug to False after app is functional
+    # app.run_server(debug=True, dev_tools_hot_reload=False)  # TODO set debug to False after app is functional

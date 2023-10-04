@@ -30,6 +30,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+If you encounter problems amidst installing the requirements (regarding not being able to find suitable versions for some packages such as rosbag), try to source ROS first, since that might be the issue, and try to install the requirements again after that:
+
+```shell
+source /opt/ros/noetic/setup.bash
+pip install -r requirements.txt
+```
+
 Run the BagAnalysis python script, specifying the path where the trials data is:
 
 ```shell

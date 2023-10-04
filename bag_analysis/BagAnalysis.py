@@ -61,6 +61,9 @@ def main():
 	batch_size = 1*1024*1024*1024 # bytes, 1 GB
 	batch_size_counter = 0
 
+	# BANNED BAGS
+	banned_bags = ["testdata.bag", "pose3d.bag"]
+
   # get path where trials data is
 	path_trials_data = getPathToTrialsData()
 
@@ -75,8 +78,8 @@ def main():
 			# check if the file is a .bag file but not a _mission.bag file
 			if name.find('.bag') != -1 and name.find('_mission.bag') == -1:
 				path_to_bag = os.path.join(root, name)
-				# add new bag to bag list if it is inside ROSData folder
-				if "ROSData/" in path_to_bag:
+				# add new bag to bag list if it is inside ROSData folder and is not a banned bag
+				if "ROSData/" in path_to_bag and not any([el in name for el in banned_bags]):
 				# if "ROSData/" in path_to_bag and "test_day/" in path_to_bag:
 					bag_list.append(Bag(path_to_bag))
 					batch_size_counter += os.path.getsize(path_to_bag)

@@ -1,2 +1,1 @@
-# cais
-Cluster of Analysis for Inteligent Systems 
+# CAIS - Cluster of Analysis for Intelligent Systems

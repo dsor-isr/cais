@@ -1,0 +1,13 @@
+scipy
+numpy
+plotly
+rospkg
+gnupg
+pyyaml
+pycryptodomex
+wheel
+pandas
+actionlib==1.13.2
+angles==1.9.13
+bondpy==1.8.6
+rosbag

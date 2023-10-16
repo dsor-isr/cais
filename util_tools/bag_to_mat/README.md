@@ -1,7 +1,8 @@
-## **2. Generation of *.mat* files** ##
-This step provides the ability to generate a *.mat* file for the specified bag, according to the configuration file in "config/topics.yaml", where the topics and their chosen attributes are defined. The config file has a very simple structure, where for each wanted topic, the "topic_name", the wanted attributes and their wanted labels are defined.
+# CAIS - Cluster of Analysis for Intelligent Systems: Transforming .bag to .mat files
 
-### **Example**
+The *bag_to_mat* module of CAIS provides the ability to generate a *.mat* file for the specified bag, according to the configuration file in "config/topics.yaml", where the topics and their chosen attributes are defined. The config file has a very simple structure, where for each wanted topic, the "topic_name", the wanted attributes and their wanted labels are defined.
+
+## **Example**
 To generate a *.mat* file for the bag "/bag_sync/output_bags/mblack_cut.bag", with the attributes "position.east" and "position.north" for the filter/state topic and the "utc_time" attribute for the gps topic, the config file should have the following:
 ```yaml
 mblack_nav_filter_state: # this is just an ID and can be whatever you want

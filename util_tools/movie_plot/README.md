@@ -1,0 +1,3 @@
+# CAIS - Cluster of Analysis for Intelligent Systems: Movie Plot
+
+The *movie_plot* module of CAIS provides ...

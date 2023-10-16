@@ -1,0 +1,42 @@
+[
+    {
+        "altimeter": ["altimeter.html"],
+        "batMonit": ["actual_charge.html", "charging.html", "current.html" , "equalize.html",
+        "max_cell.html", "max_temp.html", "min_cell.html", "min_temp.html", "number_of_packs.html"
+        ],
+        "depthCell": ["pressure.html", "temperature.html"],
+        "gps": ["altitude.html", "course.html", "latitude.html", "longitude.html",
+         "mode.html", "satellites.html", "speed_over_ground.html", "utc_time.html"
+        ],
+        "imu": ["Ax.html", "Ay.html", "Az.html", "Gx.html", "Gy.html",
+        "Gz.html", "mag_abs.html", "mag_x.html", "mag_y.html", "mag_z.html", "Mx.html", 
+        "My.html", "Mz.html", "pitch.html", "roll.html", "yaw.html"
+        ],
+        "insidePressure": ["pressure.html"],
+        "thruster0": ["Current.html", "Errors.html", "Speed.html", "Temperature.html"],
+        "thruster1": ["Current.html", "Errors.html", "Speed.html", "Temperature.html"],
+        "thruster2": ["Current.html", "Errors.html", "Speed.html", "Temperature.html"],
+        "thruster3": ["Current.html", "Errors.html", "Speed.html", "Temperature.html"],
+        "thruster4": ["Current.html", "Errors.html", "Speed.html", "Temperature.html"],
+        "thruster5": ["Current.html", "Errors.html", "Speed.html", "Temperature.html"],
+        "usbl": ["measurement_usbl_fix_bearing_raw.html", "measurement_usbl_fix_bearing.html",
+        "measurement_usbl_fix_elevation_raw.html", "measurement_usbl_fix_elevation.html",
+        "measurement_usbl_fix_range.html",
+        "measurement_usbl_fix_sound_speed.html", 
+        "measurement_usbl_fix_source_id.html", 
+        "measurement_usbl_fix_type_id.html", 
+        "recv_bitrate.html", "recv_destination_address.html", 
+        "recv_duration.html", "recv_integrity.html", "recv_msg_id.html", 
+        "recv_propagation_time.html", "recv_relative_velocity.html", "recv_rssi.html", 
+        "recv_source_address.html", "recv_type_id.html", "send_bitrate.html", "send_destination_address.html", 
+        "send_duration.html", "send_integrity.html", "send_msg_id.html", "send_propagation_time.html", 
+        "send_relative_velocity.html", "send_rssi.html", "send_source_address.html", "send_type_id.html", 
+        "sensors_usbl_fix_bearing_vs_bearing_raw.html", "sensors_usbl_fix_elevation_vs_elevation_raw.html", 
+        "sensors_usbl_fix_range_vs_bearing_vs_elevation.html", "sensors_usbl_fix_range.html", 
+        "sensors_usbl_fix_source_id.html"
+        ],
+        "mission specific": ["control_surge.html", "overview_filter_dr_usbl.html",
+        "filter_vs_virtual_target.html", "overview_pf.html", "crossTrackAlongTrack.html"
+        ]
+    }
+]

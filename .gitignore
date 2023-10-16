@@ -1,3 +1,23 @@
+# To avoid cluttering the repository with garbage
+profiles.json
+drivers.json
+
+# Can get quite large, no point uploading them
+*.html
+
+# Only relevant to update the plots in app.py
+plot_names.txt
+
+# Irrelevant python data
+__pycache__
+.pytest_cache
+
+# The ROS bags are too big to be uploaded to GitHub
+*.bag
+
+# Ignore the .DS_Store files created by Dash
+.DS_Store
+
 *.pyc
 *.pyo
 *venv/

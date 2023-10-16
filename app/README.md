@@ -1,4 +1,4 @@
-# CAIS web application
+# CAIS - Cluster of Analysis for Intelligent Systems: Web Application
 
 The Cluster of Analysis for Intelligent Systems (CAIS) web application is built using [Dash](https://plotly.com/dash/), a famework designed to build applications in Python.
 

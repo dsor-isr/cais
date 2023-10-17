@@ -91,7 +91,7 @@ class Plotter(object):
 
   def __makePlotFromPlotData(self, plot_data, path_to_plots, config_type, bag_filename, overall_folder):
     # check if there are any curves to plot
-    if plot_data.curves is None:
+    if plot_data.curves is None or len(plot_data.curves) == 0:
       return
 
     # create figure data

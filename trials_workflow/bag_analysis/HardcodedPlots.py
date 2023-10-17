@@ -56,8 +56,15 @@ def getHardcodedPlotsData(bag):
   plot_data_list = list()
 
   # add here the new hardocoded plots
-  plot_data_list.append(tensionPack(bag, "1"))
-  plot_data_list.append(tensionPack(bag, "2"))
+  try:
+    plot_data_list.append(tensionPack(bag, "1"))
+  except:
+    print("[FAILED] Hardcoded Plots (tension pack 1) : " + bag.filename)
+
+  try:
+    plot_data_list.append(tensionPack(bag, "2"))
+  except:
+    print("[FAILED] Hardcoded Plots (tension pack 2) : " + bag.filename)
 
   # return the list
   return plot_data_list

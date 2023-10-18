@@ -8,11 +8,11 @@ In "/bag_sync", there are three different folders:
   - "/output_bags": where the cut bags are stored after the code is ran
 
 ## **Example**
-Given the *reference bag* "/bag_sync/reference_bag/mvector.bag" and the *input bags* "/bag_sync/input_bags/mblack.bag" and "/bag_sync/input_bags/mred.bag", then the command to be ran would simply be:
+Given the *reference bag* "/inter_bag_sync/reference_bag/mvector.bag" and the *input bags* "/inter_bag_sync/input_bags/mblack.bag" and "/inter_bag_sync/input_bags/mred.bag", then the command to be ran would simply be:
 
 ```shell
-cd bag_sync
+cd inter_bag_sync
 python sync_bags.py reference_bag/mvector.bag
 ```
 
-The output result would be the cut bags in "/bag_sync/output_bags/", "mblack_cut.bag" and "mred_cut.bag".
+The output result would be the cut bags in "/inter_bag_sync/output_bags/", "mblack_cut.bag" and "mred_cut.bag".

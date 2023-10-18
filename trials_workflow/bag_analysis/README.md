@@ -2,9 +2,11 @@
 
 ## 1. Introduction
 
-The Bag Analysis module of CAIS provides the ability to process bags, creating a series of plots making use of the bags' topics. It also divides each bag into mission bags (if missions were performed during the bag recording), which are also processed in the same way as their "parent" bags.
+The *bag_analysis* module of CAIS provides the ability to process bags, creating a series of plots making use of the bags' topics. It also divides each bag into mission bags (if missions were performed during the bag recording), which are also processed in the same way as their "parent" bags.
 
 This is an extensible tool, i.e., any new plots can be easily added to the configuration files in the config/ folder. More information on how to configure new plots is explained below.
+
+**[ IMPORTANT ] This module is the THIRD AND LAST part of the TRIALS WORKFLOW and should be ran in order to produce all the plots for the collected data. After finished, all the data can be accessed via https://trials.dsor.isr.tecnico.ulisboa.pt/ or https://cais.dsor.isr.tecnico.ulisboa.pt/ .**
 
 ## 2. Trials Data Files Format
 
@@ -40,7 +42,9 @@ pip install -r requirements.txt
 Run the BagAnalysis python script, specifying the path where the trials data is:
 
 ```shell
-python BagAnalysis.py ~/trials_raw/ #the trials data is inside the folder trials_raw, in the root folder
+python BagAnalysis.py ~/trials_raw/ #the trials data is inside the folder trials_raw, in the root folder, locally
+# or
+python BagAnalysis.py ~/../../developers/trials_ROSData/2023-09-13_SLAP/ # running in the servers, specifying a certain water trials day
 ```
 
 ## 4. Plot Configuration:

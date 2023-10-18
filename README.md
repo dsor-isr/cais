@@ -6,8 +6,8 @@ Here follows how this repository is organised and what it contains:
 
 ## 1. [app](app/README.md)
 ## 2. trials_workflow
-- collector
-- reindexer
+- [collector](trials_workflow/collector/README.md)
+- [reindexer](trials_workflow/reindex/README.md)
 - [bag_analysis](trials_workflow/bag_analysis/README.md)
 ## 3. util_tools
 - [bag_to_mat](util_tools/bag_to_mat/README.md)

@@ -12,7 +12,7 @@ plots:
         vehicles: # for all vehicles
         label: "Current [A]"
         topics:
-          - "drivers/Thruster"
+          - "thrusters/stbd/mStatus"
         fields:
           - "Current"
     plot_markers:
@@ -25,7 +25,7 @@ plots:
         vehicles: # for all vehicles
         label: ""
         topics:
-          - "drivers/Thruster"
+          - "thrusters/stbd/mStatus"
         fields:
           - "Errors"
     plot_markers:
@@ -36,9 +36,9 @@ plots:
       x: # time
       y:
         vehicles: # for all vehicles
-        label: "Speed [RPM %]"
+        label: "Speed [RPM]"
         topics:
-          - "drivers/Thruster"
+          - "thrusters/stbd/mStatus"
         fields:
           - "Speed"
     plot_markers:
@@ -51,7 +51,7 @@ plots:
         vehicles: # for all vehicles
         label: "Temperature [ºC]"
         topics:
-          - "drivers/Thruster"
+          - "thrusters/stbd/mStatus"
         fields:
           - "Temperature"
     plot_markers:

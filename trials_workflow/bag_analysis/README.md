@@ -6,7 +6,7 @@ The *bag_analysis* module of CAIS provides the ability to process bags, creating
 
 This is an extensible tool, i.e., any new plots can be easily added to the configuration files in the config/ folder. More information on how to configure new plots is explained below.
 
-**[ IMPORTANT ] This module is the THIRD AND LAST part of the TRIALS WORKFLOW and should be ran in order to produce all the plots for the collected data. After finished, all the data can be accessed via https://trials.dsor.isr.tecnico.ulisboa.pt/ or https://cais.dsor.isr.tecnico.ulisboa.pt/ .**
+**[ IMPORTANT ] This module is the THIRD AND LAST part of the TRIALS WORKFLOW and should be run in order to produce all the plots for the collected data. After finished, all the data can be accessed via https://trials.dsor.isr.tecnico.ulisboa.pt/ or https://cais.dsor.isr.tecnico.ulisboa.pt/ .**
 
 ## 2. Trials Data Files Format
 

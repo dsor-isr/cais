@@ -34,15 +34,16 @@ except:
 count = 0 # Initialize # of users
 known_hosts = ["mvector", "mred", "mblack", "myellow", "delfim", "glider"]
 try:
+    users = args.user
     for v in vehicles:
-        if v in known_hosts:
+        if v not in known_hosts:
             count = count + 1
-            print("\nWARNING: Found IP address instead of host name. Folder will be named after IP\n")
-            users = args.user
-            print(users)
+            if "." in v:
+                print("\nWARNING: Probably found IP address instead of host name. Folder will be named after: " + str(v) + "\n")
+            
     # Check if # of users is valid given # of unknown hosts
     if count != len(users):
-        print("# of users does not match # of unknown hosts found (known_hosts = [mvector, mred, mblack, myellow, delfim, glider]). Exiting...")
+        print("# of users does not match # of unknown hosts found (known_hosts = " + str(known_hosts) + "). Exiting...")
         exit()
 except:
     print("Found IP addresses with no users associated. Exiting...")

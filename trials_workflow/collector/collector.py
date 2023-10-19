@@ -31,12 +31,19 @@ except:
     dates.append(today[2] + today[1] + today[0])
     print("Using current date: " + str(dates))
 
+count = 0 # Initialize # of users
+known_hosts = ["mvector", "mred", "mblack", "myellow", "delfim", "glider"]
 try:
     for v in vehicles:
-        if "." in v:
+        if v in known_hosts:
+            count = count + 1
             print("\nWARNING: Found IP address instead of host name. Folder will be named after IP\n")
             users = args.user
             print(users)
+    # Check if # of users is valid given # of unknown hosts
+    if count != len(users):
+        print("# of users does not match # of unknown hosts found (known_hosts = [mvector, mred, mblack, myellow, delfim, glider]). Exiting...")
+        exit()
 except:
     print("Found IP addresses with no users associated. Exiting...")
     exit()
@@ -105,11 +112,11 @@ for n in name:
 
 # Extract data
 for v in vehicles:
-    if v[0] == "m":
+    if v == "mvector" or v == "mred" or v == "mblack" or v == "myellow":
         user = "medusa"
-    elif v[0] == "d":
+    elif v == "delfim":
         user = "delfim"
-    elif v[0] == "g":
+    elif v == "glider":
         user = "ubuntu"
     else:
         user = users.pop(0)

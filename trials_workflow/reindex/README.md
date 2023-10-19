@@ -8,4 +8,16 @@ The *reindex* module of CAIS provides the ability to fix .bag files' indexation,
 
 ## 2. How to run:
 
-WIP
+In order to know which arguments the script accepts, just run:
+
+```shell
+python reindex.py -h
+```
+
+Basically, it just accepts the path to the folder in which the bags to be reindexed are. Simply run:
+
+```shell
+python reindex.py /path/to/folder/
+```
+
+This way, `*.active` bags will be renamed, all bags will be reindexed and the original `*.orig.bag` will be erased.

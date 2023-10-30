@@ -42,7 +42,11 @@ try:
                 print("\nWARNING: Probably found IP address instead of host name. Folder will be named after: " + str(v) + "\n")
             
     # Check if # of users is valid given # of unknown hosts
-    if count != len(users):
+    if users == None:
+        users_size = 0
+    else:
+        users_size = len(users)
+    if count != users_size:
         print("# of users does not match # of unknown hosts found (known_hosts = " + str(known_hosts) + "). Exiting...")
         exit()
 except:

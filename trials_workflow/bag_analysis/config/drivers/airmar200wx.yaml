@@ -23,7 +23,7 @@ plots:
       x: # time
       y:
         vehicles: # for all vehicles
-        label: "Wind Speed (Sensor Frame) [kt]"
+        label: "Wind Speed (Sensor Frame) [kt/s]"
         topics:
           - "drivers/airmar_200wx/wind_speed"
         fields:

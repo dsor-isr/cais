@@ -265,7 +265,7 @@ class Plotter(object):
     # go through the Flag data and find missions
     for i in range(length - 1):
       # if a starting sequence of flags is found
-      if (Flag["data"][i] in start_flags) and (Flag["data"][i+1] in mission_flags):
+      if ((Flag["data"][i] in start_flags) and (Flag["data"][i+1] in mission_flags) or ((i == 0) and (Flag["data"][i] in mission_flags))):
         # from index i+1 forward, try to find the end of the mission
         for j in range(i+1, length - 1):
           # if an ending sequence of flags is found

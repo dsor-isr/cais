@@ -68,6 +68,36 @@ plots:
       - "lines"
       - "lines"
       - "lines+markers"
+  filter_vs_measurement_position:
+    name: "Filter vs. Position Measurement"
+    axes:
+      x:
+        vehicles: # for all vehicles
+        label: "Easting [m]"
+        topics:
+          - "/nav/filter/state"
+          - "/measurement/position"
+        fields:
+          - ["position", "east"]
+          - "value"
+        indexes:
+          - 
+          - 1
+      y:
+        vehicles: # for all vehicles
+        label: "Northing [m]"
+        topics:
+          - "/nav/filter/state"
+          - "/measurement/position"
+        fields:
+          - ["position", "north"]
+          - "value"
+        indexes:
+          - 
+          - 0
+    plot_markers:
+      - "lines+markers"
+      - "lines+markers"
   filter_vs_virtual_target:
     name: "Filter vs. Virtual Target"
     axes:

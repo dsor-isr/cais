@@ -1,0 +1,86 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+plots:
+  control_surge:
+    name: "Surge Control and Reference"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Surge speed [m/s]"
+        topics:
+          - "/ref/surge"
+          - "/nav/filter/state"
+        fields:
+          - "data"
+          - ["body_velocity", "x"]
+    plot_markers:
+      - "lines"
+      - "lines"
+  control_yaw:
+    name: "Yaw Control and Reference"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Yaw [deg]"
+        topics:
+          - "/ref/yaw"
+          - "/nav/filter/state"
+        fields:
+          - "data"
+          - ["orientation", "z"]
+    plot_markers:
+      - "lines"
+      - "lines"
+  control_depth:
+    name: "Depth Control and Reference"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Depth [m]"
+        topics:
+          - "/ref/depth"
+          - "/nav/filter/state"
+        fields:
+          - "data"
+          - ["position", "depth"]
+    plot_markers:
+      - "lines"
+      - "lines"
+  glider_control_yaw:
+    name: "Glider Yaw Control and Reference"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Yaw [rad]"
+        topics:
+          - "extctl/sensors/m_heading"
+          - "extctl/sensors/c_heading"
+        fields:
+          - "data"
+          - "data"
+    plot_markers:
+      - "lines"
+      - "lines"
+  glider_control_fin:
+    name: "Glider Fin Control and Reference"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Fin Angle [rad]"
+        topics:
+          - "extctl/sensors/m_fin"
+          - "extctl/sensors/c_heading"
+        fields:
+          - "data"
+          - "data"
+    plot_markers:
+      - "lines"
+      - "lines"

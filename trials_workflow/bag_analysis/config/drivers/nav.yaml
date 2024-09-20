@@ -1,0 +1,120 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+plots:
+  overview_pf:
+    name: "Vehicle Navigation"
+    axes:
+      x:
+        vehicles: # for all vehicles
+        label: "Easting [m]"
+        topics:
+          - "/nav/filter/state"
+        fields:
+          - ["position", "east"]
+      y:
+        vehicles: # for all vehicles
+        label: "Northing [m]"
+        topics:
+          - "/nav/filter/state"
+        fields:
+          - ["position", "north"]
+    plot_markers:
+      - "lines"
+  filter_vs_measurement_position:
+    name: "Filter vs. Position Measurement"
+    axes:
+      x:
+        vehicles: # for all vehicles
+        label: "Easting [m]"
+        topics:
+          - "/nav/filter/state"
+          - "/measurement/position"
+        fields:
+          - ["position", "east"]
+          - "value"
+        indexes:
+          - 
+          - 1
+      y:
+        vehicles: # for all vehicles
+        label: "Northing [m]"
+        topics:
+          - "/nav/filter/state"
+          - "/measurement/position"
+        fields:
+          - ["position", "north"]
+          - "value"
+        indexes:
+          - 
+          - 0
+    plot_markers:
+      - "lines+markers"
+      - "markers"
+  overview_depth:
+    name: "Depth Overview"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Depth [m]"
+        topics:
+          - "extctl/sensors/m_depth"
+        fields:
+          - "data"
+    plot_markers:
+      - "lines"
+  overview_pitch:
+    name: "Pitch Overview"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Pitch [rad]"
+        topics:
+          - "extctl/sensors/m_pitch"
+        fields:
+          - "data"
+    plot_markers:
+      - "lines"
+  overview_roll:
+    name: "Roll Overview"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Roll [rad]"
+        topics:
+          - "extctl/sensors/m_roll"
+        fields:
+          - "data"
+    plot_markers:
+      - "lines"
+  overview_pitch_battery:
+    name: "Pitch Battery Overview"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Pitch Battery Position [in]"
+        topics:
+          - "extctl/sensors/m_battpos"
+        fields:
+          - "data"
+    plot_markers:
+      - "lines"
+  avg_speed_thruster:
+    name: "Average Horizontal Speed due to Thruster"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Speed [m/s]"
+        topics:
+          - "extctl/sensors/m_avg_thruster_speed"
+        fields:
+          - "data"
+    plot_markers:
+      - "lines"

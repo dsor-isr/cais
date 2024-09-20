@@ -77,7 +77,7 @@ plots:
         label: "Fin Angle [rad]"
         topics:
           - "extctl/sensors/m_fin"
-          - "extctl/sensors/c_heading"
+          - "extctl/sensors/c_fin"
         fields:
           - "data"
           - "data"

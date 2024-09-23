@@ -121,3 +121,19 @@ plots:
           - "number_of_packs"
     plot_markers:
       - "lines"
+  glider_batteries:
+    name: "Glider Main vs. Emergency Battery Voltage"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Voltage [V]"
+        topics:
+          - "extctl/sensors/m_bms_main_battery_voltage"
+          - "extctl/sensors/m_bms_emergency_battery_voltage"
+        fields:
+          - "data"
+          - "data"
+    plot_markers:
+      - "lines"
+      - "lines"

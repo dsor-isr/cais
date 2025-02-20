@@ -230,6 +230,9 @@ class Plotter(object):
 
     # index of first mission
     mission_idx = 0
+
+    # number of closed bags
+    closed_bags = 0
     
     # go through the bag and record the mission_bags
     for topic, msg, t in bag.bag.read_messages():
@@ -243,12 +246,20 @@ class Plotter(object):
         new_bag_list[mission_idx].close()
         print("Created " + missions[mission_idx].mission_name + ".bag")
         
+        # increment number of closed bags
+        closed_bags += 1
+
         # update index to next mission
         mission_idx += 1
         
         # if already saved bags for all missions, we can skip the rest of the bag
         if mission_idx == len(missions):
           break
+    
+    # if it reached the end of the bag without closing all the mission bags
+    if (closed_bags != len(missions)):
+      new_bag_list[mission_idx].close()
+      print("Created " + missions[mission_idx].mission_name + ".bag")
 
     return
 
@@ -265,14 +276,19 @@ class Plotter(object):
     # go through the Flag data and find missions
     for i in range(length - 1):
       # if a starting sequence of flags is found
-      if ((Flag["data"][i] in start_flags) and (Flag["data"][i+1] in mission_flags) or ((i == 0) and (Flag["data"][i] in mission_flags))):
-        # from index i+1 forward, try to find the end of the mission
-        for j in range(i+1, length - 1):
+      if ((Flag["data"][i] in start_flags and Flag["data"][i+1] in mission_flags) or 
+          ((i == 0) and (Flag["data"][i] in mission_flags))):
+        # from index i forward, try to find the end of the mission
+        for j in range(i, length - 1):
           # if an ending sequence of flags is found
           if (Flag["data"][j] in mission_flags) and (Flag["data"][j+1] in end_flags):
             # after having the start (i) and end (j+1) indexes
             missions.append(Mission(bag, Flag["time"][i], Flag["time"][j+1]))
             break
+    
+    # only one flag during the whole bag and it is a mission flag
+    if (length == 1 and Flag["data"][0] in mission_flags):
+      missions.append(Mission(bag, Flag["time"][0], rospy.Time(2147483647)))
     
     return missions
           
@@ -283,20 +299,20 @@ class Plotter(object):
     # overall_configs_list = ["drivers", "missions"]
     mission_configs_list = ["missions"]
 
-    print("\nCreating Overall plots...")
-    # create plots for each bag
-    for bag in self.bag_list:
-      # get path to plots folder
-      path_to_plots = self.__getPathToPlotsFolder(bag.bag_path)
+    # print("\nCreating Overall plots...")
+    # # create plots for each bag
+    # for bag in self.bag_list:
+    #   # get path to plots folder
+    #   path_to_plots = self.__getPathToPlotsFolder(bag.bag_path)
 
-      # for each config file
-      for config_type in self.configs.keys():
-        # if config file corresponds to plots for Overall folder
-        if any(config_folder in config_type for config_folder in overall_configs_list):
-          self.__makeOverallPlotsFromConfig(bag, config_type, path_to_plots)
+    #   # for each config file
+    #   for config_type in self.configs.keys():
+    #     # if config file corresponds to plots for Overall folder
+    #     if any(config_folder in config_type for config_folder in overall_configs_list):
+    #       self.__makeOverallPlotsFromConfig(bag, config_type, path_to_plots)
       
-      # plot hardcoded plots, i.e., plots not defined in the .yaml config files
-      self.__makeHarcodedPlots(bag, path_to_plots, "Overall")
+    #   # plot hardcoded plots, i.e., plots not defined in the .yaml config files
+    #   self.__makeHarcodedPlots(bag, path_to_plots, "Overall")
 
     print("\nCreating Mission plots...")
 

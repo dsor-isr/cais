@@ -1,0 +1,86 @@
+# The yaml filename defines the folder where all plots will be saved.
+# In x axis: if vehicles are not specified, this plot will be done
+# for all vehicles independently.
+# In x axis: if topics are not specified, default x axis value will
+# be Time
+plots:
+  Motor_RPM:
+    name: "Motor RPM"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Speed [RPM]"
+        topics:
+          - "can_thrusters/port/motor_controller_status"
+          - "can_thrusters/stbd/motor_controller_status"
+        fields:
+          - "motor_rpm"
+          - "motor_rpm"
+    plot_markers:
+      - "lines"
+      - "lines"
+  Battery_Current:
+    name: "Battery Current"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Current [A]"
+        topics:
+          - "can_thrusters/port/motor_controller_status"
+          - "can_thrusters/stbd/motor_controller_status"
+        fields:
+          - "battery_current"
+          - "battery_current"
+    plot_markers:
+      - "lines"
+      - "lines"
+  KSI_Voltage:
+    name: "KSI Voltage"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Voltage [V]"
+        topics:
+          - "can_thrusters/port/motor_controller_status"
+          - "can_thrusters/stbd/motor_controller_status"
+        fields:
+          - "ksi_voltage"
+          - "ksi_voltage"
+    plot_markers:
+      - "lines"
+      - "lines"
+  Controller_Temperature:
+    name: "Controller Temperature"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Temperature [ºC x10]"
+        topics:
+          - "can_thrusters/port/motor_controller_status"
+          - "can_thrusters/stbd/motor_controller_status"
+        fields:
+          - "controller_temperature"
+          - "controller_temperature"
+    plot_markers:
+      - "lines"
+      - "lines"
+  Motor_Temperature:
+    name: "Motor Temperature"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Temperature [ºC x10]"
+        topics:
+          - "can_thrusters/port/motor_controller_status"
+          - "can_thrusters/stbd/motor_controller_status"
+        fields:
+          - "motor_temperature"
+          - "motor_temperature"
+    plot_markers:
+      - "lines"
+      - "lines"

@@ -84,3 +84,19 @@ plots:
     plot_markers:
       - "lines"
       - "lines"
+  rudder_control:
+    name: "Rudder Control"
+    axes:
+      x: # time
+      y:
+        vehicles: # for all vehicles
+        label: "Angle [deg]"
+        topics:
+          - "ref/rudder_angle"
+          - "can_instrumentation/rudder_angle"
+        fields:
+          - "data"
+          - "data"
+    plot_markers:
+      - "lines"
+      - "lines"

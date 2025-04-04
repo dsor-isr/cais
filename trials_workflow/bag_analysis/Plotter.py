@@ -299,20 +299,20 @@ class Plotter(object):
     # overall_configs_list = ["drivers", "missions"]
     mission_configs_list = ["missions"]
 
-    # print("\nCreating Overall plots...")
-    # # create plots for each bag
-    # for bag in self.bag_list:
-    #   # get path to plots folder
-    #   path_to_plots = self.__getPathToPlotsFolder(bag.bag_path)
+    print("\nCreating Overall plots...")
+    # create plots for each bag
+    for bag in self.bag_list:
+      # get path to plots folder
+      path_to_plots = self.__getPathToPlotsFolder(bag.bag_path)
 
-    #   # for each config file
-    #   for config_type in self.configs.keys():
-    #     # if config file corresponds to plots for Overall folder
-    #     if any(config_folder in config_type for config_folder in overall_configs_list):
-    #       self.__makeOverallPlotsFromConfig(bag, config_type, path_to_plots)
+      # for each config file
+      for config_type in self.configs.keys():
+        # if config file corresponds to plots for Overall folder
+        if any(config_folder in config_type for config_folder in overall_configs_list):
+          self.__makeOverallPlotsFromConfig(bag, config_type, path_to_plots)
       
-    #   # plot hardcoded plots, i.e., plots not defined in the .yaml config files
-    #   self.__makeHarcodedPlots(bag, path_to_plots, "Overall")
+      # plot hardcoded plots, i.e., plots not defined in the .yaml config files
+      self.__makeHarcodedPlots(bag, path_to_plots, "Overall")
 
     print("\nCreating Mission plots...")
 

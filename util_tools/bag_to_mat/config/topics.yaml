@@ -53,6 +53,18 @@ topics:
     topic_name: "/mvector0/PathData"
     fields: [["pd"]]
     var_name: ["pd"]
+  mvector0_gamma:
+    topic_name: "/mvector0/Gamma"
+    fields: [["data"]]
+    var_name: ["data"]
+  mvector0_acomms_modem_recv:
+    topic_name: "/mvector0/acomms/modem/recv"
+    fields: [["destination_address"], ["source_address"]]
+    var_name: ["destination_address", "source_address"]
+  mvector0_acomms_modem_send:
+    topic_name: "/mvector0/acomms/modem/send"
+    fields: [["destination_address"], ["source_address"]]
+    var_name: ["destination_address", "source_address"]
   
   ########
   # MRED #
@@ -125,6 +137,22 @@ topics:
     topic_name: "/mred0/slap/st_curve"
     fields: [["path_pos"], ["path_vel_gamma"], ["traj_pos"], ["traj_vel"], ["vd_bar"]]
     var_name: ["path_pos", "path_vel_gamma", "traj_pos", "traj_vel", "vd_bar"]
+  mred0_pathdata:
+    topic_name: "/mred0/PathData"
+    fields: [["pd"]]
+    var_name: ["pd"]
+  mred0_gamma:
+    topic_name: "/mred0/Gamma"
+    fields: [["data"]]
+    var_name: ["data"]
+  mred0_acomms_modem_recv:
+    topic_name: "/mred0/acomms/modem/recv"
+    fields: [["destination_address"], ["source_address"]]
+    var_name: ["destination_address", "source_address"]
+  mred0_acomms_modem_send:
+    topic_name: "/mred0/acomms/modem/send"
+    fields: [["destination_address"], ["source_address"]]
+    var_name: ["destination_address", "source_address"]
   
   ##########
   # MBLACK #
@@ -205,3 +233,125 @@ topics:
     topic_name: "/mblack0/ref/yaw_rate"
     fields: [["data"]]
     var_name: ["ref_yaw_rate"]
+  mblack0_pathdata:
+    topic_name: "/mblack0/PathData"
+    fields: [["pd"]]
+    var_name: ["pd"]
+  mblack0_gamma:
+    topic_name: "/mblack0/Gamma"
+    fields: [["data"]]
+    var_name: ["data"]
+  mblack0_acomms_modem_recv:
+    topic_name: "/mblack0/acomms/modem/recv"
+    fields: [["destination_address"], ["source_address"]]
+    var_name: ["destination_address", "source_address"]
+  mblack0_acomms_modem_send:
+    topic_name: "/mblack0/acomms/modem/send"
+    fields: [["destination_address"], ["source_address"]]
+    var_name: ["destination_address", "source_address"]
+  ##########
+  # GLIDER #
+  ##########
+  glider0_nav_filter_state:
+    topic_name: "/glider0/nav/filter/state"
+    fields: [["position", "east"], ["position", "north"], ["position", "depth"], ["orientation", "z"], ["body_velocity", "x"], ["body_velocity", "y"], ["body_velocity", "z"]]
+    var_name: ["easting", "northing", "depth", "yaw", "surge", "sway", "heave"]
+  glider0_ref_yaw:
+    topic_name: "/glider0/ref/yaw"
+    fields: [["data"]]
+    var_name: ["ref_yaw"]
+  glider0_pathdata:
+    topic_name: "/glider0/PathData"
+    fields: [["pd"]]
+    var_name: ["pd"]
+  glider0_pfollowing_debug:
+    topic_name: "/glider0/pfollowing/debug"
+    fields: [["cross_track_error"], ["along_track_error"]]
+    var_name: ["cross_track", "along_track"]
+  glider0_gamma:
+    topic_name: "/glider0/Gamma"
+    fields: [["data"]]
+    var_name: ["data"]
+  # glider0_measurement_position:
+  #   topic_name: "/glider0/measurement/position"
+  #   fields: [["value"]]
+  #   var_name: ["value"]
+  glider0_extctl_sensors_m_avg_thruster_speed:
+    topic_name: "/glider0/extctl/sensors/m_avg_thruster_speed"
+    fields: [["data"]]
+    var_name: ["data"]
+  glider0_acomms_modem_recv:
+    topic_name: "/glider0/acomms/modem/recv"
+    fields: [["destination_address"], ["source_address"]]
+    var_name: ["destination_address", "source_address"]
+  glider0_acomms_modem_send:
+    topic_name: "/glider0/acomms/modem/send"
+    fields: [["destination_address"], ["source_address"]]
+    var_name: ["destination_address", "source_address"]
+  glider0_gsnifferdata:
+    topic_name: "/glider0/gsniffer_data"
+    fields: [["integral"], ["measurement_timestamp"]]
+    var_name: ["integral", "measurement_timestamp"]
+  ###########
+  #  VN310  #
+  ###########
+  glider0_drivers_vn310_raw_sentence:
+    topic_name: "/glider0/drivers/vn310/raw"
+    fields: [["sentence"]]
+    var_name: ["vn310_raw_sentence"]
+
+
+
+  # mblack0_addons_full_mission:
+  #   topic_name: "/mblack0/addons/full_mission"
+  #   fields: [["RefPoint"], ["type"], ["StartPoint"], ["CenterPoint"], ["EndPoint"], ["adirection"]]
+  #   var_name: ["ref_point", "type", "start_point", "center_point", "end_point", "adirection"]
+  # mvector0_addons_full_mission:
+  #   topic_name: "/mvector0/addons/full_mission"
+  #   fields: [["RefPoint"], ["type"], ["StartPoint"], ["CenterPoint"], ["EndPoint"], ["adirection"]]
+  #   var_name: ["ref_point", "type", "start_point", "center_point", "end_point", "adirection"]
+  # mred0_addons_full_mission:
+  #   topic_name: "/mred0/addons/full_mission"
+  #   fields: [["RefPoint"], ["type"], ["StartPoint"], ["CenterPoint"], ["EndPoint"], ["adirection"]]
+  #   var_name: ["ref_point", "type", "start_point", "center_point", "end_point", "adirection"]
+
+
+  ####################
+  #  Magic Electric  #
+  ####################
+  magicelectric0_port:
+    topic_name: "/magicelectric0/can_thrusters/port/motor_controller_status0"
+    fields: [["motor_rpm"]]
+    var_name: ["motor_rpm"]
+  magicelectric0_stbd:
+    topic_name: "/magicelectric0/can_thrusters/stbd/motor_controller_status0"
+    fields: [["motor_rpm"]]
+    var_name: ["motor_rpm"]
+  magicelectric0_nav_filter_state:
+    topic_name: "/magicelectric0/nav/filter/state"
+    fields: [["position", "east"], ["position", "north"], ["position", "depth"], ["orientation", "z"], ["body_velocity", "x"], ["body_velocity", "y"], ["body_velocity", "z"], ["orientation_rate", "z"]]
+    var_name: ["easting", "northing", "depth", "yaw", "surge", "sway", "heave", "yawrate"]
+  magicelectric0_throttle_command:
+    topic_name: "/magicelectric0/throttle_command"
+    fields: [["value"]]
+    var_name: ["value"]
+  magicelectric0_rudder_angle:
+    topic_name: "/magicelectric0/can_instrumentation/rudder_angle"
+    fields: [["data"]]
+    var_name: ["value"]
+  magicelectric0_measurement_position:
+    topic_name: "/magicelectric0/measurement/position"
+    fields: [["value"]]
+    var_name: ["value"]
+  magicelectric0_measurement_orientation:
+    topic_name: "/magicelectric0/measurement/orientation"
+    fields: [["value"]]
+    var_name: ["value"]
+  magicelectric0_drivers_airmar_200wx_wind_angle:
+    topic_name: "/magicelectric0/drivers/airmar_200wx/wind_angle"
+    fields: [["data"]]
+    var_name: ["data"]
+  magicelectric0_drivers_airmar_200wx_wind_speed:
+    topic_name: "/magicelectric0/drivers/airmar_200wx/wind_speed"
+    fields: [["data"]]
+    var_name: ["data"]

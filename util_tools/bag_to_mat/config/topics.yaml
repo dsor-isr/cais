@@ -347,11 +347,15 @@ topics:
     topic_name: "/magicelectric0/measurement/orientation"
     fields: [["value"]]
     var_name: ["value"]
-  magicelectric0_drivers_airmar_200wx_wind_angle:
-    topic_name: "/magicelectric0/drivers/airmar_200wx/wind_angle"
-    fields: [["data"]]
-    var_name: ["data"]
-  magicelectric0_drivers_airmar_200wx_wind_speed:
-    topic_name: "/magicelectric0/drivers/airmar_200wx/wind_speed"
-    fields: [["data"]]
-    var_name: ["data"]
+  magicelectric0_drivers_airmar_200wx_wind_apparent:
+    topic_name: "/magicelectric0/drivers/airmar_200wx/wind_apparent"
+    fields: [["wind_direction"], ["wind_speed"], ["wind_speed_units"]]
+    var_name: ["angle", "speed", "speed_units"]
+  magicelectric0_drivers_airmar_dx900_water_speed:
+    topic_name: "/magicelectric0/drivers/airmar_dx900/ground_water_speed"
+    fields: [["water_speed_longitudinal_kn"], ["water_speed_transverse_kn"]]
+    var_name: ["longitudinal_kn", "transverse_kn"]
+  magicelectric0_drivers_vn310_GPGGA:
+    topic_name: "/magicelectric0/drivers/vn310/GPGGA/data"
+    fields: [["gps_qual"]]
+    var_name: ["gps_qual"]
